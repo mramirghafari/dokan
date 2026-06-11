@@ -1,0 +1,42 @@
+[27-Dec-2025 14:45:19 Asia/Tehran] PHP Parse error:  Unclosed '{' on line 143 in /home/darami/public_html/newdokan/ocr_ai.php on line 231
+[27-Dec-2025 14:48:24 Asia/Tehran] PHP Fatal error:  Uncaught Exception: API Error (404): Requested resource mistral-small-latest does not exist. for more information check https://ava.al/limits . Please contact support at support@avalai.ir and include the request ID 019b5f84-4398-7eb1-8c4f-5392ba2da870 in your email if you believe this is an error. in /home/darami/public_html/newdokan/ocr_ai.php:42
+Stack trace:
+#0 /home/darami/public_html/newdokan/ocr_ai.php(111): curl_json()
+#1 {main}
+  thrown in /home/darami/public_html/newdokan/ocr_ai.php on line 42
+[27-Dec-2025 14:51:16 Asia/Tehran] PHP Fatal error:  Uncaught Exception: API Error (400): Invalid model: mistral-ocr-2505 Please contact support at support@avalai.ir and include the request ID 019b5f86-1d3f-7550-82aa-329868182cef in your email if you believe this is an error. in /home/darami/public_html/newdokan/ocr_ai.php:42
+Stack trace:
+#0 /home/darami/public_html/newdokan/ocr_ai.php(111): curl_json()
+#1 {main}
+  thrown in /home/darami/public_html/newdokan/ocr_ai.php on line 42
+[27-Dec-2025 15:01:42 Asia/Tehran] PHP Fatal error:  Uncaught Exception: API Error (400): Invalid model: mistral-ocr-2505 Please contact support at support@avalai.ir and include the request ID 019b5f8f-aae6-7b42-9c34-8a587332550a in your email if you believe this is an error. in /home/darami/public_html/newdokan/ocr_ai.php:42
+Stack trace:
+#0 /home/darami/public_html/newdokan/ocr_ai.php(111): curl_json()
+#1 {main}
+  thrown in /home/darami/public_html/newdokan/ocr_ai.php on line 42
+[28-Dec-2025 12:31:31 Asia/Tehran] PHP Fatal error:  Cannot use YooKassa\Model\Receipt\Receipt as Receipt because the name is already in use in /home/darami/dokan-source/app/Http/Controllers/ReceiptController.php on line 14
+[04-Mar-2026 16:45:01 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:45:31 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:45:32 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:45:39 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:45:50 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:45:51 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:45:51 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:45:54 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:45:54 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:45:54 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:45:55 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:46:10 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:46:13 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:46:14 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:46:36 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:47:01 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:47:04 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:47:04 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:47:05 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:47:05 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:47:06 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:47:06 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:47:09 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[04-Mar-2026 16:47:25 Asia/Tehran] PHP Fatal error:  Carbon\CarbonImmutable cannot use Carbon\Carbon - it is not a trait in /home/darami/dokan-source/vendor/nesbot/carbon/src/Carbon/CarbonImmutable.php on line 836
+[18-Apr-2026 12:26:35 Asia/Tehran] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.28. in /home/darami/dokan-source/vendor/composer/platform_check.php on line 24

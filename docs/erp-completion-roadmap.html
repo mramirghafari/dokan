@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>رودمپ تکمیل ERP — مقیاس، Multi-Tenant، CRM و BI</title>
+    <style>
+        :root {
+            --paper: #fbfaf6;
+            --ink: #1e2930;
+            --muted: #66747d;
+            --line: #d9dfdc;
+            --p0: #b42318;
+            --p1: #b86b00;
+            --p2: #2563a8;
+            --p3: #14865f;
+            --done: #14865f;
+            --partial: #b86b00;
+            --next: #2563a8;
+            --todo: #6b7280;
+            --risk: #b42318;
+            --soft-p0: #fff0ee;
+            --soft-p1: #fff0d8;
+            --soft-p2: #e5f0fb;
+            --soft-p3: #e4f5ee;
+            --shadow: 0 16px 38px rgba(30, 41, 48, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background:
+                linear-gradient(135deg, rgba(180, 35, 24, 0.06), transparent 28%),
+                linear-gradient(315deg, rgba(20, 134, 95, 0.08), transparent 30%),
+                var(--paper);
+            font-family: "Vazirmatn", "Segoe UI", Tahoma, sans-serif;
+            line-height: 1.85;
+        }
+
+        .page {
+            width: min(1180px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 28px 0 56px;
+        }
+
+        header {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .hero, .status-board, .section, .note {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow);
+        }
+
+        .hero { padding: 28px; border-radius: 8px; }
+        h1 { margin: 0 0 12px; font-size: clamp(26px, 4vw, 40px); line-height: 1.3; }
+        h2 { margin-top: 0; }
+        h3 { margin-top: 0; font-size: 17px; }
+        .lead { color: var(--muted); font-size: 16px; max-width: 820px; }
+
+        .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 32px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #f3f5f4;
+            border: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .status-board {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 18px;
+            border-radius: 8px;
+        }
+
+        .metric {
+            min-height: 96px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .metric strong { display: block; font-size: 26px; line-height: 1.2; }
+        .metric span { color: var(--muted); font-size: 13px; }
+        .metric small { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+
+        .legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .tag.p0 { color: var(--p0); background: var(--soft-p0); border-color: rgba(180, 35, 24, 0.25); }
+        .tag.p1 { color: var(--p1); background: var(--soft-p1); border-color: rgba(184, 107, 0, 0.25); }
+        .tag.p2 { color: var(--p2); background: var(--soft-p2); border-color: rgba(37, 99, 168, 0.25); }
+        .tag.p3 { color: var(--p3); background: var(--soft-p3); border-color: rgba(20, 134, 95, 0.25); }
+        .tag.todo { color: var(--todo); background: #eef0f2; }
+        .tag.partial { color: var(--partial); background: #fff7e8; }
+        .tag.done { color: var(--done); background: #e8f6f1; }
+
+        .section { margin-top: 16px; padding: 22px; border-radius: 8px; }
+        .section-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 14px; }
+        .section-desc { color: var(--muted); font-size: 15px; margin: 0; }
+
+        .phase-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        .phase-card {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 16px;
+            background: #fff;
+        }
+
+        .phase-card h3 { margin-bottom: 8px; }
+        .phase-card ul { margin: 8px 0 0; padding-right: 18px; color: var(--muted); font-size: 14px; }
+        .phase-card li + li { margin-top: 4px; }
+
+        .phase-card.p0 { border-right: 4px solid var(--p0); }
+        .phase-card.p1 { border-right: 4px solid var(--p1); }
+        .phase-card.p2 { border-right: 4px solid var(--p2); }
+        .phase-card.p3 { border-right: 4px solid var(--p3); }
+
+        .roadmap-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 14px;
+        }
+
+        .roadmap-table th,
+        .roadmap-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--line);
+            text-align: right;
+            vertical-align: top;
+        }
+
+        .roadmap-table th { background: #eef3f1; color: #34434a; }
+        .roadmap-table tr:last-child td { border-bottom: none; }
+
+        code {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 5px;
+            background: #f1f4f3;
+            color: #26343b;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.92em;
+        }
+
+        .note { margin-top: 16px; padding: 18px 22px; border-radius: 8px; }
+        .note strong { color: var(--risk); }
+
+        .timeline {
+            display: grid;
+            gap: 12px;
+        }
+
+        .week {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 14px 16px;
+            background: #fff;
+        }
+
+        .week-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .week-head strong { font-size: 15px; }
+        .week p { margin: 0; color: var(--muted); font-size: 14px; }
+
+        @media (max-width: 820px) {
+            header, .status-board, .phase-grid { grid-template-columns: 1fr; }
+            .page { width: min(100% - 20px, 1180px); padding-top: 12px; }
+            .section-head { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <header>
+            <section class="hero">
+                <div class="meta">
+                    <span class="pill">تاریخ تهیه: 10 Jun 2026</span>
+                    <span class="pill">افق: ۹۰ روز (۳ فاز + سخت‌سازی)</span>
+                    <span class="pill">مرجع وضعیت: erp-roadmap-checklist.html</span>
+                    <span class="pill">هدف نمره: ۷۲ → ۸۸+</span>
+                </div>
+                <h1>رودمپ تکمیل ERP دکان</h1>
+                <p class="lead">
+                    این سند جدا از چک‌لیست اصلی است و فقط روی شکاف‌های شناسایی‌شده در بازبینی ۱۰ ژوئن ۲۰۲۶ تمرکز دارد:
+                    مقیاس‌پذیری per-tenant، یکپارچگی multi-tenant، CRM حرفه‌ای و BI enterprise.
+                    ترتیب اجرا بر اساس <strong>ریسک production</strong> و <strong>وابستگی فنی</strong> است، نه صرفاً جذابیت feature.
+                </p>
+            </section>
+
+            <aside class="status-board" aria-label="اهداف کمی">
+                <div class="metric"><strong>✓ P0</strong><span>هفته ۱–۲</span><small>تکمیل — Ajax لیست‌ها، summary، remote lookup</small></div>
+                <div class="metric"><strong>P1</strong><span>هفته ۳–۵</span><small>tenant scope یکپارچه، archive job، load test</small></div>
+                <div class="metric"><strong>P2</strong><span>هفته ۶–۹</span><small>CRM 360، forecast، اتوماسیون، کمپین live</small></div>
+                <div class="metric"><strong>P3</strong><span>هفته ۱۰–۱۲</span><small>BI executive، chart/pivot، reconciliation</small></div>
+            </aside>
+        </header>
+
+        <div class="legend">
+            <span class="tag p0">P0 بحرانی — بدون این scale نمی‌خورد</span>
+            <span class="tag p1">P1 بالا — امنیت tenant و پایداری</span>
+            <span class="tag p2">P2 مهم — CRM حرفه‌ای</span>
+            <span class="tag p3">P3 تکمیل — BI enterprise</span>
+            <span class="tag todo">□ شروع نشده</span>
+            <span class="tag done">✓ انجام شد</span>
+        </div>
+
+        <section class="note">
+            <h2>اصول اجرایی (قبل از شروع هر فاز)</h2>
+            <ul>
+                <li><strong>بدون تخریب داده:</strong> همه migrationها غیرمخرب؛ rollback plan برای index و scope.</li>
+                <li><strong>یک آیتم = یک PR:</strong> هر کار قابل review، smoke و بروزرسانی چک‌لیست اصلی.</li>
+                <li><strong>تعریف done:</strong> کد + UI + migration (در صورت نیاز) + smoke + یک پاراگراف در <code>erp-user-guide.html</code>.</li>
+                <li><strong>عدم ادعای ۱۰۰٪:</strong> تا load test و tenant audit پاس نشود، در چک‌لیست «آماده production scale» ننویسیم.</li>
+                <li><strong>Feature flag:</strong> قابلیت‌های CRM/BI جدید per-tenant روشن شوند.</li>
+            </ul>
+        </section>
+
+        <section class="section" id="priority-matrix">
+            <div class="section-head">
+                <div>
+                    <h2>۱. ماتریس اولویت‌بندی</h2>
+                    <p class="section-desc">اولویت = اثر بر production × احتمال شکست در scale. P0 و P1 قبل از feature جدید CRM/BI.</p>
+                </div>
+            </div>
+            <table class="roadmap-table">
+                <thead>
+                    <tr>
+                        <th>اولویت</th>
+                        <th>حوزه</th>
+                        <th>مشکل فعلی</th>
+                        <th>خروجی مورد انتظار</th>
+                        <th>معیار قبولی</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tag p0">P0</span></td>
+                        <td>لیست مشتریان</td>
+                        <td><code>CustomersController@index</code> با <code>->get()</code> و <code>withCount/withSum</code></td>
+                        <td>DataTable/Ajax server-side + endpoint جستجو</td>
+                        <td><span class="tag done">انجام شد</span> — <code>customers/datatable</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p0">P0</span></td>
+                        <td>لیست فاکتور/پیش‌فاکتور</td>
+                        <td><code>InvoiceController</code> بارگذاری یکجا</td>
+                        <td>paginate + فیلتر سمت سرور</td>
+                        <td><span class="tag done">انجام شد</span> — <code>PishFactorListService</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p0">P0</span></td>
+                        <td>لیست کالا</td>
+                        <td><code>ProductController</code> با <code>->get()</code></td>
+                        <td>paginate + جستجوی remote</td>
+                        <td><span class="tag done">انجام شد</span> — <code>products/datatable</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p0">P0</span></td>
+                        <td>خلاصه لیست‌ها</td>
+                        <td>aggregate سنگین روی هر request</td>
+                        <td>ستون‌های summary یا cache کوتاه‌مدت per tenant</td>
+                        <td><span class="tag done">انجام شد</span> — <code>CustomerListSummaryService</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p0">P0</span></td>
+                        <td>Remote lookup فرم‌ها</td>
+                        <td>dropdown مشتری/کالا با <code>->get()</code></td>
+                        <td><code>/erp/scale-hardening/lookup</code> + Select2 Ajax</td>
+                        <td><span class="tag done">انجام شد</span> — کامپوننت <code>x-erp-remote-select</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p1">P1</span></td>
+                        <td>Tenant isolation</td>
+                        <td>scope دستی؛ دو ستون <code>tenant_id</code> / <code>tenants_id</code></td>
+                        <td>Trait <code>BelongsToTenant</code> + audit خودکار</td>
+                        <td><span class="tag done">انجام شد</span> — <code>erp:backfill-tenant</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p1">P1</span></td>
+                        <td>Archive</td>
+                        <td>policy در config بدون job</td>
+                        <td><code>erp:archive-cold-data</code> زمان‌بندی‌شده</td>
+                        <td><span class="tag done">انجام شد</span> — scheduler ۰۵:۰۰</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p1">P1</span></td>
+                        <td>Load test</td>
+                        <td>بدون تست بار واقعی</td>
+                        <td>سناریوی ۱ پنل × ۱۰k مشتری × ۵۰k فاکتور</td>
+                        <td><span class="tag done">انجام شد</span> — <code>erp:load-test</code>, <code>erp:phase-gate</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p2">P2</span></td>
+                        <td>پرونده ۳۶۰ مشتری</td>
+                        <td>timeline ناقص</td>
+                        <td>تب واحد: مالی، فروش، CRM، تماس، تیکت، پیوست</td>
+                        <td><span class="tag done">انجام شد</span> — <code>/customers/{id}/360</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p2">P2</span></td>
+                        <td>Forecast CRM</td>
+                        <td>داشبورد پایه</td>
+                        <td>pipeline وزنی ماهانه، aging، drill-down</td>
+                        <td><span class="tag done">انجام شد</span> — reconcile + drill-down</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p2">P2</span></td>
+                        <td>کمپین live</td>
+                        <td>ساختار DB بدون ارسال واقعی</td>
+                        <td>اتصال SMS (کاوه‌نگار) + queue ارسال</td>
+                        <td><span class="tag done">انجام شد</span> — dispatch queue + dry-run</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p3">P3</span></td>
+                        <td>داشبورد Executive</td>
+                        <td>گزارش مدیریتی پراکنده</td>
+                        <td><code>/bi/executive</code> با drill-down</td>
+                        <td>KPI از summary نه query زنده روی اسناد</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p3">P3</span></td>
+                        <td>Report builder</td>
+                        <td>بدون chart/pivot پیشرفته</td>
+                        <td>chart، pivot، export Excel/PDF queued</td>
+                        <td>گزارش ۵۰k ردیف از job نه sync</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p3">P3</span></td>
+                        <td>Reconciliation BI</td>
+                        <td>سلامت mart ناقص</td>
+                        <td>مقایسه dashboard vs ledger/موجودی</td>
+                        <td>هشدار اختلاف &gt; آستانه configurable</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="section" id="phases-overview">
+            <div class="section-head">
+                <div>
+                    <h2>۲. نمای کلی فازها</h2>
+                    <p class="section-desc">هر فاز باید قبل از شروع فاز بعد «gate review» داشته باشد. P0 و P1 موازی با توسعه feature جدید ممنوع است.</p>
+                </div>
+            </div>
+            <div class="phase-grid">
+                <article class="phase-card p0">
+                    <h3>فاز ۰ — سخت‌سازی مقیاس (هفته ۱–۲)</h3>
+                    <p class="section-desc">بدون این فاز، افزودن CRM/BI فقط مشکل را پنهان می‌کند.</p>
+                    <ul>
+                        <li>Server-side pagination مشتری، فاکتور، کالا</li>
+                        <li>گسترش <code>/erp/scale-hardening/lookup</code> به همه فرم‌ها</li>
+                        <li>حذف <code>withCount/withSum</code> از لیست‌های بزرگ</li>
+                        <li>Smoke scale روی seed ۱۰k+</li>
+                    </ul>
+                </article>
+                <article class="phase-card p1">
+                    <h3>فاز ۱ — Multi-tenant و پایداری (هفته ۳–۵)</h3>
+                    <ul>
+                        <li>Trait سراسری tenant + تست isolation</li>
+                        <li>یکسان‌سازی تدریجی <code>tenants_id</code></li>
+                        <li>Job آرشیو داده سرد</li>
+                        <li>Queue برای export/import سنگین</li>
+                        <li>Load test + گزارش bottleneck</li>
+                    </ul>
+                </article>
+                <article class="phase-card p2">
+                    <h3>فاز ۲ — CRM حرفه‌ای (هفته ۶–۹)</h3>
+                    <ul>
+                        <li>پرونده ۳۶۰ کامل مشتری</li>
+                        <li>Forecast و drill-down داشبورد CRM</li>
+                        <li>اتوماسیون فاز ۲ (بعد از فاکتور، دلیل باخت)</li>
+                        <li>کمپین SMS + attribution واقعی</li>
+                        <li>تبدیل کارت کاریز → پیش‌فاکتور</li>
+                        <li>Import lead اکسل</li>
+                    </ul>
+                </article>
+                <article class="phase-card p3">
+                    <h3>فاز ۳ — BI enterprise (هفته ۱۰–۱۲)</h3>
+                    <ul>
+                        <li>داشبورد مدیرعامل و CFO</li>
+                        <li>Chart/pivot/export در report builder</li>
+                        <li>Backfill تاریخی data mart</li>
+                        <li>Reconciliation مالی/انبار</li>
+                        <li>Cohort/retention رفتاری دقیق‌تر</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="weekly-plan">
+            <div class="section-head">
+                <div>
+                    <h2>۳. برنامه هفتگی ۱۲ هفته</h2>
+                    <p class="section-desc">وضعیت هر هفته در انتهای هفته در این فایل و <code>erp-roadmap-checklist.html</code> ثبت شود.</p>
+                </div>
+            </div>
+            <div class="timeline">
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۱ — مشتریان و lookup</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        <code>CustomersController@index</code> → endpoint Ajax با paginate، sort، فیلتر منطقه/وضعیت/جستجو.
+                        جایگزینی dropdown مشتری در فرم‌های پرتکرار با remote lookup.
+                        فایل‌ها: <code>CustomersController</code>، <code>resources/views/customers/index.blade.php</code>، route جدید <code>customers.datatable</code>.
+                    </p>
+                </div>
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۲ — فاکتور، کالا، smoke scale</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        paginate برای لیست‌های اصلی <code>InvoiceController</code> و <code>ProductController</code>.
+                        Seeder تست <code>ScaleTestSeeder</code> (۱۰k مشتری، ۵k کالا، ۵۰k فاکتور — یک tenant).
+                        اجرای <code>ErpScaleHardeningService</code> و ثبت score قبل/بعد.
+                    </p>
+                </div>
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۳ — BelongsToTenant و audit</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        ایجاد <code>app/Traits/BelongsToTenant.php</code> و <code>app/Scopes/TenantScope.php</code>.
+                        اعمال روی مدل‌های CRM/BI جدید؛ سپس customers، pishfactors، products.
+                        گسترش <code>CrmHealthAuditService</code> برای جداول هسته ERP.
+                    </p>
+                </div>
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۴ — Archive + Queue سنگین</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        Command <code>erp:archive-cold-data</code> طبق <code>config/erp_scale.php</code>.
+                        Jobهای <code>ExportReportJob</code>، <code>ImportCustomersJob</code> برای عملیات انبوه.
+                        Scheduler روزانه ۰۵:۰۰ برای archive.
+                    </p>
+                </div>
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۵ — Load test و gate فاز ۰/۱</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        تست بار: لیست مشتری صفحه ۱/۵۰، جستجو، داشبورد BI refresh.
+                        سند gate: scale score ≥ 85، ۰ critical در tenant audit، slow-query.log بدون spike &gt; 2s روی queryهای لیست.
+                        <strong>اگر gate رد شد، فاز ۲ شروع نشود.</strong>
+                    </p>
+                </div>
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۶ — پرونده ۳۶۰ مشتری</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        صفحه <code>/customers/{id}/360</code> با timeline تجمیعی از فاکتور، پیگیری، فرصت، تماس، تیکت، پرداخت، پیامک.
+                        Quick actions: تماس، task، تیکت، پیش‌فاکتور.
+                        سرویس <code>CustomerTimelineService</code>.
+                    </p>
+                </div>
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۷ — داشبورد CRM و forecast</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        گسترش <code>CrmDashboardService</code>: forecast ماهانه، aging مرحله، lead source، LTV ساده.
+                        Drill-down از کارت KPI به لیست فیلترشده opportunity/followup.
+                    </p>
+                </div>
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۸ — اتوماسیون CRM فاز ۲</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        Rule بعد از فاکتور، اجبار دلیل باخت، escalation تاخیر به سرپرست.
+                        تبدیل کارت برنده کاریز → پیش‌فاکتور با trace.
+                    </p>
+                </div>
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۹ — کمپین (پیام ثابت) و import lead</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        <code>fixedMessageFor()</code> و فعال‌سازی مخاطب بدون SMS (<code>sms_enabled=false</code>).
+                        Import اکسل lead با dedupe.
+                        gate فاز ۲: پرونده ۳۶۰ + forecast + یک کمپین ثبت‌شده.
+                    </p>
+                </div>
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۱۰ — داشبورد Executive/CFO</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        ✅ <code>BiExecutiveDashboardService</code> — مسیرهای <code>/bi/executive</code> و <code>/bi/cfo</code> فقط از <code>bi_daily_summaries</code>.
+                        کارت KPI، روند ۱۴ روزه، توزیع دامنه، مقایسه دوره قبل و بودجه Targets.
+                    </p>
+                </div>
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۱۱ — Report builder پیشرفته</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        ✅ نمودار bar/line (ApexCharts)، pivot سطر×ستون، export CSV/Excel/PDF از queue با دانلود.
+                        اشتراک قالب: private / organization / tenant / role.
+                    </p>
+                </div>
+                <div class="week">
+                    <div class="week-head">
+                        <strong>هفته ۱۲ — Reconciliation و backfill</strong>
+                        <span class="tag done">انجام شد</span>
+                    </div>
+                    <p>
+                        ✅ <code>/bi/reconciliation</code> — مغایرت فروش/مالی/انبار/CRM با منبع عملیاتی، امتیاز سلامت، backfill صف‌شده.
+                        <code>bi:backfill-data-mart --months=12</code> و gate فاز ۳: <code>erp:phase-gate --phase=3</code>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="technical-backlog">
+            <div class="section-head">
+                <div>
+                    <h2>۴. بک‌لاگ فنی تفصیلی</h2>
+                    <p class="section-desc">هر ردیف = یک issue/PR مستقل. ترتیب ستون اولویت همان ترتیب اجراست.</p>
+                </div>
+            </div>
+            <table class="roadmap-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>کار</th>
+                        <th>اولویت</th>
+                        <th>فایل‌های کلیدی</th>
+                        <th>وضعیت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>Ajax server-side لیست مشتریان</td><td><span class="tag p0">P0</span></td><td><code>CustomersController</code>, views/customers</td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>2</td><td>paginate لیست فاکتور/پیش‌فاکتور</td><td><span class="tag p0">P0</span></td><td><code>InvoiceController</code>, <code>PishFactorListService</code>, views/invoices/PishFactors</td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>3</td><td>paginate لیست کالا</td><td><span class="tag p0">P0</span></td><td><code>ProductController</code>, <code>ProductListService</code>, views/products</td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>4</td><td>Summary/cache برای aggregate لیست مشتری</td><td><span class="tag p0">P0</span></td><td><code>CustomerListSummaryService</code>, migration <code>customer_list_scope_summaries</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>5</td><td>Remote lookup در همه فرم‌های سنگین</td><td><span class="tag p0">P0</span></td><td><code>ErpScaleHardeningService</code>, <code>x-erp-remote-select</code>, فرم‌های ERP/CRM/انبار</td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>6</td><td><code>BelongsToTenant</code> + global scope</td><td><span class="tag p1">P1</span></td><td><code>app/Traits/BelongsToTenant.php</code>, <code>app/Scopes/TenantScope.php</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>7</td><td>تست Feature tenant isolation</td><td><span class="tag p1">P1</span></td><td><code>tests/Feature/TenantIsolationTest.php</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>8</td><td>Command آرشیو داده سرد</td><td><span class="tag p1">P1</span></td><td><code>ErpColdDataArchiveService</code>, <code>erp:archive-cold-data</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>9</td><td>Queue export/import سنگین</td><td><span class="tag p1">P1</span></td><td><code>ExportReportJob</code>, <code>ImportCustomersJob</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>10</td><td>ScaleTestSeeder + load test script</td><td><span class="tag p1">P1</span></td><td><code>ScaleTestSeedService</code>, <code>erp:seed-scale-test</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>11</td><td>صفحه پرونده ۳۶۰ مشتری</td><td><span class="tag p2">P2</span></td><td><code>CustomerTimelineService</code>, <code>customers.360</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>12</td><td>Forecast و drill-down CRM dashboard</td><td><span class="tag p2">P2</span></td><td><code>CrmDashboardService</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>13</td><td>اتوماسیون CRM فاز ۲</td><td><span class="tag p2">P2</span></td><td><code>CrmAdvancedAutomationService</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>14</td><td>کمپین با پیام ثابت (بدون SMS)</td><td><span class="tag p2">P2</span></td><td><code>CrmCampaignService::fixedMessageFor</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>15</td><td>Import lead اکسل</td><td><span class="tag p2">P2</span></td><td><code>CrmLeadController</code>, <code>DataExchangeService</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>16</td><td>داشبورد Executive/CFO</td><td><span class="tag p3">P3</span></td><td><code>BiExecutiveDashboardService</code>, <code>/bi/executive</code>, <code>/bi/cfo</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>17</td><td>Chart/pivot/export report builder</td><td><span class="tag p3">P3</span></td><td><code>BiSelfServiceReportService</code>, <code>ExportReportJob</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>18</td><td>BI reconciliation</td><td><span class="tag p3">P3</span></td><td><code>BiReconciliationService</code>, <code>/bi/reconciliation</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>19</td><td>Backfill data mart تاریخی</td><td><span class="tag p3">P3</span></td><td><code>bi:backfill-data-mart</code>, <code>BackfillBiDataMartJob</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                    <tr><td>20</td><td>Sync چک‌لیست اصلی با واقعیت کد</td><td><span class="tag p1">P1</span></td><td><code>erp-roadmap-checklist.html</code></td><td><span class="tag done">انجام شد</span></td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="section" id="gates">
+            <div class="section-head">
+                <div>
+                    <h2>۵. Gate Review — شرط عبور به فاز بعد</h2>
+                </div>
+            </div>
+            <table class="roadmap-table">
+                <thead>
+                    <tr>
+                        <th>Gate</th>
+                        <th>زمان</th>
+                        <th>شرط عبور</th>
+                        <th>در صورت رد</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Gate A — Scale</td>
+                        <td>پایان هفته ۲</td>
+                        <td>لیست مشتری/فاکتور/کالا paginate یا Ajax؛ slow-query لیست &lt; 1s با seed 10k</td>
+                        <td>توقف feature؛ ادامه فقط P0</td>
+                    </tr>
+                    <tr>
+                        <td>Gate B — Tenant</td>
+                        <td>پایان هفته ۵</td>
+                        <td>۰ unscoped critical؛ load test گزارش شده؛ archive job اجرا شده</td>
+                        <td><span class="tag done">ابزار gate</span> — <code>erp:phase-gate</code></td>
+                    </tr>
+                    <tr>
+                        <td>Gate C — CRM</td>
+                        <td>پایان هفته ۹</td>
+                        <td>۳۶۰ + forecast + یک کمپین ثبت‌شده + import lead</td>
+                        <td>فاز BI با summary ناقص ممنوع</td>
+                    </tr>
+                    <tr>
+                        <td>Gate D — Production ready</td>
+                        <td>پایان هفته ۱۲</td>
+                        <td>✅ scale 100؛ reconciliation 100%؛ چک‌لیست sync؛ <code>erp:phase-gate --phase=3</code> passed</td>
+                        <td>تمدید ۲ هفته فقط روی gapهای gate</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="note" id="score-target">
+            <h2>۶. اهداف نمره پس از ۹۰ روز</h2>
+            <table class="roadmap-table">
+                <thead>
+                    <tr>
+                        <th>بعد</th>
+                        <th>امروز</th>
+                        <th>هدف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>مقیاس‌پذیری</td><td>۶.۵</td><td>۸.۵</td></tr>
+                    <tr><td>Multi-tenant</td><td>۷.۰</td><td>۸.۵</td></tr>
+                    <tr><td>CRM حرفه‌ای</td><td>۶.۸</td><td>۸.۰</td></tr>
+                    <tr><td>BI حرفه‌ای</td><td>۶.۲</td><td>۷.۸</td></tr>
+                    <tr><td><strong>جمع کل</strong></td><td><strong>۷۲</strong></td><td><strong>۸۸+</strong></td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="note">
+            <h2>۷. قانون بروزرسانی این رودمپ</h2>
+            <p>
+                هر جمعه: وضعیت آیتم‌های بک‌لاگ، gateها و مسدودکننده‌ها بروز شود.
+                هر آیتم تکمیل‌شده: لینک PR، تاریخ، و ارجاع به ردیف متناظر در <code>erp-roadmap-checklist.html</code>.
+                اگر اولویت عملیاتی کارفرما عوض شد، فقط ترتیب اجرا جابه‌جا شود — gateها حذف نشوند.
+            </p>
+        </section>
+
+        <section class="note">
+            <h2>۸. گام بعدی فوری (این هفته)</h2>
+            <p>
+                <strong>شروع از آیتم #1:</strong> تبدیل لیست مشتریان به server-side Ajax.
+                این کار بیشترین اثر را روی تجربه روزانه کاربران و ریسک timeout دارد.
+                بعد از merge، seed تست ۱۰k مشتری و مقایسه score در <code>/erp/scale-hardening</code>.
+            </p>
+        </section>
+    </main>
+</body>
+</html>
