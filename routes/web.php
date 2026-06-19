@@ -132,7 +132,7 @@ Route::middleware(['auth', 'panel.active'])->group(function () {
     Route::get('customers/{customer}/360', "CustomersController@profile360")->name('customers.360');
     Route::resource('customers', CustomersController::class);
     Route::any('customers_search', "CustomersController@search")->name('customers.search');
-    Route::delete('customers/destory/{customer_id}', "CustomersController@destroy")->name('customers.destroy');
+    Route::delete('customers/destory/{customer_id}', "CustomersController@destroy")->name('customers.destroy.legacy');
     Route::get('customers/{customer_id}/orders', "CustomersController@CustomerOrders")->name('customers.orders');
     Route::get('customersCreatedByMe', "CustomersController@createdByMe")->name('customers.createdByMe');
     Route::get('activeCustomers', "CustomersController@activeCustomers")->name('customers.activeCustomers');
@@ -304,7 +304,7 @@ Route::middleware(['auth', 'panel.active'])->group(function () {
     Route::post('Account/import-standard', "AccountController@importStandard")->name('Account.importStandard');
     Route::resource('Account', AccountController::class)->except('show');
     Route::resource('Terminals', TerminalController::class)->except('show');
-    Route::resource('Accounting', AccountingController::class)->except('show');
+    Route::resource('Accounting', AccountingController::class)->except('show', 'index');
     Route::get('Accounting/vouchers', "AccountingController@vouchers")->name('Accounting.vouchers');
     Route::get('Accounting/vouchers/create', "AccountingController@createVoucher")->name('Accounting.vouchers.create');
     Route::get('Accounting/vouchers/opening', "AccountingController@createOpeningVoucher")->name('Accounting.vouchers.opening');
