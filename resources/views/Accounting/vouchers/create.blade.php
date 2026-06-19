@@ -7,22 +7,14 @@
     <meta content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
         name="viewport" />
     <title>ثبت سند حسابداری - دکان دارمینو</title>
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
 </head>
 
 <body>
-    @include('sweetalert::alert')
+    @include('partials.panel-toasts')
     @php
         $isEdit = isset($voucher) && $voucher;
         $voucherRows = $voucherRows ?? [];
@@ -36,7 +28,7 @@
                 @include('sections/header')
                 <div class="content-wrapper">
                     <div class="container-xxl flex-grow-1 container-p-y">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+                        <div id="tour-voucher-create-header" class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
                             <h4 class="mb-0"><span class="text-muted fw-light">مالی و حسابداری /</span>
                                 {{ $isEdit ? 'ویرایش سند حسابداری' : 'ثبت سند حسابداری' }}</h4>
                             <a class="btn btn-outline-secondary" href="{{ route('Accounting.vouchers') }}">بازگشت به
@@ -65,11 +57,33 @@
                                 <div class="card-body">
                                     <div class="row g-3">
                                         <div class="col-12 col-md-3">
+                                            <label class="form-label">نوع سند</label>
+                                            <input type="text" class="form-control" value="عادی" readonly>
+                                        </div>
+                                        <div class="col-12 col-md-3">
                                             <label class="form-label">تاریخ سند</label>
                                             <input type="date" name="voucher_date_en" class="form-control"
                                                 value="{{ old('voucher_date_en', $today) }}">
                                         </div>
-                                        <div class="col-12 col-md-9">
+                                        <div class="col-12 col-md-3">
+                                            <label class="form-label">شماره عطف</label>
+                                            <input type="text" name="reference_number" class="form-control"
+                                                value="{{ old('reference_number', $isEdit ? $voucher->reference_number : '') }}"
+                                                placeholder="اختیاری">
+                                        </div>
+                                        <div class="col-12 col-md-3">
+                                            <label class="form-label">دوره مالی</label>
+                                            <select name="fiscal_year_id" class="form-select select2-basic">
+                                                <option value="">— بدون دوره —</option>
+                                                @foreach (($fiscalYears ?? []) as $fiscalYear)
+                                                    <option value="{{ $fiscalYear->id }}"
+                                                        @selected((string) old('fiscal_year_id', $isEdit ? $voucher->fiscal_year_id : optional($selectedFiscalYear ?? null)->id) === (string) $fiscalYear->id)>
+                                                        {{ $fiscalYear->title }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
                                             <label class="form-label">شرح سند</label>
                                             <input type="text" name="description" class="form-control"
                                                 value="{{ old('description', $isEdit ? $voucher->description : '') }}"
@@ -79,7 +93,7 @@
                                 </div>
                             </div>
 
-                            <div class="card">
+                            <div id="tour-voucher-create-lines" class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">اقلام سند</h5>
                                     <button type="button" class="btn btn-sm btn-outline-primary" id="add-row">افزودن
@@ -109,15 +123,7 @@
                                                 @endphp
                                                 <tr>
                                                     <td>
-                                                        <select name="account_id[]" class="form-select select2-basic">
-                                                            <option value="">انتخاب حساب</option>
-                                                            @foreach ($accounts as $account)
-                                                                <option value="{{ $account->id }}"
-                                                                    @selected((string) $selectedAccountId === (string) $account->id)>
-                                                                    {{ $account->code }} - {{ $account->name }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
+                                                        @include('partials.accounting.account-cascader-cell', ['accounts' => $accounts, 'selectedAccountId' => $selectedAccountId])
                                                     </td>
                                                     <td><input type="text" name="item_description[]"
                                                             class="form-control" placeholder="شرح"
@@ -263,12 +269,11 @@
                                                             value="{{ old('credit_amount.' . $i, $row['credit_amount'] ?? 0) }}">
                                                     </td>
                                                     <td><button type="button"
-                                                            class="btn btn-sm btn-icon btn-outline-danger remove-row"><i
-                                                                class="ti ti-trash"></i></button></td>
+                                                            class="btn btn-sm btn-icon btn-outline-danger remove-row"><x-ui.icon name="trash" /></button></td>
                                                 </tr>
                                             @endfor
                                         </tbody>
-                                        <tfoot>
+                                        <tfoot id="tour-voucher-create-totals">
                                             <tr>
                                                 <th colspan="4" class="text-end">جمع کل سند</th>
                                                 <th class="text-end" id="total-debit">0</th>
@@ -284,7 +289,7 @@
                                     </table>
                                 </div>
                                 <div class="card-body d-flex justify-content-end gap-2">
-                                    <button type="submit"
+                                    <button id="tour-voucher-create-submit" type="submit"
                                         class="btn btn-primary">{{ $isEdit ? 'ذخیره ویرایش سند موقت' : 'ثبت سند موقت' }}</button>
                                 </div>
                             </div>
@@ -301,14 +306,17 @@
 
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/select2/select2.js"></script>
     <script src="{{ asset('assets/') }}/js/main.js"></script>
     @include('partials.erp-remote-select-assets')
+    @include('partials.accounting.account-cascader-script', ['accounts' => $accounts])
     <script>
         $(function() {
             function initSelects() {
@@ -368,6 +376,9 @@
                 row.find('input').val('');
                 row.find('.debit, .credit').val('0');
                 $('#voucher-items tbody').append(row);
+                if (window.AccountCascader) {
+                    window.AccountCascader.resetRow(row.find('.account-cascader'));
+                }
                 initSelects();
                 recalculate();
             });
@@ -385,6 +396,9 @@
                 recalculate();
             });
 
+            if (window.AccountCascader) {
+                window.AccountCascader.initAll(document);
+            }
             initSelects();
             recalculate();
         });

@@ -57,7 +57,7 @@ class AccountingPostingService
         $this->ensureVoucherDateIsOpen($date, $tenantId);
 
         return DB::transaction(function () use ($payload, $user, $lines, $totalDebit, $totalCredit, $tenantId, $organizationId, $date) {
-            $voucher = Voucher::create([
+            $voucher = Voucher::create(array_merge([
                 'tenant_id' => $tenantId,
                 'organization_id' => $organizationId,
                 'factor_id' => 0,
@@ -76,7 +76,7 @@ class AccountingPostingService
                 'fiscal_year' => $this->jalaliYear($date),
                 'description' => Arr::get($payload, 'description') ?: 'سند حسابداری دستی',
                 'created_by' => $user?->id,
-            ]);
+            ], $this->voucherHeaderExtras($payload)));
 
             foreach ($lines as $line) {
                 $voucher->items()->create(array_merge([
@@ -121,7 +121,7 @@ class AccountingPostingService
         $this->ensureVoucherDateIsOpen($date, $tenantId);
 
         return DB::transaction(function () use ($voucher, $payload, $user, $lines, $totalDebit, $totalCredit, $tenantId, $organizationId, $date) {
-            $voucher->update([
+            $voucher->update(array_merge([
                 'tenant_id' => $tenantId,
                 'organization_id' => $organizationId,
                 'account_id' => $lines[0]['account_id'],
@@ -133,7 +133,7 @@ class AccountingPostingService
                 'fiscal_year' => $this->jalaliYear($date),
                 'description' => Arr::get($payload, 'description') ?: $voucher->description,
                 'updated_by' => $user?->id,
-            ]);
+            ], $this->voucherHeaderExtras($payload)));
 
             $voucher->items()->delete();
 
@@ -3148,6 +3148,23 @@ class AccountingPostingService
         }
 
         return $lines;
+    }
+
+    private function voucherHeaderExtras(array $payload): array
+    {
+        $extras = [];
+
+        if (Schema::hasColumn('vouchers', 'reference_number')) {
+            $reference = trim((string) Arr::get($payload, 'reference_number'));
+            $extras['reference_number'] = $reference === '' ? null : $reference;
+        }
+
+        if (Schema::hasColumn('vouchers', 'fiscal_year_id')) {
+            $fiscalYearId = Arr::get($payload, 'fiscal_year_id');
+            $extras['fiscal_year_id'] = !empty($fiscalYearId) ? (int) $fiscalYearId : null;
+        }
+
+        return $extras;
     }
 
     private function analyticLineAttributes(array $line): array

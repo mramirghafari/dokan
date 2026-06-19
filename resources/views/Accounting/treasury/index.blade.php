@@ -7,21 +7,13 @@
     <meta content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
         name="viewport" />
     <title>دریافت و پرداخت - دکان دارمینو</title>
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
 </head>
 
 <body>
-    @include('sweetalert::alert')
+    @include('partials.panel-toasts')
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
             @include('sections/sidebar')
@@ -29,38 +21,38 @@
                 @include('sections/header')
                 <div class="content-wrapper">
                     <div class="container-xxl flex-grow-1 container-p-y">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+                        <div id="tour-treasury-page-header" class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
                             <h4 class="mb-0"><span class="text-muted fw-light">مالی و حسابداری /</span> دریافت و
                                 پرداخت</h4>
-                            <div class="d-flex flex-wrap gap-2">
+                            <div id="tour-treasury-header-actions" class="d-flex flex-wrap gap-2">
                                 <a class="btn btn-outline-dark" href="{{ route('Accounting.treasury.liquidity') }}">
-                                    <i class="ti ti-report-analytics me-1"></i> مانده نقدینگی
+                                    <x-ui.icon name="report-analytics" class="me-1" /> مانده نقدینگی
                                 </a>
                                 <a class="btn btn-outline-success"
                                     href="{{ route('Accounting.treasury.cashForecast') }}">
-                                    <i class="ti ti-chart-arrows-vertical me-1"></i> پیش بینی نقدینگی
+                                    <x-ui.icon name="chart-arrows-vertical" class="me-1" /> پیش بینی نقدینگی
                                 </a>
                                 <a class="btn btn-outline-secondary"
                                     href="{{ route('Accounting.treasury.pettyCash') }}">
-                                    <i class="ti ti-wallet me-1"></i> تنخواه
+                                    <x-ui.icon name="wallet" class="me-1" /> تنخواه
                                 </a>
                                 <a class="btn btn-outline-secondary"
                                     href="{{ route('Accounting.treasury.chequeBooks') }}">
-                                    <i class="ti ti-notebook me-1"></i> دسته چک و هشدارها
+                                    <x-ui.icon name="notebook" class="me-1" /> دسته چک و هشدارها
                                 </a>
                                 <a class="btn btn-outline-warning"
                                     href="{{ route('Accounting.treasury.bankReconciliation') }}">
-                                    <i class="ti ti-checkup-list me-1"></i> مغایرت بانکی
+                                    <x-ui.icon name="checkup-list" class="me-1" /> مغایرت بانکی
                                 </a>
                                 <a class="btn btn-outline-info" href="{{ route('Accounting.treasury.cheques') }}">
-                                    <i class="ti ti-report-money me-1"></i> گزارش چک
+                                    <x-ui.icon name="report-money" class="me-1" /> گزارش چک
                                 </a>
                                 <a class="btn btn-outline-primary"
                                     href="{{ route('Accounting.treasury.transfer.create') }}">
-                                    <i class="ti ti-arrows-transfer-up me-1"></i> انتقال بین حساب ها
+                                    <x-ui.icon name="arrows-transfer-up" class="me-1" /> انتقال بین حساب ها
                                 </a>
-                                <a class="btn btn-primary" href="{{ route('Accounting.treasury.create') }}">
-                                    <i class="ti ti-plus me-1"></i> ثبت دریافت/پرداخت
+                                <a id="tour-treasury-create-btn" class="btn btn-primary" href="{{ route('Accounting.treasury.create') }}">
+                                    <x-ui.icon name="plus" class="me-1" /> ثبت دریافت/پرداخت
                                 </a>
                             </div>
                         </div>
@@ -73,7 +65,7 @@
                             </div>
                         @endif
 
-                        <div class="card">
+                        <div id="tour-treasury-table" class="card">
                             <div class="card-datatable table-responsive py-0">
                                 <table class="table table-hover align-middle">
                                     <thead>
@@ -251,10 +243,12 @@
 
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <script src="{{ asset('assets/') }}/js/main.js"></script>
 </body>

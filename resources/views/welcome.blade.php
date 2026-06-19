@@ -11,35 +11,25 @@ use Hekmatinasser\Verta\Verta; ?>
         name="viewport" />
     <title>پیشخوان دکان دارمینو</title>
     <meta content="" name="description" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet" />
-    <!-- Core CSS -->
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><!-- Icons -->
+<!-- Core CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/apex-charts/apex-charts.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/swiper/swiper.css" rel="stylesheet" />
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.bootstrap5.min.css" />
-    <!-- Page CSS -->
-    <link href="{{ asset('assets/') }}/vendor/css/pages/cards-advance.css" rel="stylesheet" />
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Vendors CSS -->@if (empty($showSetupCard))
+        @include('partials.assets.datatables-styles', ['bundle' => 'basic'])
+        <link href="{{ asset('assets/') }}/vendor/libs/apex-charts/apex-charts.css" rel="stylesheet" />
+        <link href="{{ asset('assets/') }}/vendor/css/pages/cards-advance.css" rel="stylesheet" />
+    @endif
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
-    <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/css/rtl.css?v={{ filemtime(public_path('assets/css/rtl.css')) }}" rel="stylesheet" />
+    @if (!empty($showSetupCard) || !empty($panelOnboarding['show_welcome_modal']) || !empty($panelOnboarding['show_tour']))
+        @include('partials.panel-onboarding-styles')
+    @endif
     <style>
         @media(max-width: 768px) {
             .svgicon {
@@ -85,21 +75,33 @@ use Hekmatinasser\Verta\Verta; ?>
                 <div class="content-wrapper">
                     <!-- Content -->
                     <div class="container-xxl flex-grow-1 container-p-y">
+                        @include('partials.panel-setup-dashboard')
+
+                        @if (empty($showSetupCard) && ($dashboardWidgets['dashboard_widget_quick_actions'] ?? true))
                         <div class="row">
                             @if (\App\Services\TenantSettings::enabled('feature_route_management'))
                                 <div class="mb-4 col-sm-6 col-12">
                                     <a class="btn btn-primary waves-effect waves-light w-100"
-                                        href="{{ route('tasks.create') }}"><i class="ti ti-plus me-md-2"></i> ثبت مسیر
+                                        href="{{ route('tasks.create') }}"><x-ui.icon name="plus" class="me-md-2" /> ثبت مسیر
                                         جدید</a>
                                 </div>
                             @endif
                             <div class="mb-4 col-sm-6 col-12">
                                 <a class="btn btn-primary waves-effect waves-light w-100"
-                                    href="{{ route('products.index') }}"><i class="ti ti-plus me-md-2"></i> ثبت سفارش
+                                    href="{{ route('products.index') }}"><x-ui.icon name="plus" class="me-md-2" /> ثبت سفارش
                                     جدید</a>
                             </div>
                         </div>
+                        @endif
+
+                        @if (
+                            empty($showSetupCard) && (
+                                ($dashboardWidgets['dashboard_widget_user_info'] ?? true)
+                                || ($dashboardWidgets['dashboard_widget_org_stats'] ?? true)
+                            )
+                        )
                         <div class="row mb-3">
+                            @if (empty($showSetupCard) && ($dashboardWidgets['dashboard_widget_user_info'] ?? true))
                             <div class="col-12 col-sm-6 mb-3">
                                 <div class="card h-100">
                                     <div class="card-header d-flex align-items-center justify-content-between py-2">
@@ -224,6 +226,8 @@ use Hekmatinasser\Verta\Verta; ?>
                                     </div>
                                 </div>
                             </div>
+                            @endif
+                            @if (empty($showSetupCard) && ($dashboardWidgets['dashboard_widget_org_stats'] ?? true))
                             <div class="col-12 col-sm-6 mb-3">
                                 <div class="card h-100">
                                     <div class="card-header d-flex align-items-center justify-content-between py-2">
@@ -362,7 +366,10 @@ use Hekmatinasser\Verta\Verta; ?>
                                     </div>
                                 </div>
                             </div>
+                            @endif
                         </div>
+                        @endif
+                        @if (empty($showSetupCard) && ($dashboardWidgets['dashboard_widget_top_leaders'] ?? true))
                         <div class="row mb-3">
                             <div class="col-12 col-sm-12 order-1 order-lg-2 mb-4 mb-lg-0">
 
@@ -409,7 +416,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                                         style="width: 10px !important; max-width: 40px !important; min-width: 40px !important">
                                                         #</th>
                                                     <th>کد سرپرست</th>
-                                                    <th>نام سرپرست</th>
+                                                    <th class="name-col">نام سرپرست</th>
                                                     <th>مشتری جدید</th>
                                                     <th>تعداد فاکتور</th>
                                                     <th>مبلغ کل فاکتور <small>ریال</small></th>
@@ -422,10 +429,10 @@ use Hekmatinasser\Verta\Verta; ?>
                                                     <tr>
                                                         <th>{{ $x }}</th>
                                                         <td><small>{{ $leader->leader->username }}</small></td>
-                                                        <td><small data-bs-toggle="tooltip" data-bs-placement="top"
+                                                        <td class="name-col"><small data-bs-toggle="tooltip" data-bs-placement="top"
                                                                 data-bs-custom-class="custom-tooltip"
                                                                 data-bs-title="{{ $leader->leader->name }}"><a
-                                                                    href="{{ route('userInvoiceList', $leader->leader->id) }}">{{ strlen($leader->leader->name) > 12 ? mb_substr($leader->leader->name, 0, 15, 'UTF-8') . '...' : $leader->leader->name }}</a></small>
+                                                                    href="{{ route('userInvoiceList', $leader->leader->id) }}">{{ $leader->leader->name }}</a></small>
                                                         </td>
 
                                                         <td>
@@ -459,6 +466,8 @@ use Hekmatinasser\Verta\Verta; ?>
                                 </div>
                             </div>
                         </div>
+                        @endif
+                        @if (empty($showSetupCard) && ($dashboardWidgets['dashboard_widget_top_visitors'] ?? true))
                         <div class="row mb-3">
                             <div class="col-12 col-sm-12 order-1 order-lg-2 mb-4 mb-lg-0">
                                 <div class="card">
@@ -492,7 +501,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                                 <tr class="text-center">
                                                     <th width="20">#</th>
                                                     <th>کد بازاریاب</th>
-                                                    <th>نام بازاریاب</th>
+                                                    <th class="name-col">نام بازاریاب</th>
                                                     <th>مشتری جدید</th>
                                                     <th>تعداد فاکتور</th>
                                                     <th>مبلغ کل فاکتور <small>ریال</small></th>
@@ -506,10 +515,10 @@ use Hekmatinasser\Verta\Verta; ?>
                                                     <tr>
                                                         <th>{{ $x }}</th>
                                                         <td><small>{{ $visitor->visitor->username }}</small></td>
-                                                        <td><small data-bs-toggle="tooltip" data-bs-placement="top"
+                                                        <td class="name-col"><small data-bs-toggle="tooltip" data-bs-placement="top"
                                                                 data-bs-custom-class="custom-tooltip"
                                                                 data-bs-title="{{ $visitor->visitor->name }}"><a
-                                                                    href="{{ route('userInvoiceList', $visitor->visitor_id) }}">{{ strlen($visitor->visitor->name) > 12 ? mb_substr($visitor->visitor->name, 0, 15, 'UTF-8') . '...' : $visitor->visitor->name }}</a></small>
+                                                                    href="{{ route('userInvoiceList', $visitor->visitor_id) }}">{{ $visitor->visitor->name }}</a></small>
                                                         </td>
 
                                                         <td>
@@ -542,7 +551,9 @@ use Hekmatinasser\Verta\Verta; ?>
                                 </div>
                             </div>
                         </div>
+                        @endif
 
+                        @if (empty($showSetupCard) && ($dashboardWidgets['dashboard_widget_recent_factors'] ?? true))
                         <div class="row mb-3">
                             <div class="col-12 col-sm-12 order-1 order-lg-2 mb-4 mb-lg-0">
 
@@ -683,7 +694,9 @@ use Hekmatinasser\Verta\Verta; ?>
                                 </div>
                             </div>
                         </div>
+                        @endif
 
+                        @if (empty($showSetupCard))
                         <div class="row mb-3">
                             <div class="col-12 col-sm-12 order-1 order-lg-2 mb-4 mb-lg-0">
                                 <div class="card">
@@ -734,7 +747,10 @@ use Hekmatinasser\Verta\Verta; ?>
                                 </div>
                             </div>
                         </div>
+                        @if (empty($showSetupCard) && ($dashboardWidgets['dashboard_widget_warehouse'] ?? true))
                         @include('sections.warehouse_dashboard')
+                        @endif
+                        @endif
                     </div>
                     <!-- / Content -->
                     @include('sections/footer')
@@ -750,38 +766,39 @@ use Hekmatinasser\Verta\Verta; ?>
         <div class="drag-target"></div>
     </div>
     <!-- / Layout wrapper -->
+
+    @if (!empty($panelOnboarding['show_welcome_modal']))
+        @include('partials.panel-welcome-modal')
+    @endif
+
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
+<script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <!-- endbuild -->
-    <!-- Vendors JS -->
-    <script src="{{ asset('assets/') }}/vendor/libs/apex-charts/apexcharts.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/swiper/swiper.js"></script>
-
-    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
-
-    <!-- اکستنشن‌ها -->
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+    @if (empty($showSetupCard))
+        @include('partials.assets.datatables-scripts', ['bundle' => 'basic'])
+        <script src="{{ asset('assets/') }}/vendor/libs/apex-charts/apexcharts.js"></script>
+    @endif
 
     <!-- Main JS -->
     <script src="{{ asset('assets/') }}/js/main.js"></script>
-    <!-- Page JS -->
+    <script>
+        if (window.panelTourConfig) {
+            window.panelTourConfig.isDashboard = true;
+            window.panelTourConfig.showWelcomeModal = @json(!empty($panelOnboarding['show_welcome_modal']));
+        }
+    </script>
+    @include('partials.panel-tour-scripts')
+
+    @if (empty($showSetupCard))
+    <!-- Dashboard widgets JS -->
     <link rel="stylesheet" href="{{ asset('/css/jalalidatepicker.min.css') }}" />
     <script src="{{ asset('/js/jalalidatepicker.min.js') }}"></script>
     <script>
@@ -1028,6 +1045,7 @@ use Hekmatinasser\Verta\Verta; ?>
             });
         });
     </script>
+    @endif
 
 
 

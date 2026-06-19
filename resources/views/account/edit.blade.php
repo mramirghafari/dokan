@@ -9,19 +9,12 @@
     <title>ویرایش حساب {{ $Account->name }} - دکان دارمینو</title>
     <meta content="" name="description" />
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet" />
-    <!-- Core CSS -->
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><!-- Icons -->
+<!-- Core CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables.bootstrap5.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css"
         rel="stylesheet" />
@@ -30,10 +23,7 @@
 
     <!-- Page CSS -->
     <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" />
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
@@ -118,6 +108,54 @@
                                                 </select>
                                             </div>
                                             <div class="mb-3">
+                                                <label class="form-label" for="account_category">طبقه حساب</label>
+                                                <select class="select2 form-select" id="account_category"
+                                                    name="account_category">
+                                                    <option value="">انتخاب کنید</option>
+                                                    <option value="asset"
+                                                        {{ $Account->account_category === 'asset' ? 'selected' : '' }}>
+                                                        دارایی</option>
+                                                    <option value="liability"
+                                                        {{ $Account->account_category === 'liability' ? 'selected' : '' }}>
+                                                        بدهی</option>
+                                                    <option value="equity"
+                                                        {{ $Account->account_category === 'equity' ? 'selected' : '' }}>
+                                                        حقوق مالکانه</option>
+                                                    <option value="income"
+                                                        {{ $Account->account_category === 'income' ? 'selected' : '' }}>
+                                                        درآمد</option>
+                                                    <option value="expense"
+                                                        {{ $Account->account_category === 'expense' ? 'selected' : '' }}>
+                                                        هزینه</option>
+                                                    <option value="cost_of_goods"
+                                                        {{ $Account->account_category === 'cost_of_goods' ? 'selected' : '' }}>
+                                                        بهای تمام شده</option>
+                                                    <option value="memo"
+                                                        {{ $Account->account_category === 'memo' ? 'selected' : '' }}>
+                                                        انتظامی / آماری</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3 d-none" id="field-asset-class">
+                                                <label class="form-label" for="asset_class">طبقه فرعی (جاری /
+                                                    غیرجاری)</label>
+                                                <select class="select2 form-select" id="asset_class" name="asset_class"
+                                                    data-selected="{{ $Account->asset_class }}">
+                                                    <option value="">انتخاب کنید</option>
+                                                </select>
+                                                <small class="text-muted">جاری = کمتر از یک سال؛ غیرجاری = بلندمدت (بیش از
+                                                    یک سال).</small>
+                                            </div>
+                                            <div class="mb-3 d-none" id="field-standard-account">
+                                                <label class="form-label" for="asset_type">حساب کل استاندارد
+                                                    (راهنما)</label>
+                                                <select class="select2 form-select" id="asset_type" name="asset_type"
+                                                    data-selected="{{ $Account->asset_type }}">
+                                                    <option value="">انتخاب کنید</option>
+                                                </select>
+                                                <small class="text-muted d-block mt-1" id="standard-account-desc">با
+                                                    انتخاب یک حساب کل استاندارد، نام آن به‌صورت خودکار پر می‌شود.</small>
+                                            </div>
+                                            <div class="mb-3">
                                                 <label class="form-label" for="type">نوع حساب</label>
                                                 <select class="select2 form-select" id="type" name="type">
                                                     <option value="0">انتخاب کنید</option>
@@ -146,34 +184,7 @@
                                                         {{ $Account->type == 9 ? 'selected' : '' }}>بدهی / تعهدات
                                                     </option>
                                                 </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label" for="account_category">طبقه حساب</label>
-                                                <select class="select2 form-select" id="account_category"
-                                                    name="account_category">
-                                                    <option value="">انتخاب کنید</option>
-                                                    <option value="asset"
-                                                        {{ $Account->account_category === 'asset' ? 'selected' : '' }}>
-                                                        دارایی</option>
-                                                    <option value="liability"
-                                                        {{ $Account->account_category === 'liability' ? 'selected' : '' }}>
-                                                        بدهی</option>
-                                                    <option value="equity"
-                                                        {{ $Account->account_category === 'equity' ? 'selected' : '' }}>
-                                                        حقوق مالکانه</option>
-                                                    <option value="income"
-                                                        {{ $Account->account_category === 'income' ? 'selected' : '' }}>
-                                                        درآمد</option>
-                                                    <option value="expense"
-                                                        {{ $Account->account_category === 'expense' ? 'selected' : '' }}>
-                                                        هزینه</option>
-                                                    <option value="cost_of_goods"
-                                                        {{ $Account->account_category === 'cost_of_goods' ? 'selected' : '' }}>
-                                                        بهای تمام شده</option>
-                                                    <option value="memo"
-                                                        {{ $Account->account_category === 'memo' ? 'selected' : '' }}>
-                                                        انتظامی / آماری</option>
-                                                </select>
+                                                <small class="text-muted d-block mt-1">این فیلد فقط رفتار حساب را مشخص می‌کند (مثلاً «بانک» فیلدهای بانکی را فعال می‌کند) و جایگزین «طبقه حساب» نیست.</small>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label" for="detail_type">نوع تفصیل</label>
@@ -237,6 +248,14 @@
                                                     <option value="2"
                                                         {{ $Account->nature == 2 ? 'selected' : '' }}>بستانکار</option>
                                                 </select>
+                                            </div>
+                                            <div class="mb-3" id="field-opening-balance">
+                                                <label class="form-label" for="opening_balance">مانده افتتاحیه</label>
+                                                <input class="form-control" id="opening_balance"
+                                                    placeholder="مبلغ مانده اول دوره این حساب — برای سند افتتاحیه استفاده می‌شود"
+                                                    type="number" step="any" name="opening_balance"
+                                                    value="{{ $Account->opening_balance }}" />
+                                                <small class="text-muted d-block mt-1">مبلغ مانده اول دوره این حساب — برای سند افتتاحیه استفاده می‌شود.</small>
                                             </div>
                                             <div class="mb-3 con_bank {{ $Account->type != 1 ? 'd-none' : '' }} ">
                                                 <label class="form-label" for="account_number">شماره حساب</label>
@@ -473,11 +492,13 @@
     <!-- build:js assets/vendor/js/core.js -->
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <!-- endbuild -->
     <script src="{{ asset('assets/') }}/vendor/libs/jquery-sticky/jquery-sticky.js"></script>
@@ -619,6 +640,102 @@
 
             });
 
+        });
+    </script>
+
+    <script>
+        // ===== کدینگ استاندارد: طبقه → جاری/غیرجاری → حساب کل استاندارد =====
+        $(document).ready(function() {
+            const subClasses = @json(config('standard_chart_of_accounts.sub_classes', []));
+            const standardAccounts = @json(config('standard_chart_of_accounts.standard_accounts', []));
+
+            function rebuildSelect($el, html) {
+                if ($el.data('select2')) {
+                    $el.select2('destroy');
+                }
+                $el.html(html).select2();
+            }
+
+            function getStandardList(category, subClass) {
+                const node = standardAccounts[category];
+                if (!node) return [];
+                if (Array.isArray(node)) return node;
+                return node[subClass] || [];
+            }
+
+            function refreshSubClass(selectedClass) {
+                const category = $('#account_category').val();
+                const classes = subClasses[category];
+
+                if (!classes) {
+                    $('#field-asset-class').addClass('d-none');
+                    rebuildSelect($('#asset_class'), '<option value=""></option>');
+                    return;
+                }
+
+                let html = '<option value="">انتخاب کنید</option>';
+                Object.keys(classes).forEach(function(key) {
+                    const sel = (selectedClass && selectedClass === key) ? ' selected' : '';
+                    html += `<option value="${key}"${sel}>${classes[key]}</option>`;
+                });
+                rebuildSelect($('#asset_class'), html);
+                $('#field-asset-class').removeClass('d-none');
+            }
+
+            function refreshStandardAccounts(selectedName) {
+                const category = $('#account_category').val();
+                const needsSub = !!subClasses[category];
+                const subClass = $('#asset_class').val();
+
+                if (!category || (needsSub && !subClass)) {
+                    $('#field-standard-account').addClass('d-none');
+                    rebuildSelect($('#asset_type'), '<option value=""></option>');
+                    return;
+                }
+
+                const list = getStandardList(category, subClass);
+                if (!list.length) {
+                    $('#field-standard-account').addClass('d-none');
+                    rebuildSelect($('#asset_type'), '<option value=""></option>');
+                    return;
+                }
+
+                let html = '<option value="">انتخاب کنید</option>';
+                list.forEach(function(item) {
+                    const sel = (selectedName && selectedName === item.name) ? ' selected' : '';
+                    html += `<option value="${item.name}" data-desc="${item.desc || ''}"${sel}>${item.name}</option>`;
+                });
+                rebuildSelect($('#asset_type'), html);
+                $('#field-standard-account').removeClass('d-none');
+                updateStandardDesc();
+            }
+
+            function updateStandardDesc() {
+                const desc = $('#asset_type').find('option:selected').data('desc') || '';
+                $('#standard-account-desc').text(desc ||
+                    'با انتخاب یک حساب کل استاندارد، نام آن به‌صورت خودکار پر می‌شود.');
+            }
+
+            $('#account_category').on('change', function() {
+                refreshSubClass();
+                refreshStandardAccounts();
+            });
+            $('#asset_class').on('change', function() {
+                refreshStandardAccounts();
+            });
+            $('#asset_type').on('change', function() {
+                updateStandardDesc();
+                const name = $(this).val();
+                if (name && !$('#name').val().trim()) {
+                    $('#name').val(name);
+                }
+            });
+
+            // مقداردهی اولیه با مقادیر ذخیره‌شده
+            const initialClass = $('#asset_class').data('selected') || '';
+            const initialType = $('#asset_type').data('selected') || '';
+            refreshSubClass(initialClass);
+            refreshStandardAccounts(initialType);
         });
     </script>
 

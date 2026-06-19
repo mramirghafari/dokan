@@ -10,10 +10,18 @@ use App\Traits\HasOrganizationFilter;
 class Unit extends Model
 {
     use HasFactory, SoftDeletes, HasOrganizationFilter;
-    protected $fillable = ['code', 'title', 'symbol', 'unit_type', 'parent_id', 'conversion_to_parent', 'organization_id', 'tenant_id', 'description', 'isActive'];
+    protected $fillable = ['code', 'title', 'symbol', 'unit_type', 'usage_scope', 'parent_id', 'conversion_to_parent', 'organization_id', 'tenant_id', 'description', 'isActive'];
 
     protected $casts = [
         'conversion_to_parent' => 'decimal:6',
+    ];
+
+    public const SCOPE_PRODUCT = 'product';
+    public const SCOPE_SHIPPING = 'shipping';
+
+    public const USAGE_SCOPE_LABELS = [
+        self::SCOPE_PRODUCT => 'واحد محصول',
+        self::SCOPE_SHIPPING => 'واحد باربری',
     ];
 
     public const UNIT_TYPE_LABELS = [
@@ -23,6 +31,11 @@ class Unit extends Model
         'length' => 'طولی',
         'service' => 'خدمت',
     ];
+
+    public function scopeForUsageScope($query, string $scope)
+    {
+        return $query->where('usage_scope', $scope);
+    }
 
     public function parent()
     {

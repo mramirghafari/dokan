@@ -6,14 +6,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>پرونده ۳۶۰ {{ $customer->name }} - دکان دارمینو</title>
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
+    <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
     <style>
         .timeline-360 { position: relative; padding-right: 1.25rem; }
         .timeline-360::before { content: ''; position: absolute; top: 0; bottom: 0; right: .45rem; width: 2px; background: #e7e7e8; }
@@ -71,7 +67,7 @@
                         <div class="card-body d-flex flex-wrap gap-2">
                             @foreach ($quick_actions as $action)
                                 <a href="{{ $action['url'] }}" class="btn btn-outline-primary">
-                                    <i class="ti {{ $action['icon'] }} me-1"></i>{{ $action['label'] }}
+                                    <x-ui.icon :name="$action['icon']" class="me-1" />{{ $action['label'] }}
                                 </a>
                             @endforeach
                         </div>
@@ -119,6 +115,9 @@
 </div>
 <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
 <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
 <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
 <script src="{{ asset('assets/') }}/js/main.js"></script>
 </body>

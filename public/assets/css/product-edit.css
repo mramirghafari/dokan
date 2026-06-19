@@ -1,0 +1,314 @@
+/* Product edit — layout & tabs */
+.product-edit-page {
+    --pe-brand: #543C92;
+    --pe-brand-soft: rgba(84, 60, 146, 0.08);
+    --pe-border: #ebe9f1;
+    --pe-muted: #6e6b7b;
+    --pe-radius: 14px;
+}
+
+.product-edit-hero {
+    border: none;
+    border-radius: var(--pe-radius);
+    background: linear-gradient(135deg, #f8f7fc 0%, #fff 55%, #faf8ff 100%);
+    box-shadow: 0 10px 30px rgba(84, 60, 146, 0.08);
+}
+
+.product-edit-hero__eyebrow {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--pe-brand);
+    background: var(--pe-brand-soft);
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    margin-bottom: 0.5rem;
+}
+
+.product-edit-hero .card-body h4 {
+    font-weight: 800;
+    color: #2f2b3d;
+}
+
+/* Main form card — keep overflow visible so sticky footer works (erp-form-card) */
+.product-edit-card {
+    border: 1px solid var(--pe-border);
+    border-radius: var(--pe-radius);
+    box-shadow: 0 4px 18px rgba(20, 18, 32, 0.04);
+    overflow: visible;
+    padding: 0;
+    background: #fff;
+}
+
+.product-edit-card > .card-body {
+    padding: 0;
+}
+
+.product-edit-card__head {
+    background: #f8f7fc;
+    border-bottom: 1px solid var(--pe-border);
+    padding: 0;
+    overflow: hidden;
+    border-radius: var(--pe-radius) var(--pe-radius) 0 0;
+}
+
+.product-edit-card__tabs-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    max-width: 100%;
+    padding: 0.75rem 1.25rem 0;
+}
+
+.product-edit-card__tabs-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+
+.product-edit-card__tabs-scroll::-webkit-scrollbar-thumb {
+    background: rgba(84, 60, 146, 0.25);
+    border-radius: 999px;
+}
+
+.product-edit-card__body {
+    padding: 1.35rem 1.5rem;
+    background: #fff;
+}
+
+.product-edit-card__body > .tab-pane {
+    padding: 0;
+}
+
+/* Tabs — horizontal scroll inside card, RTL-safe */
+/* Reset theme .card .nav.nav-tabs { margin: ±1.5rem } which clips tabs in RTL */
+.product-edit-card.card .nav.nav-tabs.product-edit-tabs {
+    margin: 0 !important;
+    margin-inline: 0 !important;
+}
+
+.product-edit-tabs {
+    display: flex;
+    border-bottom: none !important;
+    margin-bottom: 0 !important;
+    gap: 0.35rem;
+    flex-wrap: nowrap !important;
+    width: max-content;
+    min-width: 100%;
+}
+
+.product-edit-tabs .nav-item {
+    flex: 0 0 auto;
+    min-width: 0;
+}
+
+.product-edit-tabs .nav-link {
+    width: auto !important;
+    margin: 0 !important;
+    border: 1px solid transparent !important;
+    border-radius: 10px 10px 0 0 !important;
+    color: var(--pe-muted);
+    font-weight: 600;
+    font-size: 0.86rem;
+    padding: 0.65rem 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    background: transparent;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.product-edit-tabs .nav-link i {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.product-edit-tabs .nav-link:hover {
+    color: var(--pe-brand);
+    background: rgba(84, 60, 146, 0.05);
+}
+
+.product-edit-tabs .nav-link.active {
+    color: var(--pe-brand) !important;
+    background: #fff !important;
+    border-color: var(--pe-border) !important;
+    border-bottom-color: #fff !important;
+    box-shadow: 0 -2px 8px rgba(84, 60, 146, 0.06);
+    position: relative;
+    z-index: 2;
+    margin-bottom: -1px !important;
+}
+
+@media (max-width: 992px) {
+    .product-edit-tabs .nav-link {
+        font-size: 0.8rem;
+        padding: 0.55rem 0.5rem;
+    }
+
+    .product-edit-tabs .nav-link i {
+        display: none;
+    }
+}
+
+/* Section panels inside tabs */
+.product-edit-panel {
+    border: 1px solid var(--pe-border);
+    border-radius: 12px;
+    background: #fcfbfe;
+    padding: 1rem 1.15rem;
+    margin-bottom: 1rem;
+}
+
+.product-edit-panel:last-child {
+    margin-bottom: 0;
+}
+
+.product-edit-panel__title,
+.product-edit-section-title {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #2f2b3d;
+    margin: 0 0 0.85rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px dashed var(--pe-border);
+}
+
+.product-edit-page .form-label {
+    font-weight: 600;
+    color: #4a4658;
+    margin-bottom: 0.35rem;
+    font-size: 0.88rem;
+}
+
+/* Toggle cards — compact, side by side via Bootstrap grid */
+.product-toggle-card {
+    border: 1px solid var(--pe-border);
+    border-radius: 10px;
+    padding: 0.75rem 0.85rem;
+    background: #fff;
+    height: 100%;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.product-toggle-card:hover {
+    border-color: rgba(84, 60, 146, 0.22);
+}
+
+.product-toggle-card.is-on {
+    border-color: rgba(34, 160, 107, 0.4);
+    background: linear-gradient(180deg, #f6fdf9 0%, #fff 100%);
+}
+
+.product-toggle-card__body {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.product-toggle-card__text {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-toggle-card__text label {
+    cursor: pointer;
+}
+
+.product-toggle-card__text strong {
+    display: block;
+    font-size: 0.86rem;
+    color: #2f2b3d;
+    line-height: 1.35;
+}
+
+.product-toggle-card__text small {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--pe-muted);
+    line-height: 1.4;
+    margin-top: 0.1rem;
+}
+
+.product-toggle-card .form-check-input {
+    width: 2.4rem;
+    height: 1.25rem;
+    cursor: pointer;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+/* Image upload */
+.product-image-upload {
+    border: 2px dashed #d4d2dd;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.product-image-upload:hover {
+    border-color: var(--pe-brand);
+    background: var(--pe-brand-soft);
+}
+
+.product-image-upload img {
+    width: 100%;
+    max-width: 180px;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid var(--pe-border);
+    margin-bottom: 0.65rem;
+}
+
+.product-image-upload__hint {
+    font-size: 0.8rem;
+    color: var(--pe-muted);
+    margin: 0;
+}
+
+.product-edit-page .alert-price-warning {
+    border-radius: 12px;
+    border: 1px solid rgba(245, 159, 0, 0.35);
+    background: #fff8eb;
+}
+
+.product-edit-meta-card {
+    border: 1px solid var(--pe-border);
+    border-radius: var(--pe-radius);
+    overflow: hidden;
+}
+
+.product-edit-meta-card .card-header {
+    background: #f8f7fc;
+    border-bottom: 1px solid var(--pe-border);
+    padding: 0.85rem 1.15rem;
+}
+
+.product-edit-page .conversion-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid var(--pe-border);
+}
+
+.product-edit-page .conversion-inline .form-control {
+    width: 72px;
+    text-align: center;
+}
+
+.product-edit-page [id^="tour-product"] {
+    scroll-margin-top: 5.5rem;
+}
+
+.product-edit-page .select2-container {
+    width: 100% !important;
+}

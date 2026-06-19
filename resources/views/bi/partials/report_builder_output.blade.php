@@ -97,7 +97,7 @@
                 @forelse ($result['rows'] as $row)
                     <tr>
                         @foreach ($result['columns'] as $column)
-                            @php $value = $row->{$column['key']}; @endphp
+                            <?php $value = $row->{$column['key']}; ?>
                             <td>
                                 @if ($column['type'] === 'measure' && is_numeric($value))
                                     {{ number_format((float) $value, 2) }}

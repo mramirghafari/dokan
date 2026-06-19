@@ -9,19 +9,12 @@
     <title>ثبت محصول جدید - دکان دارمینو</title>
     <meta content="" name="description" />
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet" />
-    <!-- Core CSS -->
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><!-- Icons -->
+<!-- Core CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables.bootstrap5.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css"
         rel="stylesheet" />
@@ -30,13 +23,11 @@
 
     <!-- Page CSS -->
     <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" />
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
+    <link href="{{ asset('assets/css/product-edit.css') }}?v=4" rel="stylesheet" />
 </head>
 
 <body>
@@ -44,6 +35,8 @@
     @php
         $featureBranchManagement = \App\Services\TenantSettings::enabled('feature_branch_management');
         $featureWarehouseManagement = \App\Services\TenantSettings::enabled('feature_warehouse_management');
+        $featureDistribution = $featureDistribution ?? \App\Services\TenantSettings::enabled('feature_distribution');
+        $featureAgencySales = $featureAgencySales ?? \App\Services\TenantSettings::enabled('feature_agency_sales');
     @endphp
     @include('sweetalert::alert')
     <!-- Layout wrapper -->
@@ -56,7 +49,7 @@
                 <!-- Content wrapper -->
                 <div class="content-wrapper">
                     <!-- Content -->
-                    <div class="container-xxl flex-grow-1 container-p-y">
+                    <div class="container-xxl flex-grow-1 container-p-y product-edit-page">
                         <h4 class="row justify-content-between py-3 mb-2">
                             <div class="col-9">
                                 <a href="{{ route('products.index') }}" class="text-muted fw-light">محصولات /</a>
@@ -76,40 +69,49 @@
                         </h4>
                         <!-- Sticky Actions -->
                         <div class="row mt-3">
-                            <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data"
-                                id="addProduct" novalidate>
-                                @csrf
-                                @include('errors.errors')
-                                <div class="col-12 text-end py-4">
-                                    <button class="btn btn-primary me-sm-3 me-1" type="submit">ایجاد محصول</button>
-                                </div>
-                                <div class="nav-align-top nav-tabs-shadow mb-4">
-                                    <ul class="nav nav-tabs" role="tablist">
-                                        <li class="nav-item">
-                                            <button aria-controls="navs-top-home" aria-selected="true"
-                                                class="nav-link active" data-bs-target="#navs-top-home"
-                                                data-bs-toggle="tab" role="tab" type="button">مشخصات اصلی
-                                                محصول</button>
-                                        </li>
-                                        <li class="nav-item">
-                                            <button aria-controls="navs-top-profile" aria-selected="false"
-                                                class="nav-link" data-bs-target="#navs-top-profile" data-bs-toggle="tab"
-                                                role="tab"
-                                                type="button">{{ $featureWarehouseManagement ? 'مشخصات انبار' : 'اطلاعات تکمیلی محصول' }}</button>
-                                        </li>
-                                        <li class="nav-item">
-                                            <button aria-controls="navs-top-messages" aria-selected="false"
-                                                class="nav-link" data-bs-target="#navs-top-messages"
-                                                data-bs-toggle="tab" role="tab" type="button">ویژگی ها و اطلاعات
-                                                اضافی</button>
-                                        </li>
-                                        <li class="nav-item">
-                                            <button aria-controls="navs-top-messages" aria-selected="false"
-                                                class="nav-link" data-bs-target="#pricesinfo" data-bs-toggle="tab"
-                                                role="tab" type="button">اعلامیه قیمت</button>
-                                        </li>
-                                    </ul>
-                                    <div class="tab-content">
+                            <div class="col-12">
+                                <div class="card product-edit-card erp-form-card mb-4">
+                                    <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data"
+                                        id="addProduct" class="erp-form-card__form" novalidate>
+                                        @csrf
+                                        @include('errors.errors')
+
+                                        <div class="product-edit-card__head">
+                                            <div class="product-edit-card__tabs-scroll">
+                                                <ul class="nav nav-tabs product-edit-tabs" role="tablist">
+                                                    <li class="nav-item">
+                                                        <button aria-controls="navs-top-home" aria-selected="true"
+                                                            class="nav-link active" data-bs-target="#navs-top-home"
+                                                            data-bs-toggle="tab" role="tab" type="button">
+                                                            <x-ui.icon name="package" />مشخصات اصلی
+                                                        </button>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <button aria-controls="navs-top-profile" aria-selected="false"
+                                                            class="nav-link" data-bs-target="#navs-top-profile"
+                                                            data-bs-toggle="tab" role="tab" type="button">
+                                                            <x-ui.icon name="building-warehouse" />
+                                                            {{ $featureWarehouseManagement ? 'مشخصات انبار' : 'اطلاعات تکمیلی' }}
+                                                        </button>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <button aria-controls="navs-top-messages" aria-selected="false"
+                                                            class="nav-link" data-bs-target="#navs-top-messages"
+                                                            data-bs-toggle="tab" role="tab" type="button">
+                                                            <x-ui.icon name="adjustments" />ویژگی‌ها و تصویر
+                                                        </button>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <button aria-controls="pricesinfo" aria-selected="false"
+                                                            class="nav-link" data-bs-target="#pricesinfo"
+                                                            data-bs-toggle="tab" role="tab" type="button">
+                                                            <x-ui.icon name="currency-dollar" />اعلامیه قیمت
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="product-edit-card__body tab-content">
                                         <div class="tab-pane fade show active" id="navs-top-home" role="tabpanel">
                                             <div class="row g-3 p-3">
                                                 <div class="col-md-4">
@@ -177,12 +179,14 @@
                                                     </select>
                                                 </div>
 
+                                                <h6 class="product-edit-section-title">واحدهای اندازه‌گیری</h6>
+                                                <div class="row g-3 mb-3">
                                                 <div class="col-md-4">
                                                     <label for="pr_unit">واحد اصلی محصول:</label>
                                                     <select class="select2 form-select" data-allow-clear="true"
                                                         id="pr_unit" name="base_unit_id" required>
                                                         <option value="0">انتخاب کنید</option>
-                                                        @foreach ($units as $unit)
+                                                        @foreach ($productUnits as $unit)
                                                             <option value="{{ $unit->id }}"
                                                                 @if (old('base_unit_id') == $unit->id) selected @endif>
                                                                 {{ $unit->title }}</option>
@@ -194,7 +198,7 @@
                                                     <select class="select2 form-select" data-allow-clear="true"
                                                         id="pr_sub_unit" name="secondary_unit_id">
                                                         <option value="0">انتخاب کنید</option>
-                                                        @foreach ($units as $unit)
+                                                        @foreach ($productUnits as $unit)
                                                             <option value="{{ $unit->id }}"
                                                                 @if (old('secondary_unit_id') == $unit->id) selected @endif>
                                                                 {{ $unit->title }}</option>
@@ -213,6 +217,49 @@
                                                         <span class="sub_unit_text">واحد فرعی</span> </label>
 
                                                 </div>
+                                                </div>
+
+                                                @if ($featureDistribution)
+                                                    <h6 class="product-edit-section-title">واحدهای باربری</h6>
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-md-4">
+                                                            <label for="shipping_base_unit">واحد اصلی باربری</label>
+                                                            <select class="select2 form-select" data-allow-clear="true"
+                                                                id="shipping_base_unit" name="pr_weight_unit">
+                                                                <option value="">انتخاب کنید</option>
+                                                                @foreach ($shippingUnits as $unit)
+                                                                    <option value="{{ $unit->title }}"
+                                                                        @selected(old('pr_weight_unit') === $unit->title)>
+                                                                        {{ $unit->title }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label for="shipping_secondary_unit">واحد فرعی باربری</label>
+                                                            <select class="select2 form-select" data-allow-clear="true"
+                                                                id="shipping_secondary_unit" name="pack_weight_unit">
+                                                                <option value="">انتخاب کنید</option>
+                                                                @foreach ($shippingUnits as $unit)
+                                                                    <option value="{{ $unit->title }}"
+                                                                        @selected(old('pack_weight_unit') === $unit->title)>
+                                                                        {{ $unit->title }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label for="pr_weight">وزن واحد اصلی</label>
+                                                            <input aria-label="وزن اصلی محصول" class="form-control"
+                                                                id="pr_weight" name="pr_weight" type="text"
+                                                                value="{{ old('pr_weight') }}" />
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label for="pack_weight">وزن واحد فرعی</label>
+                                                            <input aria-label="وزن فرعی محصول" class="form-control"
+                                                                id="pack_weight" name="pack_weight" type="text"
+                                                                value="{{ old('pack_weight') }}" />
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="navs-top-profile" role="tabpanel">
@@ -269,20 +316,19 @@
                                         </div>
                                         <div class="tab-pane fade" id="navs-top-messages" role="tabpanel">
                                             <div class="row mt-4">
-                                                <div
-                                                    class="form-group col-12 bg-secondary p-3 mb-3 rounded checkbox checkbox-primary">
-                                                    <input type="checkbox" name="item_sale_status" id="checkbox-p-1">
-                                                    <label for="checkbox-p-1" class="cr">قابلیت فروش تکی</label>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label" for="order_quantity_mode">نحوه سفارش در ثبت سفارش</label>
+                                                    <select class="form-select" id="order_quantity_mode" name="order_quantity_mode">
+                                                        @foreach (\App\Models\Product::ORDER_QUANTITY_MODES as $modeKey => $modeLabel)
+                                                            <option value="{{ $modeKey }}" @selected(old('order_quantity_mode', 'main_unit') === $modeKey)>
+                                                                {{ $modeLabel }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <small class="text-muted">تعیین می‌کند کاربر در صفحه ثبت سفارش چگونه تعداد وارد کند.</small>
                                                 </div>
-
-                                                <div
-                                                    class="form-group col-12 bg-secondary p-3 mb-3 rounded checkbox checkbox-primary">
-                                                    <input type="checkbox" name="pack_sale_status"
-                                                        id="pack_sale_status">
-                                                    <label for="pack_sale_status" class="cr text-white">قابلیت فروش
-                                                        عمده</label>
-                                                </div>
-
+                                            </div>
+                                            <div class="row mt-2">
                                                 <div
                                                     class="form-group col-12 bg-secondary p-3 mb-3 rounded checkbox checkbox-primary">
                                                     <input type="checkbox" name="isFreez" id="isFreez">
@@ -315,72 +361,6 @@
                                                 </div>
                                             </div>
 
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label for="pr_weight">وزن اصلی محصول <small
-                                                            class="text-muted">تنظیمات باربری</small>:</label>
-                                                    <div class="input-group">
-                                                        <input aria-label="وزن اصلی محصول" class="form-control"
-                                                            id="pr_weight" name="pr_weight" type="text"
-                                                            value="" />
-                                                        <button aria-expanded="false"
-                                                            class="btn btn-outline-primary dropdown-toggle selected_weight"
-                                                            data-bs-toggle="dropdown" type="button">
-                                                            واحد وزن
-                                                        </button>
-                                                        <input type="hidden" name="pr_weight_unit"
-                                                            id="pr_weight_txt">
-                                                        <ul class="dropdown-menu weight_selector dropdown-menu-end">
-                                                            <li class="dropdown-item">انتخاب کنید</li>
-                                                            <li class="dropdown-item">گرم</li>
-                                                            <li class="dropdown-item">کیلوگرم</li>
-                                                            <li class="dropdown-item">مثقال</li>
-                                                            <li class="dropdown-item">سی سی</li>
-                                                            <li class="dropdown-item">میلی لیتر</li>
-                                                            <li class="dropdown-item">لیتر</li>
-                                                            <li class="dropdown-item">تن</li>
-                                                            <li class="dropdown-item">متر مکعب</li>
-                                                            <li class="dropdown-item">گالن</li>
-                                                            <li class="dropdown-item">فله</li>
-                                                            <li class="dropdown-item">متر</li>
-                                                            <li class="dropdown-item">سانتی متر</li>
-                                                            <li class="dropdown-item">میلی متر</li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="pack_weight">وزن فرعی محصول<small
-                                                            class="text-muted">تنظیمات باربری</small>: </label>
-                                                    <div class="input-group">
-                                                        <input aria-label="وزن اصلی محصول" class="form-control"
-                                                            id="pack_weight" name="pack_weight" type="text" />
-                                                        <button aria-expanded="false"
-                                                            class="btn btn-outline-primary dropdown-toggle selected_pack_weight"
-                                                            data-bs-toggle="dropdown" type="button">
-                                                            واحد وزن
-                                                        </button>
-                                                        <input type="hidden" name="pack_weight_unit"
-                                                            id="pack_weight_txt">
-                                                        <ul
-                                                            class="dropdown-menu pack_weight_selector dropdown-menu-end">
-                                                            <li class="dropdown-item">انتخاب کنید</li>
-                                                            <li class="dropdown-item">گرم</li>
-                                                            <li class="dropdown-item">کیلوگرم</li>
-                                                            <li class="dropdown-item">مثقال</li>
-                                                            <li class="dropdown-item">سی سی</li>
-                                                            <li class="dropdown-item">میلی لیتر</li>
-                                                            <li class="dropdown-item">لیتر</li>
-                                                            <li class="dropdown-item">تن</li>
-                                                            <li class="dropdown-item">متر مکعب</li>
-                                                            <li class="dropdown-item">گالن</li>
-                                                            <li class="dropdown-item">فله</li>
-                                                            <li class="dropdown-item">متر</li>
-                                                            <li class="dropdown-item">سانتی متر</li>
-                                                            <li class="dropdown-item">میلی متر</li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                         <div class="tab-pane fade" id="pricesinfo" role="tabpanel">
 
@@ -409,6 +389,17 @@
                                                         <button aria-expanded="false" class="btn btn-outline-primary"
                                                             type="button">درصد</button>
                                                     </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="max_discount_amount">حداکثر مبلغ تخفیف</label>
+                                                    <div class="input-group">
+                                                        <input aria-label="حداکثر مبلغ تخفیف" class="form-control seprator"
+                                                            id="max_discount_amount" name="max_discount_amount" type="text"
+                                                            value="{{ old('max_discount_amount', '0') }}" />
+                                                        <button aria-expanded="false" class="btn btn-outline-primary"
+                                                            type="button">ریال</button>
+                                                    </div>
+                                                    <small class="text-muted">سقف مبلغی تخفیف برای هر ردیف در ثبت سفارش.</small>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
                                                     <label for="tax">ارزش افزوده<small
@@ -441,6 +432,7 @@
                                                             type="button">ریال</button>
                                                     </div>
                                                 </div>
+                                                @if ($featureAgencySales)
                                                 <div class="col-md-6 mb-3">
                                                     <label for="representative_price">قیمت نماینده:</label>
                                                     <div class="input-group">
@@ -451,6 +443,7 @@
                                                             type="button">ریال</button>
                                                     </div>
                                                 </div>
+                                                @endif
                                                 <div class="col-md-6 mb-3">
                                                     <label for="wholesale_price">قیمت عمده:</label>
                                                     <div class="input-group">
@@ -483,12 +476,58 @@
                                                         name="price_date_exp" placeholder="" type="text"
                                                         data-jdp />
                                                 </div>
+                                                <div class="col-12 mt-4">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <h6 class="mb-0">بازه های زمانی قیمت</h6>
+                                                        <button type="button" class="btn btn-sm btn-label-primary" id="add-price-range-row">
+                                                            افزودن بازه
+                                                        </button>
+                                                    </div>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm align-middle" id="price-ranges-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>نوع قیمت</th>
+                                                                    <th>مبلغ</th>
+                                                                    <th>از تاریخ</th>
+                                                                    <th>تا تاریخ</th>
+                                                                    <th>اولویت</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @php $existingRanges = old('price_ranges', [['price_type' => 'sale', 'amount' => old('price', '0'), 'starts_at' => old('price_date'), 'ends_at' => old('price_date_exp'), 'priority' => 0]]); @endphp
+                                                                @foreach ($existingRanges as $index => $range)
+                                                                    <tr>
+                                                                        <td>
+                                                                            <select class="form-select" name="price_ranges[{{ $index }}][price_type]">
+                                                                                @foreach ($pricePeriodTypes as $typeKey => $typeLabel)
+                                                                                    <option value="{{ $typeKey }}" @selected(($range['price_type'] ?? 'sale') === $typeKey)>{{ $typeLabel }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </td>
+                                                                        <td><input type="text" class="form-control seprator" name="price_ranges[{{ $index }}][amount]" value="{{ $range['amount'] ?? '' }}"></td>
+                                                                        <td><input type="text" class="form-control" data-jdp name="price_ranges[{{ $index }}][starts_at]" value="{{ $range['starts_at'] ?? '' }}"></td>
+                                                                        <td><input type="text" class="form-control" data-jdp name="price_ranges[{{ $index }}][ends_at]" value="{{ $range['ends_at'] ?? '' }}"></td>
+                                                                        <td><input type="number" class="form-control" name="price_ranges[{{ $index }}][priority]" value="{{ $range['priority'] ?? 0 }}"></td>
+                                                                        <td><button type="button" class="btn btn-sm btn-label-danger remove-price-range-row">حذف</button></td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                         </div>
-                                    </div>
+                                        @include('partials.erp-form-card-footer', [
+                                            'submitLabel' => 'ایجاد محصول',
+                                            'submitIcon' => 'ti-plus',
+                                            'cancelUrl' => route('products.index'),
+                                        ])
+                                    </form>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                         <!-- /Sticky Actions -->
                     </div>
@@ -510,11 +549,13 @@
     <!-- build:js assets/vendor/js/core.js -->
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <!-- endbuild -->
     <script src="{{ asset('assets/') }}/vendor/libs/jquery-sticky/jquery-sticky.js"></script>
@@ -526,35 +567,25 @@
     <script src="{{ asset('assets/') }}/js/main.js"></script>
     <!-- Page JS -->
     <script src="{{ asset('assets/') }}/js/form-layouts.js"></script>
+    <link rel="stylesheet" href="{{ asset('/css/jalalidatepicker.min.css') }}" />
+    <script src="{{ asset('/js/jalalidatepicker.min.js') }}"></script>
     <script>
+        jalaliDatepicker.startWatch();
         $('.products').addClass('open')
         $('.products .addnew').addClass('active open')
-        // datatable (jquery)
-
-
-
-        $('.weight_selector li').click(function() {
-            var selected_weight = $(this).html();
-            $('.selected_weight').html(selected_weight);
-            $('#pr_weight_txt').val(selected_weight);
-
-        });
-
-        $('.pack_weight_selector li').click(function() {
-            var selected_weight = $(this).html();
-            $('.selected_pack_weight').html(selected_weight);
-            $('#pack_weight_txt').val(selected_weight);
-
-        });
 
         $('#pr_unit').on('change', function() {
-            var pr_uniit = $(this).val();
-            $('.unit_text').html(pr_uniit);
+            var pr_unit = $('#pr_unit option:selected').text().trim();
+            if (pr_unit && pr_unit !== 'انتخاب کنید') {
+                $('.unit_text').html(pr_unit);
+            }
         });
 
         $('#pr_sub_unit').on('change', function() {
-            var pr_uniit = $(this).val();
-            $('.sub_unit_text').html(pr_uniit);
+            var pr_sub_unit = $('#pr_sub_unit option:selected').text().trim();
+            if (pr_sub_unit && pr_sub_unit !== 'انتخاب کنید') {
+                $('.sub_unit_text').html(pr_sub_unit);
+            }
         });
 
         $('.seprator').on('input', function() {
@@ -567,6 +598,33 @@
             }
 
             $(this).val(val);
+        });
+
+        let priceRangeIndex = $('#price-ranges-table tbody tr').length;
+        $('#add-price-range-row').on('click', function() {
+            const row = `
+                <tr>
+                    <td>
+                        <select class="form-select" name="price_ranges[${priceRangeIndex}][price_type]">
+                            @foreach ($pricePeriodTypes as $typeKey => $typeLabel)
+                                <option value="{{ $typeKey }}">{{ $typeLabel }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control seprator" name="price_ranges[${priceRangeIndex}][amount]" value=""></td>
+                    <td><input type="text" class="form-control" data-jdp name="price_ranges[${priceRangeIndex}][starts_at]" value=""></td>
+                    <td><input type="text" class="form-control" data-jdp name="price_ranges[${priceRangeIndex}][ends_at]" value=""></td>
+                    <td><input type="number" class="form-control" name="price_ranges[${priceRangeIndex}][priority]" value="0"></td>
+                    <td><button type="button" class="btn btn-sm btn-label-danger remove-price-range-row">حذف</button></td>
+                </tr>
+            `;
+            $('#price-ranges-table tbody').append(row);
+            jalaliDatepicker.startWatch();
+            priceRangeIndex++;
+        });
+
+        $(document).on('click', '.remove-price-range-row', function() {
+            $(this).closest('tr').remove();
         });
     </script>
     <script>

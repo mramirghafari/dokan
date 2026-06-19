@@ -6,250 +6,364 @@
     <meta charset="UTF-8" />
     <meta content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
         name="viewport" />
-    <title>لیست محصولات - دکان دارمینو</title>
+    <title>ثبت سفارش / پیش‌فاکتور - دکان دارمینو</title>
     <meta content="" name="description" />
-    <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet" />
-    <!-- Core CSS -->
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables.bootstrap5.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css"
         rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css"
         rel="stylesheet" />
-
-    <!-- Page CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" />
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
-    <!-- Better experience of RTL -->
+    <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
-    <style>
-        .light-style .select2-container--default .select2-selection--single {
-            height: 50px;
-        }
-
-        @media(min-width: 768px) {
-            .card-img-top {
-                width: 330px;
-                height: 330px;
-            }
-        }
-
-        @media(max-width: 768px) {
-            .card-img-top {
-                width: 270px;
-                height: 270px;
-            }
-
-            h5.card-title {
-                height: 60px;
-            }
-        }
-    </style>
+    <link href="{{ asset('assets/css/product-neworder.css') }}?v=2" rel="stylesheet" />
 </head>
 
 <body>
     @include('sweetalert::alert')
-    <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
             @include('sections.sidebar')
-            <!-- Layout container -->
             <div class="layout-page">
                 @include('sections.header')
-                <!-- Content wrapper -->
                 <div class="content-wrapper">
-                    <!-- Content -->
-                    <div class="container-xxl flex-grow-1 container-p-y">
-                        <h4 class="py-3 mb-2">
-                            <span class="text-muted fw-light">محصولات /</span>
-                            لیست محصولات
-                        </h4>
-                        <!-- Sticky Actions -->
+                    <div class="container-xxl flex-grow-1 container-p-y neworder-page">
+                        @php
+                            $Task = $Task ?? null;
+                            $isAgent = $isAgent ?? false;
+                            $productCount = $productCount ?? $products->count();
+                            $showProducts = $isAgent || isset($_GET['Customer']);
+                            $initialButtonClass = $showProducts ? 'btn-success' : 'btn-info';
+                            $initialButtonLabel = $showProducts ? 'ثبت سفارش' : 'ادامه و انتخاب محصول';
+                            $featureWarehouseManagement = $featureWarehouseManagement ?? \App\Services\TenantSettings::enabled('feature_warehouse_management');
+                            $productDiscountLimits = $productDiscountLimits ?? [];
+                        @endphp
+
+                        <div class="card neworder-hero" id="tour-neworder-page-header">
+                            <div class="card-body">
+                                <div id="tour-neworder-page-title">
+                                    <span class="neworder-hero__eyebrow">فروش و سفارش‌گیری</span>
+                                    <h4 class="mb-0">
+                                        <span class="text-muted fw-light">سفارش‌ها /</span>
+                                        ثبت سفارش / پیش‌فاکتور
+                                    </h4>
+                                    <p class="neworder-hero__subtitle mb-0">
+                                        مشتری را انتخاب کنید، محصولات را جستجو و تعداد بزنید، سپس سفارش را ثبت کنید تا به‌صورت پیش‌فاکتور در سیستم ذخیره شود.
+                                    </p>
+                                </div>
+                                <div class="neworder-hero__stats">
+                                    <span class="neworder-hero__stat">
+                                        <x-ui.icon name="package" />
+                                        {{ number_format($productCount) }} محصول فعال
+                                    </span>
+                                    @if (!$isAgent)
+                                        <span class="neworder-hero__stat">
+                                            <x-ui.icon name="users" />
+                                            {{ number_format($Customers->count()) }} مشتری در دسترس
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
                         <form id="addFactor" method="POST" action="{{ route('add_factor_visitor') }}">
                             <input type="hidden" id="visitor_lat" name="visitor_lat" />
                             <input type="hidden" id="visitor_lng" name="visitor_lng" />
                             @csrf
-                            @php($Task = $Task ?? null)
-                            @php($isAgent = $isAgent ?? false)
                             @if ($Task != null)
                                 <input type="hidden" name="task_id" value="{{ $Task }}" />
                             @endif
-                            <div class="row justify-content-center align-items-start g-3 mb-3">
-                                <div class="col-12 col-md-6 order-2 order-md-1">
-                                    @if (!$isAgent)
-                                        <select class="form-control select2 py-3 customers_list" name="customer"
-                                            style="height: 70px" @if (isset($_GET['Customer'])) disabled @endif>
-                                            <option>انتخاب کنید...</option>
+
+                            @if (!$isAgent)
+                                <div class="card neworder-customer-card" id="tour-neworder-customer-card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <x-ui.icon name="user-search" class="me-1" />
+                                            انتخاب مشتری
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <label class="form-label" for="tour-neworder-customer-select">انتخاب مشتری برای این فاکتور</label>
+                                        <select class="form-control select2 customers_list" id="tour-neworder-customer-select"
+                                            name="customer" @if (isset($_GET['Customer'])) disabled @endif>
+                                            <option value="">انتخاب کنید...</option>
                                             @foreach ($Customers as $customer)
                                                 <option value="{{ $customer->id }}"
+                                                    data-max-purchase="{{ $customer->max_purchase_amount ?? '' }}"
+                                                    data-max-discount="{{ $customer->max_discount_amount ?? '' }}"
                                                     @if (isset($_GET['Customer']) && $_GET['Customer'] == $customer->id) selected @endif
                                                     @if (isset($_GET['Customer'])) readonly @endif>
-                                                    {{ $customer->name }} / تابلو: {{ $customer->tablo }} / آدرس:
-                                                    {{ $customer->address }}</option>
+                                                    {{ $customer->name }}
+                                                    @if ($customer->tablo)
+                                                        / تابلو: {{ $customer->tablo }}
+                                                    @endif
+                                                    @if ($customer->mobile)
+                                                        / موبایل: {{ $customer->mobile }}
+                                                    @endif
+                                                    @if ($customer->address)
+                                                        / آدرس: {{ $customer->address }}
+                                                    @endif
+                                                </option>
                                             @endforeach
                                         </select>
+                                        <div class="form-text mt-2">
+                                            با نام، موبایل، تابلو یا آدرس در لیست جستجو کنید.
+                                        </div>
                                         @if (isset($_GET['Customer']))
                                             <input type="hidden" name="customer" value="{{ $_GET['Customer'] }}">
                                         @endif
-                                    @endif
-                                </div>
-                                <div class="col-12 col-md-4 order-1 order-md-2">
-                                    <div id="productValidationAlert" class="alert alert-danger text-center d-none mb-3">
-                                        برای ثبت فاکتور حداقل باید یک محصول را انتخاب نمایید
                                     </div>
-                                    <button type="button"
-                                        class="btn w-100 p-3 my-0 set_customer {{ $isAgent || isset($_GET['Customer']) ? 'btn-success' : 'btn-info' }}">
-                                        ثبت سفارش
-                                    </button>
                                 </div>
-                            </div>
-                            <div class="row prlist {{ $isAgent || isset($_GET['Customer']) ? '' : 'd-none' }} mt-3">
-                                <div class="col-12 mb-3">
-                                    <input type="text" class="form-control form-control-lg" id="searchInput"
-                                        placeholder="جستجوی محصول..." />
-                                </div>
-                                @foreach ($products as $product)
-                                    <div class="col-6 col-lg-3 mb-3 pr_item">
-                                        <div class="card">
-                                            <img class="card-img-top"
-                                                src="{{ $product->photo == null ? asset('/img/core-img/placeholder-image.png') : asset("/storage/uploads/$product->photo") }}" />
-                                            <div class="card-body p-2">
-                                                <h5 class="card-title mb-2">{{ $product->title }}
-                                                    {{ $product->display_name }}</h5>
-                                                <p class="mb-1">کد محصول: <strong>{{ $product->sku }}</strong></p>
-                                                <p class="mb-1">
-                                                    انبار مربوطه:
-                                                    <strong>
-                                                        @if (is_array(json_decode($product->store_id)))
-                                                            @foreach (json_decode($product->store_id) as $storeid)
-                                                                <?php $Store = DB::table('stores')->where('id', $storeid)->first();
-                                                                echo $Store->title;
-                                                                ?>
-                                                            @endforeach
-                                                        @endif
-                                                    </strong>
-                                                </p>
-                                                <p class="mb-1">تعداد در {{ $product->pr_sub_unit }}:
-                                                    <strong>{{ $product->pack_items }}</strong>
-                                                </p>
-                                            </div>
-                                            @if ($product->set_price == 0)
-                                                <ul class="list-group list-group-flush">
-                                                    <li class="list-group-item text-end pricepr">
-                                                        {{ number_format(intval($product->price)) }} ریال</li>
-                                                </ul>
-                                            @endif
-                                            @if ($product->pack_sale_status == 1)
-                                                <p class="px-3 mb-0">{{ $product->pr_sub_unit }}: </p>
-                                                <div class="d-flex counterbox mb-3">
-                                                    <span class="col-2 minus">-</span>
-                                                    <input type="number" class="inputcount col-8" min="0"
-                                                        max="1000" value="0"
-                                                        name="pack_{{ $product->id }}" />
-                                                    <span class="col-2 plus">+</span>
+                            @endif
 
-                                                </div>
-                                            @endif
-                                            @if ($product->item_sale_status == 1)
-                                                <p class="px-3 mb-0">{{ $product->pr_unit }}: </p>
-                                                <div class="d-flex counterbox">
-                                                    <span class="col-2 minus">-</span>
-                                                    <input type="number" class="inputcount col-8" min="0"
-                                                        max="1000" value="0"
-                                                        name="item_{{ $product->id }}" />
-                                                    <span class="col-2 plus">+</span>
-                                                </div>
-                                            @endif
-                                            @if ($product->set_price == 1)
-                                                <label class="col-12 mt-2 px-3">
-                                                    <strong class="d-block"> قیمت هر {{ $product->pr_unit }} به
-                                                        <small>ریال</small>:</strong>
-                                                    <input type="text" class="form-control price"
-                                                        name="price_{{ $product->id }}"
-                                                        value="{{ intval($product->price) > 0 ? number_format(intval($product->price)) : '0' }}"
-                                                        style="background-color: #F3F0F0">
-                                                </label>
-                                            @endif
-                                            <p class="px-3 mt-2 mb-0">درصد تخفیف: </p>
-                                            <div class="d-flex counterbox">
-                                                <span class="col-2 minus">-</span>
-                                                <input type="number" class="inputcount col-8" min="0"
-                                                    max="1000" value="0"
-                                                    name="discount_{{ $product->id }}" />
-                                                <span class="col-2 plus">+</span>
-                                            </div>
-                                            <div class="card-body col-12 w-100">
-                                                <a href="#" class="btn btn-outline-secondary w-100"
-                                                    type="button">
-                                                    جزئیات محصول
-                                                </a>
-                                            </div>
+                            <div id="productValidationAlert"
+                                class="alert alert-danger neworder-validation-alert text-center d-none mb-3"
+                                role="alert">
+                                <x-ui.icon name="alert-circle" class="me-1" />
+                                برای ثبت فاکتور حداقل باید یک محصول را انتخاب نمایید
+                            </div>
+
+                            <div class="prlist {{ $showProducts ? '' : 'd-none' }}" id="tour-neworder-products-section">
+                                <div class="card neworder-search-card" id="tour-neworder-search">
+                                    <div class="card-body py-3">
+                                        <label class="form-label mb-2" for="searchInput">جستجوی محصول</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text">
+                                                <x-ui.icon name="search" />
+                                            </span>
+                                            <input type="text" class="form-control" id="searchInput"
+                                                placeholder="{{ $featureWarehouseManagement ? 'نام، کد SKU یا انبار محصول را بنویسید...' : 'نام یا کد SKU محصول را بنویسید...' }}" />
                                         </div>
                                     </div>
-                                @endforeach
+                                </div>
+
+                                @if ($products->isEmpty())
+                                    <div class="neworder-empty-state" id="tour-neworder-empty">
+                                        <div class="neworder-empty-state__icon">
+                                            <x-ui.icon name="package-off" />
+                                        </div>
+                                        <h5>محصول فعالی برای سفارش وجود ندارد</h5>
+                                        <p>
+                                            ابتدا از بخش «محصولات» کالای فعال با قیمت تعریف‌شده ثبت کنید، سپس به این صفحه برگردید.
+                                        </p>
+                                    </div>
+                                @else
+                                    <div class="row neworder-products-grid" id="tour-neworder-grid">
+                                        @foreach ($products as $product)
+                                            @php
+                                                $qtyMode = $product->resolveOrderQuantityMode();
+                                                $productLimits = $productDiscountLimits[$product->id] ?? [];
+                                            @endphp
+                                            <div class="col-6 col-md-4 col-lg-3 pr_item" data-product-id="{{ $product->id }}">
+                                                <div class="neworder-product-card"
+                                                    data-pack-items="{{ max(1, (int) $product->pack_items) }}"
+                                                    @if ($loop->first) id="tour-neworder-product-card" @endif>
+                                                    <div class="neworder-product-card__media @if ($product->photo == null) neworder-product-card__media--placeholder @endif">
+                                                        @if ($product->photo == null)
+                                                            <x-ui.icon name="photo" />
+                                                        @else
+                                                            <img alt="{{ $product->title }}"
+                                                                src="{{ asset("/storage/uploads/$product->photo") }}" />
+                                                        @endif
+                                                    </div>
+
+                                                    <div class="neworder-product-card__body">
+                                                        <h5 class="neworder-product-card__title">
+                                                            {{ $product->title }}
+                                                            @if ($product->display_name)
+                                                                <span class="d-block text-muted fw-normal small mt-1">{{ $product->display_name }}</span>
+                                                            @endif
+                                                        </h5>
+                                                        <div class="neworder-product-card__meta">
+                                                            <div class="neworder-product-card__meta-row">
+                                                                <x-ui.icon name="barcode" />
+                                                                <span>کد محصول: <strong>{{ $product->sku }}</strong></span>
+                                                            </div>
+                                                            @if ($featureWarehouseManagement)
+                                                            <div class="neworder-product-card__meta-row">
+                                                                <x-ui.icon name="building-warehouse" />
+                                                                <span>
+                                                                    انبار:
+                                                                    <strong>
+                                                                        @if (is_array(json_decode($product->store_id)))
+                                                                            @foreach (json_decode($product->store_id) as $storeid)
+                                                                                <?php $Store = DB::table('stores')->where('id', $storeid)->first();
+                                                                                echo $Store->title;
+                                                                                ?>
+                                                                            @endforeach
+                                                                        @endif
+                                                                    </strong>
+                                                                </span>
+                                                            </div>
+                                                            @endif
+                                                            <div class="neworder-product-card__meta-row">
+                                                                <x-ui.icon name="box" />
+                                                                <span>تعداد در {{ $product->pr_sub_unit }}: <strong>{{ $product->pack_items }}</strong></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    @if ($product->set_price == 0)
+                                                        <div class="neworder-product-card__price">
+                                                            <span class="neworder-product-card__price-label">قیمت واحد</span>
+                                                            <span class="pricepr">{{ number_format(intval($product->price)) }} ریال</span>
+                                                        </div>
+                                                    @endif
+
+                                                    <div class="neworder-product-card__controls">
+                                                        @if ($qtyMode === 'secondary_unit' || $qtyMode === 'both')
+                                                            <div class="neworder-control-group"
+                                                                @if ($loop->first) id="tour-neworder-quantity" @endif>
+                                                                <span class="neworder-control-group__label">{{ $product->pr_sub_unit ?: 'واحد فرعی' }}</span>
+                                                                <div class="d-flex counterbox">
+                                                                    <span class="col-2 minus">-</span>
+                                                                    <input type="number" class="inputcount col-8" min="0"
+                                                                        max="1000" value="0"
+                                                                        name="pack_{{ $product->id }}" />
+                                                                    <span class="col-2 plus">+</span>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+
+                                                        @if ($qtyMode === 'main_unit' || $qtyMode === 'both')
+                                                            <div class="neworder-control-group"
+                                                                @if ($loop->first && $qtyMode !== 'secondary_unit') id="tour-neworder-quantity" @endif>
+                                                                <span class="neworder-control-group__label">{{ $product->pr_unit ?: 'واحد اصلی' }}</span>
+                                                                <div class="d-flex counterbox">
+                                                                    <span class="col-2 minus">-</span>
+                                                                    <input type="number" class="inputcount col-8" min="0"
+                                                                        max="1000" value="0"
+                                                                        name="item_{{ $product->id }}" />
+                                                                    <span class="col-2 plus">+</span>
+                                                                </div>
+                                                            </div>
+                                                        @elseif ($qtyMode === 'none')
+                                                            <div class="neworder-control-group">
+                                                                <span class="neworder-control-group__label">تک‌فروشی</span>
+                                                                <div class="form-check form-switch mt-1">
+                                                                    <input class="form-check-input fixed-qty-toggle inputcount"
+                                                                        type="checkbox"
+                                                                        id="fixed_qty_{{ $product->id }}"
+                                                                        data-product-id="{{ $product->id }}" />
+                                                                    <label class="form-check-label" for="fixed_qty_{{ $product->id }}">
+                                                                        @if ($product->display_name)
+                                                                            {{ $product->display_name }}
+                                                                        @else
+                                                                            افزودن به سفارش (تعداد ۱)
+                                                                        @endif
+                                                                    </label>
+                                                                </div>
+                                                                <input type="hidden" name="item_{{ $product->id }}"
+                                                                    id="item_{{ $product->id }}" value="0"
+                                                                    class="fixed-qty-hidden" />
+                                                            </div>
+                                                        @endif
+
+                                                        @if ($product->set_price == 1)
+                                                            <div class="neworder-control-group neworder-product-card__price-input"
+                                                                @if ($loop->first) id="tour-neworder-price" @endif>
+                                                                <span class="neworder-control-group__label">
+                                                                    قیمت هر {{ $product->pr_unit }} (ریال)
+                                                                </span>
+                                                                <input type="text" class="form-control price"
+                                                                    name="price_{{ $product->id }}"
+                                                                    value="{{ intval($product->price) > 0 ? number_format(intval($product->price)) : '0' }}" />
+                                                            </div>
+                                                        @endif
+
+                                                        <div class="neworder-control-group"
+                                                            @if ($loop->first) id="tour-neworder-discount" @endif
+                                                            @if (!empty($productLimits['max_discount_percent'])) data-max-discount-percent="{{ $productLimits['max_discount_percent'] }}" @endif
+                                                            @if (!empty($productLimits['max_discount_amount'])) data-max-discount-amount="{{ $productLimits['max_discount_amount'] }}" @endif>
+                                                            <span class="neworder-control-group__label">
+                                                                درصد تخفیف
+                                                                @if (!empty($productLimits['max_discount_percent']))
+                                                                    <small class="text-muted">(حداکثر {{ rtrim(rtrim(number_format($productLimits['max_discount_percent'], 2, '.', ''), '0'), '.') }}%)</small>
+                                                                @endif
+                                                            </span>
+                                                            <div class="d-flex counterbox">
+                                                                <span class="col-2 minus">-</span>
+                                                                <input type="number" class="inputcount col-8 discount-input" min="0"
+                                                                    max="{{ $productLimits['max_discount_percent'] ?? 100 }}"
+                                                                    value="0"
+                                                                    name="discount_{{ $product->id }}"
+                                                                    data-product-id="{{ $product->id }}" />
+                                                                <span class="col-2 plus">+</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="neworder-product-card__footer"
+                                                        @if ($loop->first) id="tour-neworder-details" @endif>
+                                                        <a href="#" class="btn btn-outline-secondary w-100" type="button">
+                                                            <x-ui.icon name="info-circle" class="me-1" />
+                                                            جزئیات محصول
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="card neworder-action-card" id="tour-neworder-submit">
+                                <div class="card-body">
+                                    <div class="neworder-action-bar__inner">
+                                        <p class="neworder-action-bar__hint mb-0">
+                                            @if ($showProducts)
+                                                پس از تعیین تعداد، «ثبت سفارش» را بزنید. حداقل یک محصول با تعداد بیشتر از صفر لازم است.
+                                            @else
+                                                ابتدا مشتری را انتخاب کنید، سپس با «ادامه و انتخاب محصول» وارد لیست کالا شوید.
+                                            @endif
+                                        </p>
+                                        <div class="neworder-action-bar__actions">
+                                            <button type="button"
+                                                class="btn set_customer {{ $initialButtonClass }} waves-effect waves-light">
+                                                <x-ui.icon name="shopping-cart-plus" class="me-1" />
+                                                {{ $initialButtonLabel }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </form>
-                        <!-- /Sticky Actions -->
                     </div>
-                    <!-- / Content -->
                     @include('sections.footer')
                     <div class="content-backdrop fade"></div>
                 </div>
-                <!-- Content wrapper -->
             </div>
-            <!-- / Layout page -->
         </div>
-        <!-- Overlay -->
         <div class="layout-overlay layout-menu-toggle"></div>
-        <!-- Drag Target Area To SlideIn Menu On Small Screens -->
         <div class="drag-target"></div>
     </div>
-    <!-- / Layout wrapper -->
-    <!-- Core JS -->
-    <!-- build:js assets/vendor/js/core.js -->
+
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
-    <!-- endbuild -->
     <script src="{{ asset('assets/') }}/vendor/libs/jquery-sticky/jquery-sticky.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/cleavejs/cleave.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/cleavejs/cleave-phone.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/select2/select2.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
-    <!-- Main JS -->
     <script src="{{ asset('assets/') }}/js/main.js"></script>
-    <!-- Page JS -->
     <script src="{{ asset('assets/') }}/js/form-layouts.js"></script>
     <script>
         $('.orders').addClass('open')
         $('.orders .add-order').addClass('active open')
-        // datatable (jquery)
-        $(function() {
-            var
-                dt_without_ajax_table = $('.datatables-direct-basic');
 
-            // DataTable Direct
-            // --------------------------------------------------------------------
+        $(function() {
+            var dt_without_ajax_table = $('.datatables-direct-basic');
+
             if (dt_without_ajax_table.length) {
                 dt_without_ajax = dt_without_ajax_table.DataTable({
                     searching: false,
@@ -265,8 +379,6 @@
                         .draw();
                 });
             }
-
-
         });
 
         $('.counterbox .plus').click(function() {
@@ -286,138 +398,259 @@
         });
 
         $(document).ready(function() {
+            const captureInvoiceLocation = @json($captureInvoiceLocation ?? false);
+            const $submitButton = $('.set_customer');
+            const $actionHint = $('.neworder-action-bar__hint');
+            const $customerSelect = $('#tour-neworder-customer-select');
 
-            // در لحظه‌ی لود صفحه، تلاش برای گرفتن لوکیشن
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        // اگه موفق شد مختصات کاربر گرفته بشه
-                        $('#visitor_lat').val(position.coords.latitude);
-                        $('#visitor_lng').val(position.coords.longitude);
-                        console.log('📍 Location captured:', position.coords.latitude, position.coords
-                            .longitude);
-                    },
-                    function(error) {
-                        // هندل کردن خطاها
-                        switch (error.code) {
-                            case error.PERMISSION_DENIED:
-                                console.warn("❌ User denied the request for Geolocation.");
-                                break;
-                            case error.POSITION_UNAVAILABLE:
-                                console.warn("⚠️ Location information is unavailable.");
-                                break;
-                            case error.TIMEOUT:
-                                console.warn("⏳ The request to get user location timed out.");
-                                break;
-                            default:
-                                console.warn("⚠️ An unknown geolocation error occurred.");
-                                break;
+            if ($customerSelect.length) {
+                if ($customerSelect.hasClass('select2-hidden-accessible')) {
+                    $customerSelect.select2('destroy');
+                }
+
+                if (!$customerSelect.parent().hasClass('position-relative')) {
+                    $customerSelect.wrap('<div class="position-relative"></div>');
+                }
+
+                $customerSelect.select2({
+                    width: '100%',
+                    dir: 'rtl',
+                    allowClear: true,
+                    placeholder: 'انتخاب کنید...',
+                    dropdownParent: $(document.body),
+                    language: {
+                        noResults: function() {
+                            return 'مشتری یافت نشد';
+                        },
+                        searching: function() {
+                            return 'در حال جستجو...';
                         }
-                    }, {
-                        enableHighAccuracy: true,
-                        timeout: 10000
                     }
-                );
-            } else {
-                console.warn("❌ Geolocation is not supported by this browser.");
+                });
             }
 
+            function submitOrderForm() {
+                $('#addFactor').submit();
+            }
 
-            $('.set_customer').on('click', function() {
+            function captureLocationThenSubmit(onUnavailable) {
+                if (!captureInvoiceLocation) {
+                    submitOrderForm();
+                    return;
+                }
+
+                if (!navigator.geolocation) {
+                    if (typeof onUnavailable === 'function') {
+                        onUnavailable();
+                    } else {
+                        submitOrderForm();
+                    }
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        $('#visitor_lat').val(position.coords.latitude);
+                        $('#visitor_lng').val(position.coords.longitude);
+                        submitOrderForm();
+                    },
+                    function() {
+                        if (typeof onUnavailable === 'function') {
+                            onUnavailable();
+                        } else {
+                            submitOrderForm();
+                        }
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            }
+
+            if (captureInvoiceLocation && navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        $('#visitor_lat').val(position.coords.latitude);
+                        $('#visitor_lng').val(position.coords.longitude);
+                    },
+                    function() {},
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            }
+
+            $(document).on('change', '.fixed-qty-toggle', function() {
+                const productId = $(this).data('product-id');
+                $('#item_' + productId).val(this.checked ? 1 : 0);
+            });
+
+            function productIsSelected($card) {
+                let selected = false;
+                $card.find('input[type="number"].inputcount').each(function() {
+                    if (parseInt($(this).val(), 10) > 0) {
+                        selected = true;
+                        return false;
+                    }
+                });
+                if (!selected) {
+                    $card.find('.fixed-qty-hidden').each(function() {
+                        if (parseInt($(this).val(), 10) > 0) {
+                            selected = true;
+                            return false;
+                        }
+                    });
+                }
+                return selected;
+            }
+
+            function validateDiscountLimits() {
+                let customerMaxDiscount = null;
+                if ($customerSelect.length) {
+                    const selectedOption = $customerSelect.find('option:selected');
+                    const rawCustomerMax = selectedOption.data('max-discount');
+                    if (rawCustomerMax !== undefined && rawCustomerMax !== '') {
+                        customerMaxDiscount = parseFloat(rawCustomerMax);
+                    }
+                }
+
+                let firstError = null;
+                $('.pr_item').each(function() {
+                    const $card = $(this);
+                    if (!productIsSelected($card)) {
+                        return;
+                    }
+
+                    const $discountGroup = $card.find('[data-max-discount-percent], [data-max-discount-amount]').first();
+                    const $discountInput = $card.find('.discount-input');
+                    const discountPercent = parseFloat($discountInput.val() || 0);
+                    if (discountPercent <= 0) {
+                        return;
+                    }
+
+                    const maxPercent = parseFloat($discountGroup.data('max-discount-percent'));
+                    if (!isNaN(maxPercent) && maxPercent > 0 && discountPercent > maxPercent) {
+                        firstError = 'درصد تخفیف از سقف مجاز (' + maxPercent + '%) بیشتر است.';
+                        return false;
+                    }
+
+                    const pack = parseInt($card.find('[name^="pack_"]').val() || 0, 10);
+                    const item = parseInt($card.find('[name^="item_"]').val() || 0, 10);
+                    const priceRaw = ($card.find('.price').val() || $card.find('.pricepr').text() || '0').replace(/[^\d]/g, '');
+                    const unitPrice = parseInt(priceRaw || 0, 10);
+                    const packItems = parseInt($card.find('[data-pack-items]').data('pack-items') || 1, 10);
+                    const qty = (pack * packItems) + item;
+                    const gross = qty * unitPrice;
+                    const discountAmount = Math.round((gross * discountPercent) / 100);
+
+                    let maxAmount = parseFloat($discountGroup.data('max-discount-amount'));
+                    if (!isNaN(customerMaxDiscount) && customerMaxDiscount > 0) {
+                        maxAmount = isNaN(maxAmount) || maxAmount <= 0
+                            ? customerMaxDiscount
+                            : Math.min(maxAmount, customerMaxDiscount);
+                    }
+
+                    if (!isNaN(maxAmount) && maxAmount > 0 && discountAmount > maxAmount) {
+                        firstError = 'مبلغ تخفیف (' + discountAmount.toLocaleString('fa-IR') + ' ریال) از سقف مجاز (' + maxAmount.toLocaleString('fa-IR') + ' ریال) بیشتر است.';
+                        return false;
+                    }
+                });
+
+                return firstError;
+            }
+
+            $submitButton.on('click', function() {
                 $('#productValidationAlert').addClass('d-none');
 
                 if ($(this).hasClass('btn-success')) {
                     let hasSelectedProduct = false;
 
-                    $('.prlist .inputcount').each(function() {
-                        if (parseInt($(this).val(), 10) > 0) {
+                    $('.pr_item').each(function() {
+                        if (productIsSelected($(this))) {
                             hasSelectedProduct = true;
                             return false;
                         }
                     });
 
                     if (!hasSelectedProduct) {
-                        $('#productValidationAlert').removeClass('d-none');
+                        $('#productValidationAlert').removeClass('d-none').html(
+                            '<x-ui.icon name="alert-circle" class="me-1" /> برای ثبت فاکتور حداقل باید یک محصول را انتخاب نمایید'
+                        );
                         $('html, body').animate({
                             scrollTop: $('#productValidationAlert').offset().top - 120
                         }, 200);
                         return;
                     }
 
-                    // وقتی روی دکمه سبز کلیک شد
-                    $(this).attr('type', 'button'); // موقتی، تا قبل از گرفتن لوکیشن ارسال نشه
-
-                    // اگر لوکیشن قبلاً گرفته شده بود
-                    if ($('#visitor_lat').val() && $('#visitor_lng').val()) {
-                        $('#addFactor').submit();
+                    const discountError = validateDiscountLimits();
+                    if (discountError) {
+                        $('#productValidationAlert').removeClass('d-none').html(
+                            '<x-ui.icon name="alert-circle" class="me-1" /> ' + discountError
+                        );
+                        $('html, body').animate({
+                            scrollTop: $('#productValidationAlert').offset().top - 120
+                        }, 200);
                         return;
                     }
 
-                    // گرفتن لوکیشن در لحظه
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                            function(position) {
-                                $('#visitor_lat').val(position.coords.latitude);
-                                $('#visitor_lng').val(position.coords.longitude);
-                                // بعد از ست شدن، فرم ارسال بشه
-                                $('#addFactor').submit();
-                            },
-                            function(error) {
-                                console.warn('Location access denied or unavailable:', error.message);
-                                // اگر کاربر رد کرد، باز هم فرم ارسال بشه تا پروسه متوقف نشه
-                                $('#addFactor').submit();
-                            }, {
-                                enableHighAccuracy: true,
-                                timeout: 10000
-                            }
-                        );
-                    } else {
-                        $('#addFactor').submit();
+                    $(this).attr('type', 'button');
+
+                    if (!captureInvoiceLocation) {
+                        submitOrderForm();
+                        return;
                     }
 
+                    if ($('#visitor_lat').val() && $('#visitor_lng').val()) {
+                        submitOrderForm();
+                        return;
+                    }
+
+                    captureLocationThenSubmit(submitOrderForm);
+
                 } else {
-                    // اولین کلیک — فقط تغییر استایل و نمایش بخش محصولات
-                    $(this).removeClass('btn-info').addClass('btn-success').html('ثبت سفارش');
+                    if ($customerSelect.length && !$customerSelect.val()) {
+                        $customerSelect.select2('open');
+                        return;
+                    }
+
+                    $(this).removeClass('btn-info').addClass('btn-success')
+                        .html('<x-ui.icon name="shopping-cart-plus" class="me-1" />ثبت سفارش');
+                    $actionHint.text('پس از تعیین تعداد، «ثبت سفارش» را بزنید. حداقل یک محصول با تعداد بیشتر از صفر لازم است.');
                     $('.prlist').removeClass('d-none');
+
+                    const scrollTarget = document.getElementById('tour-neworder-search')
+                        || document.getElementById('tour-neworder-products-section');
+                    if (scrollTarget) {
+                        $('html, body').animate({
+                            scrollTop: $(scrollTarget).offset().top - 120
+                        }, 250);
+                    }
                 }
             });
-
         });
     </script>
     <script>
         document.querySelectorAll('.price').forEach(input => {
             input.addEventListener('input', e => {
-                // حذف غیر عدد و نگه داشتن متن فعلی
                 let pos = e.target.selectionStart;
                 let raw = e.target.value.replace(/[^\d]/g, '');
-
-                // فرمت سه‌رقم سه‌رقم
                 let withCommas = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
                 e.target.value = withCommas;
-
-                // برگردوندن مکان کرسر تا وسط تایپ نپره
                 let diff = withCommas.length - raw.length;
                 e.target.selectionEnd = pos + diff;
             });
         });
     </script>
     <script>
-        document.getElementById("searchInput").addEventListener("keyup", function() {
-            let value = this.value.toLowerCase().trim();
-            let items = document.querySelectorAll(".pr_item");
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) {
+            searchInput.addEventListener("keyup", function() {
+                let value = this.value.toLowerCase().trim();
+                let items = document.querySelectorAll(".pr_item");
 
-            items.forEach(function(item) {
-                let text = item.innerText.toLowerCase();
-                if (text.includes(value)) {
-                    item.style.display = ""; // نمایش
-                } else {
-                    item.style.display = "none"; // مخفی کردن
-                }
+                items.forEach(function(item) {
+                    let text = item.innerText.toLowerCase();
+                    item.style.display = text.includes(value) ? "" : "none";
+                });
             });
-        });
+        }
     </script>
-
 </body>
 
 </html>

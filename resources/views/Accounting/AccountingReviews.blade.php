@@ -7,17 +7,9 @@
     <meta content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
         name="viewport" />
     <title>بسته بازبینی حسابدار - دکان دارمینو</title>
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
     <style>
         .review-metric {
             border: 1px solid rgba(75, 70, 92, .12);
@@ -81,7 +73,7 @@
 </head>
 
 <body>
-    @include('sweetalert::alert')
+    @include('partials.panel-toasts')
     @php
         $summary = $review['summary'];
         $money = fn($value) => number_format((float) $value);
@@ -107,7 +99,7 @@
                 @include('sections/header')
                 <div class="content-wrapper">
                     <div class="container-xxl flex-grow-1 container-p-y">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+                        <div id="tour-accounting-reviews-page" class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
                             <div>
                                 <h4 class="mb-1"><span class="text-muted fw-light">مالی و حسابداری /</span> بسته
                                     بازبینی حسابدار</h4>
@@ -123,7 +115,7 @@
                             </div>
                         </div>
 
-                        <form method="GET" action="{{ route('Accounting.AccountingReviews') }}"
+                        <form id="tour-accounting-reviews-filters" method="GET" action="{{ route('Accounting.AccountingReviews') }}"
                             class="card mb-4 no-print">
                             <div class="card-body row g-3 align-items-end">
                                 <div class="col-12 col-md-3">
@@ -182,7 +174,7 @@
                             </div>
                         </div>
 
-                        <div class="row g-3 mb-4">
+                        <div id="tour-accounting-reviews-table" class="row g-3 mb-4">
                             @foreach ([['title' => 'اسناد نامتوازن', 'value' => $summary['unbalanced_vouchers']], ['title' => 'اسناد بدون ردیف', 'value' => $summary['vouchers_without_items']], ['title' => 'ردیف بدون حساب معتبر', 'value' => $summary['missing_account_items']], ['title' => 'رسید تایید شده بدون سند مالی', 'value' => $summary['approved_receipts_without_voucher']], ['title' => 'موجودی منفی یا رزرو نامعتبر', 'value' => $summary['negative_balances']], ['title' => 'مغایرت ledger و مانده', 'value' => $summary['ledger_balance_mismatches']]] as $item)
                                 <div class="col-12 col-md-4 col-xl-2">
                                     <div class="review-metric p-3">
@@ -534,10 +526,12 @@
     </div>
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <script src="{{ asset('assets/') }}/js/main.js"></script>
 </body>

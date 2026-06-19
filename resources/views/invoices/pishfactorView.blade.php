@@ -9,26 +9,16 @@
     <title>جزئیات فاکتور شماره {{ $PishFactor->id }} - دکان دارمینو</title>
     <meta content="" name="description" />
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet" />
-    <!-- Core CSS -->
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><!-- Icons -->
+<!-- Core CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/sweetalert2/sweetalert2.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" />
     <!-- Page CSS -->
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
@@ -252,186 +242,11 @@
                                                             @endif
 
                                                         </tr>
-                                                        <tr class="x_border td-left-border">
-                                                            <th class="text-center" width="40">ردیف</th>
-                                                            @if ($factorMaker->column_pr_code == 1)
-                                                                <th class="text-center" width="80">کد کالا</th>
-                                                            @endif
-                                                            <th class="kalaname" width="250">نام کالا</th>
-                                                            @if ($factorMaker->column_moadian == 1)
-                                                                <th class="text-center moadian" width="90">شناسه
-                                                                    مودیان</th>
-                                                            @endif
-                                                            @if ($factorMaker->column_sub_unit == 1)
-                                                                <th class="text-center boxcol" width="70">کارتن
-                                                                </th>
-                                                            @endif
-                                                            <th class="text-center">جزء</th>
-                                                            @if ($factorMaker->column_sub_unit == 1)
-                                                                <th class="text-center">کل</th>
-                                                            @endif
-                                                            <th class="text-center">فی واحد</th>
-                                                            <th class="text-center">مبلغ ناخالص</th>
-                                                            @if ($factorMaker->column_discount == 1)
-                                                                <th class="dis_col text-center">درصد تخفیف</th>
-                                                                <th class="text-center">مبلغ تخفیف</th>
-                                                                <th class="text-center">مبلغ پس از تخفیف</th>
-                                                            @endif
-                                                            @if ($factorMaker->column_tax == 1)
-                                                                <th class="text-center">مالیات</th>
-                                                            @endif
-                                                            <th class="text-center"
-                                                                @if ($factorMaker->column_sub_unit == 2) colspan="2" @endif>
-                                                                مبلغ خالص</th>
-                                                        </tr>
-                                                    </thead>
-
-                                                    <tbody>
-                                                        @php($x = 1)
-                                                        @php($allpacks = 0)
-                                                        @php($allitems = 0)
-                                                        @php($allitems_full = 0)
-                                                        @php($item_fees = 0)
-                                                        @php($all_item_fees = 0)
-                                                        @php($all_item_tax = 0)
-                                                        @php($all_discounts = 0)
-                                                        @php($all_pats = 0)
-                                                        @php($factor_price = 0)
-                                                        @foreach ($storeGroup['products'] as $item)
-                                                            <?php $pr = DB::table('products')->where('id', $item->pr_id)->first(); ?>
-
-                                                            <tr class="item_{{ $x }} x_border  td-left-border"
-                                                                data-item="{{ $x }}">
-                                                                <td class="text-center">{{ $x }}</td>
-                                                                @if ($factorMaker->column_pr_code == 1)
-                                                                    <td class="text-center">{{ $pr->sku }}</td>
-                                                                @endif
-                                                                <td>{{ $pr->title }} {{ $pr->display_name }}</td>
-                                                                @if ($factorMaker->column_moadian == 1)
-                                                                    <td class="text-center">---</td>
-                                                                @endif
-                                                                @if ($factorMaker->column_sub_unit == 1)
-                                                                    <td class="text-center">{{ intval($item->pack) }}
-                                                                        @php($allpacks += intval($item->pack))</td>
-                                                                @endif
-                                                                <td class="text-center">{{ intval($item->tedad) }}
-                                                                    @php($allitems += intval($item->tedad))</td>
-                                                                @php($items = intval($pr->pack_items) * intval($item->pack) + intval($item->tedad))
-                                                                @php($allitems_full += intval($items))
-                                                                @if ($factorMaker->column_sub_unit == 1)
-                                                                    <td class="text-center">{{ intval($items) }}</td>
-                                                                @endif
-                                                                <td class="text-center">
-                                                                    {{ number_format(intval($item->price)) }}</td>
-                                                                @php($fee_price = intval($items) * intval($item->price))
-                                                                @php($all_item_fees += $fee_price)
-                                                                <td class="fee_price text-center">
-                                                                    {{ number_format($fee_price) }}
-                                                                    @php($item_fees += intval($item->price))</td>
-                                                                @if ($factorMaker->column_discount == 1)
-                                                                    <td class="discount_changer text-center">
-                                                                        {{ intval($item->discount) }}
-                                                                    </td>
-                                                                    <td class="discount_price text-center">
-                                                                        @php($disprice = (intval($items) * intval($item->price) * intval($item->discount)) / 100)
-                                                                        {{ number_format(round(intval($disprice))) }}
-                                                                        @php($pat = intval($fee_price) - intval($disprice))
-                                                                        @php($all_discounts += $disprice)</td>
-                                                                    <td class="pat text-center">
-                                                                        {{ number_format($pat) }}
-                                                                        @php($all_pats += $pat)</td>
-                                                                @endif
-                                                                @if ($factorMaker->column_tax == 1)
-                                                                    <td class="tax text-center"
-                                                                        data-tax="{{ $pr->tax }}">
-
-                                                                        @php($taxprice = intval(($pat * $pr->tax) / 100))
-                                                                        {{ number_format($taxprice) }}
-                                                                        @php($all_item_tax += $taxprice)
-                                                                    </td>
-                                                                @else
-                                                                    @php($taxprice = 0)
-                                                                @endif
-                                                                <td class="price_with_tax text-center"
-                                                                    @if ($factorMaker->column_sub_unit == 2) colspan="2" @endif>
-                                                                    @php($fullp = intval($pat) + intval($taxprice))
-                                                                    {{ number_format($fullp) }}
-                                                                    @php($factor_price += $fullp)
-                                                                </td>
-                                                            </tr>
-
-                                                            @php($x++)
-                                                        @endforeach
-                                                    </tbody>
-                                                    <tfoot>
-                                                        <tr>
-                                                            <th
-                                                                colspan="@if ($factorMaker->column_sub_unit == 1) 4 @else 3 @endif">
-                                                                جمع کل</th>
-                                                            @if ($factorMaker->column_sub_unit == 1)
-                                                                <th class="text-center allpacks">{{ $allpacks }}
-                                                                </th>
-                                                            @endif
-                                                            <th class="text-center allitems">{{ $allitems }}</th>
-                                                            @if ($factorMaker->column_sub_unit == 1)
-                                                                <th class="text-center">{{ $allitems_full }}</th>
-                                                            @endif
-                                                            <th class="text-center">{{ number_format($item_fees) }}
-                                                            </th>
-                                                            <th class="allitemfees text-center">
-                                                                {{ number_format($all_item_fees) }}</th>
-                                                            @if ($factorMaker->column_discount == 1)
-                                                                <th class="text-center"></th>
-
-                                                                <th class="all_discounts text-center">
-                                                                    {{ number_format($all_discounts) }}</th>
-                                                                <th class="all_pats text-center">
-                                                                    {{ number_format($all_pats) }}</th>
-                                                            @endif
-                                                            @if ($factorMaker->column_tax == 1)
-                                                                <th class="all_taxs text-center">
-                                                                    {{ number_format($all_item_tax) }}</th>
-                                                            @endif
-                                                            <th class="full_prices text-center"
-                                                                @if ($factorMaker->column_sub_unit == 2) colspan="2" @endif>
-                                                                <span>{{ number_format($factor_price) }}</span>
-                                                                <input type="hidden" name="pat_price"
-                                                                    value="{{ $all_pats }}" />
-                                                                <input type="hidden" name="fullPrice"
-                                                                    value="{{ $factor_price }}" />
-                                                            </th>
-                                                        </tr>
-                                                        <tr>
-                                                            <th colspan="5">شرایط و نحوه فروش: <span> <label
-                                                                        class="@if ($PishFactor->payment_type == 1) active @endif">نقدی</label>
-                                                                    <label
-                                                                        class="@if ($PishFactor->payment_type == 2) active @endif">چکی</label></span>
-                                                            </th>
-                                                            <th class="horof" colspan="9"></th>
-                                                        </tr>
-                                                        <tr>
-                                                            <th colspan="14">توضیحات: {{ $PishFactor->tozihat }}
-                                                            </th>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <th colspan="14">این اقلام توسط فروشگاه
-                                                                {{ $PishFactor->customer->tablo }} تحویل گرفته شد و تا
-                                                                زمان وصول کامل مبلغ فاکتور، نزد مشتری گرامی به صورت
-                                                                امانی میباشد.</th>
-                                                        </tr>
-                                                        <tr>
-                                                            <th colspan="4"
-                                                                style="text-align: right !important; height: 100px !important;">
-                                                                مهر و امضای فروشنده </th>
-                                                            <th colspan="5"
-                                                                style="text-align: right !important; height: 100px !important;">
-                                                                مهر و امضای مسئول پخش </th>
-                                                            <th colspan="5"
-                                                                style="text-align: right !important; height: 100px !important;">
-                                                                مهر و امضای خریدار </th>
-                                                        </tr>
-                                                    </tfoot>
+                                                        @include('invoices.partials.factor_line_table', [
+                                                            'factorMaker' => $factorMaker,
+                                                            'storeGroup' => $storeGroup,
+                                                            'PishFactor' => $PishFactor,
+                                                        ])
 
                                                 </table>
                                             </div>
@@ -544,7 +359,7 @@
                                 style="position: fixed; bottom: 50px;left: 50px"
                                 class="next_btn btn rounded-pill btn-icon btn-primary waves-effect waves-light"
                                 data-bs-original-title="برو به فاکتور بعدی" data-bs-placement="top"
-                                data-bs-toggle="tooltip" type="button"><i class="ti ti-arrow-forward-up"></i></a>
+                                data-bs-toggle="tooltip" type="button"><x-ui.icon name="arrow-forward-up" /></a>
                         @endif
                     </div>
                     <!-- / Content -->
@@ -565,11 +380,13 @@
     <!-- build:js assets/vendor/js/core.js -->
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <!-- endbuild -->
     <!-- Vendors JS -->

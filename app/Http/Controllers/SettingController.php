@@ -19,7 +19,7 @@ class SettingController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:settings,user')->only(['index', 'salesScenario', 'notifications', 'update']);
+        $this->middleware('can:settings,user')->only(['index', 'salesScenario', 'notifications', 'dashboardWidgets', 'update']);
     }
 
     public function salesScenario(Request $request)
@@ -34,6 +34,13 @@ class SettingController extends Controller
         abort_unless($this->canManageGlobalNotificationSettings(), 403);
 
         $request->query->set('settings_section', 'notification_sms');
+
+        return $this->index($request);
+    }
+
+    public function dashboardWidgets(Request $request)
+    {
+        $request->query->set('settings_section', 'dashboard_widgets');
 
         return $this->index($request);
     }
@@ -60,6 +67,12 @@ class SettingController extends Controller
             unset($groups['notification_sms']);
         }
 
+        if ($settingsSection !== 'dashboard_widgets') {
+            unset($groups['dashboard_widgets']);
+        }
+
+        $definitions = $this->withoutHiddenSettings($definitions, $settingsSection);
+
         $globalSettings = $this->settingsValues(null, array_keys($definitions));
 
         $tenantSettings = $targetTenantId ? $this->settingsValues($targetTenantId, array_keys($definitions)) : [];
@@ -72,16 +85,25 @@ class SettingController extends Controller
         foreach ($definitions as $key => $definition) {
             $group = $definition['group'] ?? 'general';
             $hasOverride = array_key_exists($key, $tenantSettings);
-            $inheritedValue = $globalSettings[$key] ?? ($definition['default'] ?? null);
-            $tenantValue = $hasOverride ? $tenantSettings[$key] : $inheritedValue;
+            $inheritedValue = $this->castSettingValueForView(
+                $globalSettings[$key] ?? ($definition['default'] ?? null),
+                $definition
+            );
+            $tenantValue = $hasOverride
+                ? $this->castSettingValueForView($tenantSettings[$key], $definition)
+                : $inheritedValue;
             $hasOrganizationOverride = array_key_exists($key, $organizationSettings);
+            $organizationValue = $hasOrganizationOverride
+                ? $this->castSettingValueForView($organizationSettings[$key], $definition)
+                : $tenantValue;
 
             $settings[$group][$key] = array_merge($definition, [
                 'key' => $key,
                 'value' => $tenantValue,
                 'inherited_value' => $inheritedValue,
+                'inherited_display' => $this->formatSettingDisplayValue($inheritedValue, $definition),
                 'has_override' => $hasOverride,
-                'organization_value' => $hasOrganizationOverride ? $organizationSettings[$key] : $tenantValue,
+                'organization_value' => $organizationValue,
                 'has_organization_override' => $hasOrganizationOverride,
             ]);
         }
@@ -90,16 +112,20 @@ class SettingController extends Controller
             $settings = array_intersect_key($settings, [$settingsSection => true]);
             $featureModules = collect();
             $navigationItems = collect();
+        } else {
+            $settings = $this->sortSettingsByGroupOrder($settings);
         }
 
         $pageTitle = match ($settingsSection) {
             'sales_scenario' => 'سناریوی فروش',
             'notification_sms' => 'اعلانات و پیامک ها',
+            'dashboard_widgets' => 'مدیریت ویجت‌های داشبورد',
             default => 'تنظیمات اختصاصی پنل',
         };
         $pageDescription = match ($settingsSection) {
             'sales_scenario' => 'در این صفحه مسیر کاری فروش از ثبت مشتری و فاکتور تا تایید، انبار، حسابداری و پیگیری CRM برای هر پنل تنظیم می شود.',
             'notification_sms' => 'در این صفحه مشخص می شود هر عملیات اعلان هدر، پیامک کاوه نگار یا هر دو را ارسال کند و متن پیامک هر عملیات چیست.',
+            'dashboard_widgets' => 'مشخص کنید کدام بخش‌های داشبورد برای این پنل نمایش داده شوند.',
             default => 'تنظیمات این صفحه برای فعال یا غیرفعال کردن قابلیت ها و رفتارهای هر پنل استفاده می شود.',
         };
 
@@ -193,9 +219,15 @@ class SettingController extends Controller
 
         Alert::success('تشکر', 'تنظیمات پنل با موفقیت ذخیره شد');
 
+        session()->flash('toast', [
+            'type' => 'success',
+            'message' => 'تنظیمات پنل با موفقیت ذخیره شد.',
+        ]);
+
         $route = match ($settingsSection) {
             'sales_scenario' => 'settings.salesScenario',
             'notification_sms' => 'settings.notifications',
+            'dashboard_widgets' => 'settings.dashboardWidgets',
             default => 'settings.index',
         };
 
@@ -212,6 +244,26 @@ class SettingController extends Controller
         return $section && array_key_exists($section, $groups) ? (string) $section : null;
     }
 
+    private function sortSettingsByGroupOrder(array $settings): array
+    {
+        $order = (array) config('panel_settings.settings_index_group_order', []);
+        $sorted = [];
+
+        foreach ($order as $groupKey) {
+            if (isset($settings[$groupKey])) {
+                $sorted[$groupKey] = $settings[$groupKey];
+            }
+        }
+
+        foreach ($settings as $groupKey => $items) {
+            if (!isset($sorted[$groupKey])) {
+                $sorted[$groupKey] = $items;
+            }
+        }
+
+        return $sorted;
+    }
+
     private function canManageGlobalNotificationSettings(): bool
     {
         return (int) Auth::user()?->isGod === 1;
@@ -223,6 +275,27 @@ class SettingController extends Controller
             $definitions,
             fn($definition) => ($definition['group'] ?? 'general') !== 'notification_sms'
         );
+    }
+
+    private function withoutHiddenSettings(array $definitions, ?string $settingsSection): array
+    {
+        return array_filter($definitions, function ($definition) use ($settingsSection) {
+            if (!empty($definition['hidden'])) {
+                return false;
+            }
+
+            $group = $definition['group'] ?? 'general';
+
+            if ($group === 'onboarding') {
+                return false;
+            }
+
+            if ($settingsSection) {
+                return $group === $settingsSection;
+            }
+
+            return !in_array($group, ['dashboard_widgets', 'onboarding'], true);
+        });
     }
 
     private function resolveTargetTenantId(Request $request): ?int
@@ -389,6 +462,91 @@ class SettingController extends Controller
         }
 
         return $value !== null ? trim((string) $value) : $default;
+    }
+
+    private function castSettingValueForView($value, array $definition)
+    {
+        $type = $definition['type'] ?? 'text';
+
+        if ($type === 'multiselect') {
+            if (is_array($value)) {
+                return array_values(array_map('strval', $value));
+            }
+
+            $decoded = json_decode((string) $value, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return array_values(array_map('strval', $decoded));
+            }
+
+            if ($value === null || $value === '') {
+                $default = $definition['default'] ?? [];
+
+                return is_array($default) ? array_values(array_map('strval', $default)) : [];
+            }
+
+            return [(string) $value];
+        }
+
+        if ($type === 'json') {
+            if (is_array($value)) {
+                return $value;
+            }
+
+            $decoded = json_decode((string) $value, true);
+
+            return json_last_error() === JSON_ERROR_NONE ? $decoded : $value;
+        }
+
+        if ($type === 'boolean') {
+            return in_array($value, ['yes', '1', 1, true, 'on'], true) ? 'yes' : 'no';
+        }
+
+        if ($type === 'number' && ($value === null || $value === '')) {
+            return (string) ($definition['default'] ?? '');
+        }
+
+        return $value;
+    }
+
+    private function formatSettingDisplayValue($value, array $definition): string
+    {
+        $type = $definition['type'] ?? 'text';
+        $options = (array) ($definition['options'] ?? []);
+
+        if ($type === 'boolean') {
+            return $value === 'yes' ? 'فعال' : 'غیرفعال';
+        }
+
+        if ($type === 'multiselect') {
+            $values = is_array($value) ? $value : $this->castSettingValueForView($value, $definition);
+
+            if (!is_array($values) || $values === []) {
+                return '—';
+            }
+
+            return collect($values)
+                ->map(fn ($item) => $options[(string) $item] ?? (string) $item)
+                ->implode('، ');
+        }
+
+        if ($type === 'json') {
+            if (is_array($value)) {
+                return $value === [] ? '—' : json_encode($value, JSON_UNESCAPED_UNICODE);
+            }
+
+            return ($value === null || $value === '') ? '—' : (string) $value;
+        }
+
+        if ($type === 'select') {
+            return (string) ($options[(string) $value] ?? $value ?? '—');
+        }
+
+        if ($value === null || $value === '') {
+            return '—';
+        }
+
+        return is_scalar($value) ? (string) $value : json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 
     private function syncTenantFeature(int $tenantId, string $key, ?string $value): void

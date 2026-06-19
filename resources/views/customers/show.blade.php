@@ -4,604 +4,577 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
-        name="viewport" />
-    <title>اطلاعات مشتری {{ $Customer->name }} - دکان دارمینو</title>
-    <meta content="" name="description" />
-    <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet" />
-    <!-- Core CSS -->
-    <link rel="stylesheet" href="https://static.neshan.org/sdk/mapboxgl/v1.13.2/neshan-sdk/v1.1.5/index.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>{{ $Customer->name }} — پرونده مشتری | دکان دارمینو</title>
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link rel="stylesheet" href="{{ asset('assets/vendor/libs/neshan-sdk/v1.1.5/index.css') }}" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/sweetalert2/sweetalert2.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" />
-    <link
-        href="{{ asset('assets/') }}/vendor/libs/@form-validation/form-validation.css" rel="stylesheet"/>
-    <!-- Page CSS -->
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
-    <!-- Better experience of RTL -->
-    <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet"/>
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
+    <link href="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.css') }}" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
 </head>
-<?php $organ = App\Models\Organization::find(auth()->user()->organization_id); ?>
+
 <body>
-@include('sweetalert::alert')
-<!-- Layout wrapper -->
+@include('partials.panel-toasts')
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
-        <!-- Menu -->
         @include('sections.sidebar')
-        <!-- / Menu -->
-        <!-- Layout container -->
         <div class="layout-page">
             @include('sections.header')
-            <!-- Content wrapper -->
             <div class="content-wrapper">
-                <!-- Content -->
-                <div class="container-xxl flex-grow-1 container-p-y">
-                    <div class="row justify-content-between">
-                        <div class="col">
-                            <h4 class="py-3 mb-2">
-                                <span class="text-muted fw-light">لیست مشتریان /</span>
-                                @if ($MyTask != null)
-                                        <?php
-                                        $task_area = DB::table('areas')->where('id', $MyTask->area_id)->first();
-                                        $task_region = DB::table('regions')->where('id', $task_area->region_id)->first();
-                                        ?>
-                                    <span class="text-muted fw-light">مشتریان {{ $task_region->name }} - {{ $task_area->name }} /</span>
-                                @endif
-                                جزئیات و تاریخچه حساب مشتری
-                            </h4>
-                        </div>
-                        <div class="col text-end">
-                            <a href="{{ route('customers.360', $Customer->id) }}" class="btn btn-primary waves-effect mt-2">پرونده ۳۶۰</a>
-                            <a href="{{ session('backlink') }}" class="btn btn-label-dark waves-effect ms-3 mt-2" type="button">
-                                بازگشت
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M15.75 19.5L8.25 12L15.75 4.5" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </a>
-                        </div>
+                <div class="container-xxl flex-grow-1 container-p-y customer-profile-page">
 
-                    </div>
-                    <div class="d-flex flex-column flex-sm-row align-items-center justify-content-sm-between mb-4 text-center text-sm-start gap-2">
-                        <div class="mb-2 mb-sm-0">
-                            <h4 class="mb-1">شناسه مشتری #{{ $Customer->customer_code }}</h4>
-                            <p class="mb-0">ثبت شده در تاریخ: {{ Verta($Customer->created_at)->format('Y/m/d H:i:s') }}</p>
-                        </div>
-                        @if (auth()->user()->isAdmin == 1 && $Customer->activeOrders->count() == 0)
-                            <form action="{{ route('customers.destroy', $Customer->id) }}"
-                                  method="POST"
-                                  onsubmit="return confirm('آیا از این مشتری اطمینان دارید؟');">
-                                @method('delete')
-                                @csrf
-                                <button class="btn btn-label-danger delete-customer" type="submit">حذف مشتری</button>
-                            </form>
-
-                        @endif
-                    </div>
-                    <div class="row">
-                        <!-- Customer-detail Sidebar -->
-                        <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
-                            <!-- Customer-detail Card -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="customer-avatar-section">
-                                        <div class="d-flex align-items-center flex-column">
-                                            <div class="customer-info text-center">
-                                                <h4 class="mb-1">{{ $Customer->tablo }}</h4>
-                                                <small>نام مشتری: <strong>{{ $Customer->name }}</strong></small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-around flex-wrap my-4">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="avatar">
-                                                <div class="avatar-initial rounded bg-label-primary">
-                                                    <i class="ti ti-shopping-cart ti-md"></i>
-                                                </div>
-                                            </div>
-                                            <div class="gap-0 d-flex flex-column">
-                                                <p class="mb-0 fw-medium">{{ count($Factors) }}</p>
-                                                <small>سفارشات</small>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="avatar">
-                                                <div class="avatar-initial rounded bg-label-primary">
-                                                    <i class="ti ti-currency-dollar ti-md"></i>
-                                                </div>
-                                            </div>
-                                            <div class="gap-0 d-flex flex-column">
-                                                <p class="mb-0 fw-medium">
-                                                    <bdi><svg class="toman" width="1rem" height="1rem">
-                                                            <use xlink:href="#toman">
-                                                                <symbol id="toman" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
-                                                                    <path clip-rule="evenodd" d="M3.057 1.742L3.821 1l.78.75-.776.741-.768-.749zm3.23 2.48c0 .622-.16 1.111-.478 1.467-.201.221-.462.39-.783.505a3.251 3.251 0 01-1.083.163h-.555c-.421 0-.801-.074-1.139-.223a2.045 2.045 0 01-.9-.738A2.238 2.238 0 011 4.148c0-.059.001-.117.004-.176.03-.55.204-1.158.525-1.827l1.095.484c-.257.532-.397 1-.419 1.403-.002.04-.004.08-.004.12 0 .252.055.458.166.618a.887.887 0 00.5.354c.085.028.178.048.278.06.079.01.16.014.243.014h.555c.458 0 .769-.081.933-.244.14-.139.21-.383.21-.731V2.02h1.2v2.202zm5.433 3.184l-.72-.7.709-.706.735.707-.724.7zm-2.856.308c.542 0 .973.19 1.293.569.297.346.445.777.445 1.293v.364h.18v-.004h.41c.221 0 .377-.028.467-.084.093-.055.14-.14.14-.258v-.069c.004-.243.017-1.044 0-1.115L13 8.05v1.574a1.4 1.4 0 01-.287.863c-.306.405-.804.607-1.495.607h-.627c-.061.733-.434 1.257-1.117 1.573-.267.122-.58.21-.937.265a5.845 5.845 0 01-.914.067v-1.159c.612 0 1.072-.082 1.38-.247.25-.132.376-.298.376-.499h-.515c-.436 0-.807-.113-1.113-.339-.367-.273-.55-.667-.55-1.18 0-.488.122-.901.367-1.24.296-.415.728-.622 1.296-.622zm.533 2.226v-.364c0-.217-.048-.389-.143-.516a.464.464 0 00-.39-.187.478.478 0 00-.396.187.705.705 0 00-.136.449.65.65 0 00.003.067c.008.125.066.22.177.283.093.054.21.08.352.08h.533zM9.5 6.707l.72.7.724-.7L10.209 6l-.709.707zm-6.694 4.888h.03c.433-.01.745-.106.937-.29.024.012.065.035.12.068l.074.039.081.042c.135.073.261.133.379.18.345.146.67.22.977.22a1.216 1.216 0 00.87-.34c.3-.285.449-.714.449-1.286a2.19 2.19 0 00-.335-1.145c-.299-.457-.732-.685-1.3-.685-.502 0-.916.192-1.242.575-.113.132-.21.284-.294.456-.032.062-.06.125-.084.191a.504.504 0 00-.03.078 1.67 1.67 0 00-.022.06c-.103.309-.171.485-.205.53-.072.09-.214.14-.427.147-.123-.005-.209-.03-.256-.076-.057-.054-.085-.153-.085-.297V7l-1.201-.5v3.562c0 .261.048.496.143.703.071.158.168.296.29.413.123.118.266.211.43.28.198.084.42.13.665.136v.001h.036zm2.752-1.014a.778.778 0 00.044-.353.868.868 0 00-.165-.47c-.1-.134-.217-.201-.35-.201-.18 0-.33.103-.447.31-.042.071-.08.158-.114.262a2.434 2.434 0 00-.04.12l-.015.053-.015.046c.142.118.323.216.544.293.18.062.325.092.433.092.044 0 .086-.05.125-.152z" fill-rule="evenodd"></path>
-                                                                </symbol>
-                                                            </use>
-                                                        </svg>{{ number_format($FactorsPriceCount) }}</bdi>
-                                                </p>
-                                                <small>مجموع خرید</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="info-container">
-                                        <small class="d-block pt-4 border-top fw-normal text-uppercase text-muted my-3">جزئیات</small>
-                                        <ul class="list-unstyled">
-                                            <li class="mb-3">
-                                                <span class="fw-medium me-2">نام مشتری:</span>
-                                                <span>{{ $Customer->name }}</span>
-                                            </li>
-                                            <li class="mb-3">
-                                                <span class="fw-medium me-2">کدملی:</span>
-                                                <span>{{ $Customer->national_id }}</span>
-                                            </li>
-                                            <li class="mb-3">
-                                                <span class="fw-medium me-2">صنف / کانال:</span>
-                                                <span class="badge bg-label-info">{{ $Customer->senf }}</span> / <span class="badge bg-label-info">{{ $Customer->channel }}</span>
-                                            </li>
-                                            <li class="mb-3">
-                                                <span class="fw-medium me-2">شماره تلفن:</span>
-                                                <span>
-                                                    <bdi><a href="tel:{{ $Customer->phone }}">{{ $Customer->phone }}</a></bdi>
-                                                </span>
-                                            </li>
-                                            <li class="mb-3">
-                                                <span class="fw-medium me-2">آدرس:</span>
-                                                <span>{{ $Customer->address }}</span>
-                                            </li>
-                                        </ul>
-                                        <div class="d-flex justify-content-center">
-                                            <a class="btn btn-primary me-3"  href="{{ route('customers.edit', $Customer->id) }}">ویرایش اطلاعات مشتری</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="customer-avatar-section">
-                                        <div class="d-flex align-items-center flex-column">
-                                            <div class="customer-info text-center">
-                                                <h4 class="mb-1">رفتار مالی مشتری</h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="info-container">
-                                        <small class="d-block pt-4 border-top fw-normal text-uppercase text-muted my-3">آمار ورود و خروج مالی</small>
-                                        <ul class="list-unstyled">
-                                            <?php $Mande = 0; ?>
-                                            @foreach ($FactorsAccepted as $fa)
-                                                <li class="mb-1 py-1" style="border-bottom: 1px solid #272626;">
-                                                    <span class="fw-medium me-2 text-warning">خروج</span>
-                                                    <span>{{ number_format(intval(str_replace(',', '', $fa->fullPrice))) }} ریال</span>
-                                                </li>
-                                                    <?php $Mande -= intval(str_replace(',', '', $fa->fullPrice)); ?>
-
-                                                @if ($fa->payment_type == 1)
-                                                    <li class="mb-1 py-1" style="border-bottom: 1px solid #272626;">
-                                                        <span class="fw-medium me-2 text-success">ورود نقدی</span>
-                                                        <span>{{ number_format(intval(str_replace(',', '', $fa->fullPrice))) }} ریال</span>
-                                                    </li>
-                                                        <?php $Mande += intval(str_replace(',', '', $fa->fullPrice)); ?>
-                                                @endif
-                                                @if ($fa->payment_type == 2)
-                                                    <li class="mb-1 py-1" style="border-bottom: 1px solid #272626;">
-                                                        <span class="fw-medium me-2 text-success">ورود چکی</span>
-                                                        <span>{{ number_format(intval(str_replace(',', '', $fa->fullPrice))) }} ریال</span>
-                                                    </li>
-                                                        <?php $Mande += intval(str_replace(',', '', $fa->fullPrice)); ?>
-                                                @endif
-                                                @if ($fa->payment_type == null || $fa->payment_type == 3)
-                                                    <li class="mb-1 py-1" style="border-bottom: 1px solid #272626;">
-                                                        <span class="fw-medium me-2 text-danger">بدهکار</span>
-                                                        <span>{{ number_format(intval(str_replace(',', '', $fa->fullPrice))) }} ریال</span>
-                                                    </li>
-                                                @endif @endforeach
-                                        </ul>
-                                        <p>وضعیت:
-
-                                            <?php if($Mande > 0) { ?>
-                                            <strong class="text-success">
-    بستانکار مبلغ: {{ number_format(abs($Mande)) }} ریال
-    </strong>
-    <?php }else { ?>
-    <strong class="text-danger">بدهکار مبلغ: {{ number_format(abs($Mande)) }} ریال</strong>
-    <?php } ?>
-    </p>
-    </div>
-    </div>
-    </div>
-    <!-- /Customer-detail Card -->
-    </div>
-    <!--/ Customer Sidebar -->
-    <!-- Customer Content -->
-    <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
-        <div class="card card-action mb-4">
-            <div class="card-header align-items-center py-4">
-                <h5 class="card-action-title mb-0">CRM و فرصت های فروش مشتری</h5>
-                <div class="card-action-element d-flex gap-2">
-                    <a class="btn btn-label-primary"
-                        href="{{ route('crm.followups.index', ['subject_type' => 'customer', 'search' => $Customer->name]) }}">کارتابل
-                        پیگیری</a>
-                    <a class="btn btn-label-info"
-                        href="{{ route('crm.opportunities.index', ['search' => $Customer->name]) }}">Pipeline فروش</a>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row g-3 mb-4">
-                    <div class="col-6 col-md-3">
-                        <div class="border rounded p-3 h-100"><small class="text-muted">پیگیری باز</small>
-                            <h5 class="mb-0 mt-1">{{ number_format($CrmStats['open_followups']) }}</h5>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="border rounded p-3 h-100"><small class="text-muted">پیگیری معوق</small>
-                            <h5 class="mb-0 mt-1 text-danger">{{ number_format($CrmStats['overdue_followups']) }}</h5>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="border rounded p-3 h-100"><small class="text-muted">فرصت باز</small>
-                            <h5 class="mb-0 mt-1">{{ number_format($CrmStats['open_opportunities']) }}</h5>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="border rounded p-3 h-100"><small class="text-muted">ارزش فرصت</small>
-                            <h5 class="mb-0 mt-1 text-success">
-                                {{ number_format($CrmStats['open_opportunity_amount']) }}</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="row g-4">
-                    <div class="col-12 col-lg-6">
-                        <h6 class="mb-3">آخرین پیگیری ها</h6>
-                        <div class="list-group list-group-flush">
-                            @forelse($CrmFollowups as $followup)
-                                <div class="list-group-item px-0">
-                                    <div class="d-flex justify-content-between gap-2">
-                                        <strong>{{ $followup->title }}</strong>
-                                        <span
-                                            class="badge bg-label-{{ in_array($followup->status, ['open', 'in_progress'], true) ? 'warning' : 'secondary' }}">{{ $followup->statusText() }}</span>
-                                    </div>
-                                    <small class="text-muted">{{ $followup->typeText() }} - مسئول:
-                                        {{ optional($followup->assignedUser)->name ?: '-' }} - موعد:
-                                        {{ optional($followup->due_date_en)->format('Y-m-d') ?: '-' }}</small>
-                                </div>
-                            @empty
-                                <div class="text-muted py-3">برای این مشتری پیگیری CRM ثبت نشده است.</div>
-                            @endforelse
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-6">
-                        <h6 class="mb-3">فرصت های فروش</h6>
-                        <div class="list-group list-group-flush">
-                            @forelse($CrmOpportunities as $opportunity)
-                                <div class="list-group-item px-0">
-                                    <div class="d-flex justify-content-between gap-2">
-                                        <strong>{{ $opportunity->title }}</strong>
-                                        <span
-                                            class="badge bg-label-{{ $opportunity->status === 'won' ? 'success' : ($opportunity->status === 'lost' ? 'danger' : 'primary') }}">{{ $opportunity->stageText() }}</span>
-                                    </div>
-                                    <small class="text-muted">{{ $opportunity->code }} -
-                                        {{ number_format($opportunity->amount) }} ریال - احتمال
-                                        {{ $opportunity->probability_percent }}% - مسئول:
-                                        {{ optional($opportunity->assignedUser)->name ?: '-' }}</small>
-                                </div>
-                            @empty
-                                <div class="text-muted py-3">برای این مشتری فرصت فروش ثبت نشده است.</div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Address accordion -->
-        <div class="card card-action mb-4">
-            <div class="card-header align-items-center py-4">
-                <h5 class="card-action-title mb-0">تاریخچه خریدهای مشتری</h5>
-                <div class="card-action-element">
-                    @if ($Customer->shop_lat == null && $Customer->shop_lng == null)
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#modalerrorlocation">
-                            ثبت فاکتور جدید
-                        </button>
-                        <div class="modal fade" id="modalerrorlocation" tabindex="-1"
-                            aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <p class="alert alert-danger m-0">برای این مشتری لوکیشن ثبت نشده و قابلیت ثبت سفارش
-                                        وجود ندارد.</p>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <form method="GET" action="{{ route('products.index') }}">
-                            <input type="hidden" name="Customer" value="{{ $Customer->id }}" />
-                            @if ($MyTask)
-                                <input type="hidden" name="Task" value="{{ $MyTask->id }}" />
-                            @endif
-                            <button class="btn btn-label-primary" type="submit">ثبت سفارش جدید</button>
-                        </form>
-                    @endif
-
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="accordion accordion-flush accordion-arrow-left" id="ecommerceBillingAccordionAddress">
-                    @foreach ($Factors as $factor)
-
-                        @php
-                            $details_count = App\Models\PishFactorItems::where('pishfactor_id', $factor->id)->count();
-                            $details = App\Models\PishFactorItems::where('pishfactor_id', $factor->id)->get();
-                        @endphp
-
-                        <div class="accordion-item border-bottom">
-                            <div class="accordion-header d-flex justify-content-between align-items-center flex-wrap flex-sm-nowrap"
-                                id="heading_{{ $factor->id }}">
-                                <a aria-controls="heading_{{ $factor->id }}" aria-expanded="false"
-                                    class="accordion-button collapsed"
-                                    data-bs-target="#factor_id_{{ $factor->id }}" data-bs-toggle="collapse"
-                                    role="button">
-                                    <span>
-                                        <span class="d-flex gap-2 align-items-baseline">
-                                            <span class="h6 mb-1">سفارش {{ $factor->id }}</span>
-                                            @if ($factor->status == 0)
-                                                <span class="badge bg-label-warning">در انتظار تایید</span>
-                                            @elseif($factor->status == 1)
-                                                <span class="badge bg-label-success">تایید شده</span>
-                                            @elseif($factor->status == 3)
-                                                <span class="badge bg-label-danger">رد شده</span>
-                                            @elseif($factor->status == 4)
-                                                <span class="badge bg-label-success">تحویل شده</span>
-                                            @elseif($factor->status == 5)
-                                                <span class="badge bg-label-warning">مرجوعی</span>
+                    {{-- Hero --}}
+                    <div class="customer-profile-hero card border-0 mb-4" id="tour-customer-hero">
+                        <div class="card-body p-4 p-lg-5">
+                            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                                <div>
+                                    <nav aria-label="breadcrumb" class="customer-profile-breadcrumb mb-2" id="tour-customer-breadcrumb">
+                                        <ol>
+                                            <li><a href="{{ route('customers.index') }}">مشتریان</a></li>
+                                            @if ($taskContext)
+                                                <li class="customer-profile-breadcrumb__sep" aria-hidden="true">/</li>
+                                                <li><span>{{ $taskContext['region'] }} / {{ $taskContext['area'] }}</span></li>
                                             @endif
-
-                                        </span>
-                                        <?php $visitor = DB::table('users')->where('id', $factor->visitor_id)->first(); ?>
-                                        <span class="mb-0 text-muted">سفارش ثبت شده توسط: <strong>{{ $visitor->name }}
-                                            </strong><span style="display: inline-block;direction: ltr"> در تاریخ:
-                                                {{ Verta($factor->created_at)->format('Y/m/d') }}</span> </span>
-                                    </span>
-                                </a>
-                                <div class="d-flex gap-3 p-4 p-sm-0 pt-0 ms-1 ms-sm-0">
-                                    <a href="{{ route('pishFactorInfo', $factor->id) }}">
-                                        <i class="ti ti-pencil text-secondary ti-sm"></i>
+                                            <li class="customer-profile-breadcrumb__sep" aria-hidden="true">/</li>
+                                            <li class="customer-profile-breadcrumb__current">پرونده مشتری</li>
+                                        </ol>
+                                    </nav>
+                                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2" id="tour-customer-identity">
+                                        <h3 class="text-white mb-0">{{ $Customer->name }}</h3>
+                                        @if ($badges['active'])
+                                            <span class="customer-profile-pill customer-profile-pill--active">
+                                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M5.25 8.1L7.1 9.95L10.85 6.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                فعال
+                                            </span>
+                                        @endif
+                                        @if ($badges['loyal'])
+                                            <span class="customer-profile-pill customer-profile-pill--loyal">
+                                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 13.5S3.5 10.2 3.5 6.6C3.5 4.9 4.8 3.5 6.5 3.5C7.45 3.5 8.3 4 8 4.8C7.7 4 8.55 3.5 9.5 3.5C11.2 3.5 12.5 4.9 12.5 6.6C12.5 10.2 8 13.5 8 13.5Z" fill="currentColor"/></svg>
+                                                وفادار
+                                            </span>
+                                        @endif
+                                        @if ((int) $Customer->status !== 1)
+                                            <span class="badge bg-label-danger">غیرفعال</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-white-50 mb-0">
+                                        کد مشتری <strong class="text-white">#{{ $Customer->customer_code }}</strong>
+                                        <span class="mx-2">·</span>
+                                        عضویت {{ verta($Customer->created_at)->format('Y/m/d H:i') }}
+                                    </p>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2" id="tour-customer-actions">
+                                    <a href="{{ route('customers.360', $Customer->id) }}" class="btn btn-light btn-sm">
+                                        <x-ui.icon name="layout-grid" class="me-1" />پرونده ۳۶۰
                                     </a>
-
+                                    <a href="{{ route('customers.edit', $Customer->id) }}" class="btn btn-warning btn-sm">
+                                        <x-ui.icon name="edit" class="me-1" />ویرایش
+                                    </a>
+                                    <a href="{{ session('backlink', route('customers.index')) }}" class="btn btn-outline-light btn-sm">
+                                        <span class="d-inline-flex align-items-center gap-1">
+                                            بازگشت
+                                            <x-ui.icon name="arrow-left" />
+                                        </span>
+                                    </a>
+                                    @if ($canDelete)
+                                        <form id="customer-delete-form" action="{{ route('customers.destroy', $Customer->id) }}" method="POST" class="d-inline">
+                                            @csrf @method('delete')
+                                            <button type="button" id="customer-delete-btn" class="btn btn-outline-danger btn-sm customer-profile-btn-delete">حذف</button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
-                            <div class="accordion-collapse collapse"
-                                data-bs-parent="#ecommerceBillingAccordionAddress"
-                                id="factor_id_{{ $factor->id }}">
-                                <div class="accordion-body ps-4 ms-2">
-                                    <h6 class="mb-1">تعداد اقلام سفارش: <b>{{ $details_count }} قلم</b></h6>
-                                    @foreach ($details as $item)
-                                        <?php $product = DB::table('products')->where('id', $item->pr_id)->first(); ?>
-                                        <p class="mb-1">{{ $product->title }} به مقدار
-                                            {{ intval($item->tedad) + intval($item->pack * $product->pack_items) }}
-                                            {{ $product->pr_unit }}</p>
-                                    @endforeach
+
+                            @php
+                                $heroKpis = [
+                                    ['icon' => 'ti-shopping-cart', 'label' => 'کل سفارش‌ها', 'value' => number_format($metrics['orders_total'])],
+                                    ['icon' => 'ti-receipt', 'label' => 'سفارش فعال', 'value' => number_format($metrics['orders_active'])],
+                                    ['icon' => 'ti-currency-dollar', 'label' => 'مجموع خرید', 'value' => number_format($metrics['revenue_total'])],
+                                    ['icon' => 'ti-wallet', 'label' => 'مانده حساب', 'value' => number_format($metrics['account_balance'])],
+                                ];
+                                if ($isSubscriptionPanel && $metrics['subscription']) {
+                                    $heroKpis[] = [
+                                        'icon' => 'ti-calendar-stats',
+                                        'label' => 'مانده اشتراک',
+                                        'value' => $metrics['subscription']['label'],
+                                    ];
+                                }
+                            @endphp
+                            <div class="customer-profile-kpi-row customer-profile-kpi-row--{{ count($heroKpis) }}" id="tour-customer-kpis">
+                                @foreach ($heroKpis as $kpi)
+                                    <div class="customer-profile-kpi">
+                                        <div class="customer-profile-kpi__icon"><x-ui.icon :name="$kpi['icon']" /></div>
+                                        <div>
+                                            <div class="customer-profile-kpi__value">{{ $kpi['value'] }}</div>
+                                            <div class="customer-profile-kpi__label">{{ $kpi['label'] }}</div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        {{-- Sidebar --}}
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card mb-4" id="tour-customer-contact-card">
+                                <div class="card-header border-bottom">
+                                    <h5 class="card-title mb-0">اطلاعات تماس و هویت</h5>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="customer-profile-dl">
+                                        <div><dt>نام کامل</dt><dd>{{ $Customer->name ?: '—' }}</dd></div>
+                                        <div><dt>تابلو / برند</dt><dd>{{ $Customer->tablo ?: '—' }}</dd></div>
+                                        <div><dt>موبایل</dt><dd dir="ltr">@if($Customer->mobile)<a href="tel:{{ $Customer->mobile }}">{{ $Customer->mobile }}</a>@else — @endif</dd></div>
+                                        <div><dt>تلفن ثابت</dt><dd dir="ltr">@if($Customer->phone)<a href="tel:{{ $Customer->phone }}">{{ $Customer->phone }}</a>@else — @endif</dd></div>
+                                        <div><dt>کد ملی</dt><dd dir="ltr">{{ $Customer->national_id ?: '—' }}</dd></div>
+                                        <div><dt>صنف / کانال</dt><dd>{{ trim(($Customer->senf ?: '—') . ' / ' . ($Customer->channel ?: '—'), ' /') }}</dd></div>
+                                        <div><dt>منطقه / مسیر</dt><dd>{{ trim(($team['region'] ?: '—') . ' / ' . ($team['area'] ?: '—'), ' /') }}</dd></div>
+                                        <div><dt>بازاریاب</dt><dd>{{ $team['marketer'] ?: '—' }}</dd></div>
+                                        <div><dt>ثبت‌کننده</dt><dd>{{ $team['registrar'] ?: '—' }}</dd></div>
+                                        <div><dt>سرپرست</dt><dd>{{ $team['leader'] ?: '—' }}</dd></div>
+                                        <div><dt>مدیر فروش</dt><dd>{{ $team['sales_manager'] ?: '—' }}</dd></div>
+                                        <div><dt>آدرس</dt><dd>{{ $Customer->address ?: '—' }}</dd></div>
+                                        @if ($Customer->store_address)
+                                            <div><dt>آدرس انبار</dt><dd>{{ $Customer->store_address }}</dd></div>
+                                        @endif
+                                    </dl>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+
+                        {{-- Main tabs --}}
+                        <div class="col-xl-8 col-lg-7">
+                            <div class="card mb-4" id="tour-customer-tabs-card">
+                                <div class="card-header border-bottom" id="tour-customer-tabs-header">
+                                    <ul class="nav nav-tabs card-header-tabs" id="tour-customer-tabs-nav" role="tablist">
+                                        <li class="nav-item"><button class="nav-link active" id="tour-customer-tab-crm" data-bs-toggle="tab" data-bs-target="#tab-crm" type="button">CRM و فروش</button></li>
+                                        <li class="nav-item"><button class="nav-link" id="tour-customer-tab-orders" data-bs-toggle="tab" data-bs-target="#tab-orders" type="button">تاریخچه خرید</button></li>
+                                        <li class="nav-item"><button class="nav-link" id="tour-customer-tab-financial" data-bs-toggle="tab" data-bs-target="#tab-financial" type="button">رفتار مالی</button></li>
+                                        @if ($locationTabEnabled)
+                                            <li class="nav-item"><button class="nav-link" id="tour-customer-tab-location" data-bs-toggle="tab" data-bs-target="#tab-location" type="button">موقعیت</button></li>
+                                        @endif
+                                    </ul>
+                                    <div class="mt-3 mt-md-0" id="tour-customer-new-order">
+                                        @if ($canNewOrder)
+                                            <form method="GET" action="{{ route('products.index') }}" class="d-inline">
+                                                <input type="hidden" name="Customer" value="{{ $Customer->id }}" />
+                                                @if ($MyTask)<input type="hidden" name="Task" value="{{ $MyTask->id }}" />@endif
+                                                <button class="btn btn-primary btn-sm" type="submit"><x-ui.icon name="plus" class="me-1" />سفارش جدید</button>
+                                            </form>
+                                        @else
+                                            <button type="button" class="btn btn-label-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-no-location">
+                                                <x-ui.icon name="map-pin-off" class="me-1" />سفارش جدید
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="card-body tab-content p-0">
+                                    {{-- CRM tab --}}
+                                    <div class="tab-pane fade show active p-4" id="tab-crm">
+                                        @if (!empty($assignments['marketer']) || !empty($assignments['supervisor']) || !empty($assignments['sales_manager']))
+                                            <div class="row g-3 mb-4" id="tour-customer-assignments">
+                                                @if (!empty($assignments['marketer']))
+                                                    <div class="col-md-6 col-lg-4">
+                                                        <div class="customer-profile-assignment-card">
+                                                            <div class="customer-profile-assignment-card__icon"><x-ui.icon name="user-star" /></div>
+                                                            <div>
+                                                                <small class="text-muted d-block mb-1">بازاریاب اختصاص‌یافته</small>
+                                                                <div class="fw-semibold">{{ $assignments['marketer']['name'] }}</div>
+                                                                @if ($assignments['marketer']['mobile'])
+                                                                    <a href="tel:{{ $assignments['marketer']['mobile'] }}" class="small" dir="ltr">{{ $assignments['marketer']['mobile'] }}</a>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                @if (!empty($assignments['supervisor']))
+                                                    <div class="col-md-6 col-lg-4">
+                                                        <div class="customer-profile-assignment-card">
+                                                            <div class="customer-profile-assignment-card__icon customer-profile-assignment-card__icon--supervisor"><x-ui.icon name="shield-check" /></div>
+                                                            <div>
+                                                                <small class="text-muted d-block mb-1">سرپرست اختصاص‌یافته</small>
+                                                                <div class="fw-semibold">{{ $assignments['supervisor']['name'] }}</div>
+                                                                @if ($assignments['supervisor']['mobile'])
+                                                                    <a href="tel:{{ $assignments['supervisor']['mobile'] }}" class="small" dir="ltr">{{ $assignments['supervisor']['mobile'] }}</a>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                @if (!empty($assignments['sales_manager']))
+                                                    <div class="col-md-6 col-lg-4">
+                                                        <div class="customer-profile-assignment-card">
+                                                            <div class="customer-profile-assignment-card__icon customer-profile-assignment-card__icon--sales-manager"><x-ui.icon name="briefcase" /></div>
+                                                            <div>
+                                                                <small class="text-muted d-block mb-1">مدیر فروش اختصاص‌یافته</small>
+                                                                <div class="fw-semibold">{{ $assignments['sales_manager']['name'] }}</div>
+                                                                @if ($assignments['sales_manager']['mobile'])
+                                                                    <a href="tel:{{ $assignments['sales_manager']['mobile'] }}" class="small" dir="ltr">{{ $assignments['sales_manager']['mobile'] }}</a>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
+                                        <div class="row g-3 mb-4" id="tour-customer-crm-stats">
+                                            @foreach ([
+                                                ['label' => 'پیگیری باز', 'value' => $crm['stats']['open_followups'], 'class' => ''],
+                                                ['label' => 'پیگیری معوق', 'value' => $crm['stats']['overdue_followups'], 'class' => 'text-danger'],
+                                                ['label' => 'فرصت باز', 'value' => $crm['stats']['open_opportunities'], 'class' => ''],
+                                                ['label' => 'ارزش فرصت', 'value' => number_format($crm['stats']['open_opportunity_amount']), 'class' => 'text-success'],
+                                            ] as $stat)
+                                                <div class="col-6 col-md-3">
+                                                    <div class="border rounded p-3 h-100 text-center">
+                                                        <small class="text-muted d-block">{{ $stat['label'] }}</small>
+                                                        <div class="h5 mb-0 mt-1 {{ $stat['class'] }}">{{ $stat['value'] }}</div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2 mb-4" id="tour-customer-crm-links">
+                                            <a class="btn btn-sm btn-label-primary" href="{{ route('crm.followups.index', ['subject_type' => 'customer', 'search' => $Customer->name]) }}">کارتابل پیگیری</a>
+                                            <a class="btn btn-sm btn-label-info" href="{{ route('crm.opportunities.index', ['search' => $Customer->name]) }}">Pipeline فروش</a>
+                                        </div>
+                                        <div class="row g-4" id="tour-customer-crm-lists">
+                                            <div class="col-lg-6">
+                                                <h6 class="mb-3">آخرین پیگیری‌ها</h6>
+                                                @forelse($crm['followups'] as $followup)
+                                                    <div class="border rounded p-3 mb-2">
+                                                        <div class="d-flex justify-content-between gap-2">
+                                                            <strong class="small">{{ $followup->title }}</strong>
+                                                            <span class="badge bg-label-{{ in_array($followup->status, ['open', 'in_progress'], true) ? 'warning' : 'secondary' }}">{{ $followup->statusText() }}</span>
+                                                        </div>
+                                                        <small class="text-muted">{{ $followup->typeText() }} — {{ optional($followup->assignedUser)->name ?: 'بدون مسئول' }}</small>
+                                                    </div>
+                                                @empty
+                                                    <div class="customer-profile-empty py-4">
+                                                        <p class="text-muted small mb-0">پیگیری CRM ثبت نشده است.</p>
+                                                    </div>
+                                                @endforelse
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h6 class="mb-3">فرصت‌های فروش</h6>
+                                                @forelse($crm['opportunities'] as $opportunity)
+                                                    <div class="border rounded p-3 mb-2">
+                                                        <div class="d-flex justify-content-between gap-2">
+                                                            <strong class="small">{{ $opportunity->title }}</strong>
+                                                            <span class="badge bg-label-{{ $opportunity->status === 'won' ? 'success' : ($opportunity->status === 'lost' ? 'danger' : 'primary') }}">{{ $opportunity->stageText() }}</span>
+                                                        </div>
+                                                        <small class="text-muted">{{ number_format($opportunity->amount) }} ریال — {{ optional($opportunity->assignedUser)->name ?: 'بدون مسئول' }}</small>
+                                                    </div>
+                                                @empty
+                                                    <div class="customer-profile-empty py-4">
+                                                        <p class="text-muted small mb-0">فرصت فروشی ثبت نشده است.</p>
+                                                    </div>
+                                                @endforelse
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Orders tab --}}
+                                    <div class="tab-pane fade p-4" id="tab-orders">
+                                        <div id="tour-customer-orders-panel">
+                                        @if ($orders->isEmpty())
+                                            <div class="customer-profile-empty text-center py-5">
+                                                <div class="customer-profile-empty__icon"><x-ui.icon name="shopping-bag" /></div>
+                                                <h6 class="mb-2">هنوز سفارشی ثبت نشده</h6>
+                                                <p class="text-muted small mb-3">اولین فاکتور یا پیش‌فاکتور این مشتری از اینجا قابل پیگیری است.</p>
+                                                @if ($canNewOrder)
+                                                    <form method="GET" action="{{ route('products.index') }}">
+                                                        <input type="hidden" name="Customer" value="{{ $Customer->id }}" />
+                                                        <button class="btn btn-primary btn-sm" type="submit">ثبت اولین سفارش</button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <div class="table-responsive" id="tour-customer-orders-table">
+                                                <table class="table table-hover align-middle mb-0 customer-profile-orders-table">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th>سفارش</th>
+                                                            <th>تاریخ</th>
+                                                            <th class="text-end">مبلغ</th>
+                                                            <th>وضعیت</th>
+                                                            <th>پرداخت</th>
+                                                            <th>بازاریاب</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($orders as $order)
+                                                            <tr class="customer-profile-order-row" data-order-id="{{ $order['id'] }}">
+                                                                <td>
+                                                                    <div class="fw-medium">#{{ $order['id'] }}</div>
+                                                                    @if ($order['invoice_id'])
+                                                                        <small class="text-muted">فاکتور {{ $order['invoice_id'] }}</small>
+                                                                    @endif
+                                                                </td>
+                                                                <td><small>{{ verta($order['created_at'])->format('Y/m/d') }}</small></td>
+                                                                <td class="text-end fw-medium">{{ number_format($order['amount']) }}</td>
+                                                                <td><span class="badge bg-label-{{ $order['status']['class'] }}">{{ $order['status']['label'] }}</span></td>
+                                                                <td><span class="badge bg-label-{{ $order['payment']['class'] }}">{{ $order['payment']['label'] }}</span></td>
+                                                                <td><small>{{ $order['visitor'] ?: '—' }}</small></td>
+                                                                <td class="text-nowrap">
+                                                                    <button type="button" class="btn btn-sm btn-icon btn-label-secondary order-toggle-items" title="اقلام">
+                                                                        <x-ui.icon name="chevron-down" />
+                                                                    </button>
+                                                                    <a href="{{ $order['view_url'] }}" class="btn btn-sm btn-icon btn-label-primary" title="مشاهده">
+                                                                        <x-ui.icon name="eye" />
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="customer-profile-order-items d-none" data-items-for="{{ $order['id'] }}">
+                                                                <td colspan="7" class="bg-light-subtle">
+                                                                    <div class="py-2 px-1">
+                                                                        <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+                                                                            <strong class="small">{{ $order['items_count'] }} قلم کالا</strong>
+                                                                            @if ($order['delivery_date'])
+                                                                                <small class="text-muted">تحویل: {{ $order['delivery_date'] }}</small>
+                                                                            @endif
+                                                                            @if ($isSubscriptionPanel && $order['subscription_end'])
+                                                                                <small class="text-muted">پایان اشتراک: {{ \Illuminate\Support\Carbon::parse($order['subscription_end'])->format('Y/m/d') }}</small>
+                                                                            @endif
+                                                                        </div>
+                                                                        <ul class="list-unstyled mb-0 small">
+                                                                            @foreach ($order['items'] as $item)
+                                                                                <li class="d-flex justify-content-between py-1 border-bottom border-light">
+                                                                                    <span>{{ $item['title'] }}</span>
+                                                                                    <span class="text-muted">{{ number_format($item['quantity']) }} {{ $item['unit'] }}</span>
+                                                                                </li>
+                                                                            @endforeach
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @endif
+                                        </div>
+                                    </div>
+
+                                    {{-- Financial tab --}}
+                                    <div class="tab-pane fade p-4" id="tab-financial">
+                                        <div id="tour-customer-financial-panel">
+                                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4" id="tour-customer-financial-summary">
+                                                <div>
+                                                    <h5 class="mb-1">رفتار مالی مشتری</h5>
+                                                    <p class="text-muted small mb-0">گردش خرید، واریزی‌ها و وضعیت بدهکار / بستانکار بر اساس سفارش‌های تأییدشده</p>
+                                                </div>
+                                                <span class="badge bg-label-{{ $financial['status'] === 'creditor' ? 'success' : ($financial['status'] === 'debtor' ? 'danger' : 'secondary') }} fs-6">
+                                                    {{ $financial['status_label'] }}
+                                                </span>
+                                            </div>
+
+                                            <div class="row g-3 mb-4">
+                                                @foreach ([
+                                                    ['label' => 'جمع خریدها', 'value' => number_format($financial['total_purchases']), 'class' => 'text-body'],
+                                                    ['label' => 'جمع واریزی‌ها', 'value' => number_format($financial['total_payments']), 'class' => 'text-success'],
+                                                    ['label' => 'تسویه‌نشده', 'value' => number_format($financial['unsettled_amount']), 'class' => 'text-danger'],
+                                                    ['label' => 'مانده نهایی', 'value' => number_format(abs($financial['balance'])), 'class' => $financial['status'] === 'creditor' ? 'text-success' : ($financial['status'] === 'debtor' ? 'text-danger' : 'text-body')],
+                                                ] as $finStat)
+                                                    <div class="col-6 col-lg-3">
+                                                        <div class="customer-profile-fin-stat border rounded p-3 h-100 text-center">
+                                                            <small class="text-muted d-block">{{ $finStat['label'] }}</small>
+                                                            <div class="h5 mb-0 mt-1 {{ $finStat['class'] }}">{{ $finStat['value'] }} <small class="fs-6 fw-normal">ریال</small></div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
+                                            @if (count($financial['transactions']) > 0)
+                                                <div class="table-responsive" id="tour-customer-financial-ledger">
+                                                    <table class="table table-hover align-middle mb-0 customer-profile-financial-table">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>تاریخ</th>
+                                                                <th>نوع</th>
+                                                                <th>شرح</th>
+                                                                <th>روش پرداخت</th>
+                                                                <th class="text-end">بدهکار</th>
+                                                                <th class="text-end">بستانکار</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($financial['transactions'] as $txn)
+                                                                <tr>
+                                                                    <td><small>{{ optional($txn['date'])->format('Y/m/d') }}</small></td>
+                                                                    <td><span class="badge bg-label-{{ $txn['type_class'] }}">{{ $txn['type_label'] }}</span></td>
+                                                                    <td>{{ $txn['description'] }}</td>
+                                                                    <td><span class="badge bg-label-{{ $txn['payment']['class'] }}">{{ $txn['payment']['label'] }}</span></td>
+                                                                    <td class="text-end {{ $txn['debit'] ? 'text-danger fw-medium' : 'text-muted' }}">
+                                                                        {{ $txn['debit'] ? number_format($txn['debit']) : '—' }}
+                                                                    </td>
+                                                                    <td class="text-end {{ $txn['credit'] ? 'text-success fw-medium' : 'text-muted' }}">
+                                                                        {{ $txn['credit'] ? number_format($txn['credit']) : '—' }}
+                                                                    </td>
+                                                                    <td class="text-nowrap">
+                                                                        <a href="{{ $txn['view_url'] }}" class="btn btn-sm btn-icon btn-label-primary" title="مشاهده سفارش">
+                                                                            <x-ui.icon name="eye" />
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            @else
+                                                <div class="customer-profile-empty text-center py-5" id="tour-customer-financial-empty">
+                                                    <div class="customer-profile-empty__icon"><x-ui.icon name="report-money" /></div>
+                                                    <h6 class="mb-2">گردش مالی ثبت نشده</h6>
+                                                    <p class="text-muted small mb-0">پس از ثبت و تأیید اولین سفارش یا واریز، گردش بدهکار/بستانکار اینجا نمایش داده می‌شود.</p>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    @if ($locationTabEnabled)
+                                    {{-- Location tab --}}
+                                    <div class="tab-pane fade p-4" id="tab-location">
+                                        <form method="POST" action="{{ route('update_customer_loc', $Customer->id) }}">
+                                            @csrf
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <p class="text-muted small mb-0">موقعیت فروشگاه و انبار را روی نقشه تنظیم و ذخیره کنید.</p>
+                                                <button class="btn btn-success btn-sm" type="submit"><x-ui.icon name="device-floppy" class="me-1" />ذخیره موقعیت</button>
+                                            </div>
+                                            <div class="row g-3" id="tour-customer-location-maps">
+                                                <div class="col-md-6">
+                                                    <h6 class="mb-2">فروشگاه</h6>
+                                                    <div id="map_get" class="customer-profile-map rounded"></div>
+                                                    <input type="hidden" id="shop_lat" name="shop_lat" value="{{ $Customer->shop_lat }}" />
+                                                    <input type="hidden" id="shop_lng" name="shop_lng" value="{{ $Customer->shop_lng }}" />
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h6 class="mb-2">انبار</h6>
+                                                    <div id="map_get_store" class="customer-profile-map rounded"></div>
+                                                    <input type="hidden" id="store_lat" name="store_lat" value="{{ $Customer->store_lat }}" />
+                                                    <input type="hidden" id="store_lng" name="store_lng" value="{{ $Customer->store_lng }}" />
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+                @include('sections.footer')
+                <div class="content-backdrop fade"></div>
             </div>
         </div>
-
-
-        <form method="POST" action="{{ route('update_customer_loc', $Customer->id) }}">
-            @csrf
-            <div class="card card-action mb-4">
-                <div class="card-header align-items-center py-4">
-                    <h5 class="card-action-title mb-0">لوکیشن مشتری</h5>
-                    <div class="card-action-element">
-                        <button class="btn btn-label-success" type="submit">ثبت موقعیت مشتری</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6 col-12 mb-3">
-                            <h5>لوکیشن فروشگاه</h5>
-                            <div id="map_get" style="height: 400px"></div>
-                            @if ($Customer->shop_lat == null && $Customer->shop_lng == null)
-                                <input type="hidden" id="shop_lat" name="shop_lat" value="" />
-                                <input type="hidden" id="shop_lng" name="shop_lng" value="" />
-                            @endif
-                        </div>
-
-                        <div class="col-6 col-12 mb-3">
-                            <h5>لوکیشن انبار</h5>
-                            <div id="map_get_store" style="height: 400px"></div>
-                            @if ($Customer->store_lat == null && $Customer->store_lat == null)
-                                <input type="hidden" id="store_lat" name="store_lat" value="" />
-                                <input type="hidden" id="store_lng" name="store_lng" value="" />
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-
-        <!-- Address accordion -->
-        <!-- payment accordion -->
-
     </div>
-    <!--/ Customer Content -->
-    </div>
-
-    </div>
-    <!-- / Content -->
-    <!-- Footer -->
-    @include('sections.footer')
-    <!-- / Footer -->
-    <div class="content-backdrop fade"></div>
-    </div>
-    <!-- Content wrapper -->
-    </div>
-    <!-- / Layout page -->
-    </div>
-    <!-- Overlay -->
     <div class="layout-overlay layout-menu-toggle"></div>
-    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
     <div class="drag-target"></div>
+</div>
+
+<div class="modal fade" id="modal-no-location" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">ثبت سفارش ممکن نیست</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                @if ($locationTabEnabled)
+                    برای این مشتری موقعیت فروشگاه ثبت نشده است. ابتدا در تب «موقعیت» لوکیشن را ثبت کنید.
+                @else
+                    امکان ثبت سفارش برای این مشتری در حال حاضر وجود ندارد.
+                @endif
+            </div>
+        </div>
     </div>
-    <!-- / Layout wrapper -->
-    <!-- Core JS -->
-    <!-- build:js assets/vendor/js/core.js -->
-    <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
-    <!-- endbuild -->
-    <!-- Vendors JS -->
-    <script src="{{ asset('assets/') }}/vendor/libs/moment/moment.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/sweetalert2/sweetalert2.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/cleavejs/cleave.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/cleavejs/cleave-phone.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/@form-validation/popular.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/@form-validation/bootstrap5.js"></script>
-    <!-- Main JS -->
-    <script src="{{ asset('assets/') }}/js/main.js"></script>
-    <script src="https://static.neshan.org/sdk/mapboxgl/v1.13.2/neshan-sdk/v1.1.5/index.js"></script>
-    <!-- Page JS -->
-    </body>
-    <script>
-        $('.customers').addClass('open')
-        $('.customers .list').addClass('active open');
-    </script>
-    <script>
-        $(document).ready(function() {
-            const neshanMapget = new nmp_mapboxgl.Map({
-                mapType: nmp_mapboxgl.Map.mapTypes.neshanVector,
-                container: "map_get",
-                zoom: 14,
-                pitch: 0,
-                center: [{{ $Customer->shop_lat != null ? $Customer->shop_lat : 51.391173 }},
-                    {{ $Customer->shop_lng != null ? $Customer->shop_lng : 35.700954 }}
-                ],
-                minZoom: 2,
-                maxZoom: 21,
-                trackResize: true,
-                mapKey: "web.69873d4db05f495bb49de6c13e8eb294",
-                poi: false,
-                traffic: false,
-                mapTypeControllerOptions: {
-                    show: false,
-                    position: 'bottom-left'
-                }
-            });
+</div>
 
+<script src="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
+<script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
+<script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
 
-            var popup = new nmp_mapboxgl.Popup({
-                offset: 25
-            }).setText('در محل مورد نظر قرار بگیرد.');
-
-
-            var marker_with_popup = new nmp_mapboxgl.Marker({
-                    color: "#FABA0D",
-                    draggable: true
-                }).setPopup(popup)
-                .setLngLat([{{ $Customer->shop_lat != null ? $Customer->shop_lat : 51.391173 }},
-                    {{ $Customer->shop_lng != null ? $Customer->shop_lng : 35.700954 }}
-                ])
-                .addTo(neshanMapget).togglePopup();
-
-            function ShoponDragEnd() {
-                const lngLat = marker_with_popup.getLngLat();
-                var latinp = document.getElementById('shop_lat').value = lngLat.lat;
-                var langinp = document.getElementById('shop_lng').value = lngLat.lng;
-
-            }
-            marker_with_popup.on('dragend', ShoponDragEnd);
-
-            // Add geolocate control to the map.
-            // Initialize the geolocate control.
-            let geolocate = new nmp_mapboxgl.GeolocateControl({
-                positionOptions: {
-                    enableHighAccuracy: true
-                },
-                trackUserLocation: true
-            });
-            // Add the control to the map.
-            neshanMapget.addControl(geolocate);
-            neshanMapget.on("load", function() {
-                geolocate.trigger(); // add this if you want to fire it by code instead of the button
-            });
-            geolocate.on("geolocate", locateUser);
-
-            function locateUser(e) {
-                // alert("A geolocate event has occurred.");
-                //alert("lng:" + e.coords.longitude + ", lat:" + e.coords.latitude);
-
-
-
-            }
-
-            const neshanMapget2 = new nmp_mapboxgl.Map({
-                mapType: nmp_mapboxgl.Map.mapTypes.neshanVector,
-                container: "map_get_store",
-                zoom: 14,
-                pitch: 0,
-                center: [{{ $Customer->store_lat != null ? $Customer->store_lat : 51.391173 }},
-                    {{ $Customer->store_lng != null ? $Customer->store_lng : 35.700954 }}
-                ],
-                minZoom: 2,
-                maxZoom: 21,
-                trackResize: true,
-                mapKey: "web.69873d4db05f495bb49de6c13e8eb294",
-                poi: false,
-                traffic: false,
-                mapTypeControllerOptions: {
-                    show: false,
-                    position: 'bottom-left'
-                }
-            });
-
-            var popup2 = new nmp_mapboxgl.Popup({
-                offset: 25
-            }).setText(
-                'روی محل مورد نظر قرار بگیرد'
-            );
-
-            var marker_with_popup2 = new nmp_mapboxgl.Marker({
-                    color: "#FABA0D",
-                    draggable: true
-                }).setPopup(popup2)
-                .setLngLat([{{ $Customer->store_lat != null ? $Customer->store_lat : 51.391173 }},
-                    {{ $Customer->store_lng != null ? $Customer->store_lng : 35.700954 }}
-                ])
-                .addTo(neshanMapget2).togglePopup();
-
-            function StoreonDragEnd() {
-                const lngLat = marker_with_popup2.getLngLat();
-                var latinp = document.getElementById('store_lat').value = lngLat.lat;
-                var langinp = document.getElementById('store_lng').value = lngLat.lng;
-
-            }
-
-            marker_with_popup2.on('dragend', StoreonDragEnd);
-
-
+<script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
+<script src="{{ asset('assets/') }}/js/main.js"></script>
+@if ($locationTabEnabled)
+<script src="{{ asset('assets/vendor/libs/neshan-sdk/v1.1.5/index.js') }}"></script>
+@endif
+<script>
+    document.querySelectorAll('.order-toggle-items').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var row = btn.closest('tr');
+            var id = row.dataset.orderId;
+            var itemsRow = document.querySelector('[data-items-for="' + id + '"]');
+            if (!itemsRow) return;
+            itemsRow.classList.toggle('d-none');
+            btn.querySelector('i').classList.toggle('ti-chevron-down');
+            btn.querySelector('i').classList.toggle('ti-chevron-up');
         });
-    </script>
+    });
 
+    var deleteBtn = document.getElementById('customer-delete-btn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'حذف مشتری',
+                text: 'آیا از حذف این مشتری اطمینان دارید؟ این عمل قابل بازگشت نیست.',
+                showCancelButton: true,
+                confirmButtonText: 'بله، حذف شود',
+                cancelButtonText: 'انصراف',
+                confirmButtonColor: '#d33',
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    document.getElementById('customer-delete-form').submit();
+                }
+            });
+        });
+    }
+
+    @if ($locationTabEnabled)
+    var mapsInitialized = false;
+    function initCustomerMaps() {
+        if (mapsInitialized) return;
+        mapsInitialized = true;
+        function initMap(containerId, latInputId, lngInputId, lat, lng) {
+            var map = new nmp_mapboxgl.Map({
+                mapType: nmp_mapboxgl.Map.mapTypes.neshanVector,
+                container: containerId,
+                zoom: 14,
+                center: [lng, lat],
+                minZoom: 2,
+                maxZoom: 21,
+                trackResize: true,
+                mapKey: "web.69873d4db05f495bb49de6c13e8eb294",
+                poi: false,
+                traffic: false,
+                mapTypeControllerOptions: { show: false }
+            });
+            var marker = new nmp_mapboxgl.Marker({ color: "#F9BA16", draggable: true })
+                .setLngLat([lng, lat])
+                .addTo(map);
+            marker.on('dragend', function() {
+                var p = marker.getLngLat();
+                document.getElementById(latInputId).value = p.lat;
+                document.getElementById(lngInputId).value = p.lng;
+            });
+        }
+        initMap('map_get', 'shop_lat', 'shop_lng',
+            {{ $Customer->shop_lat ?? 35.700954 }}, {{ $Customer->shop_lng ?? 51.391173 }});
+        initMap('map_get_store', 'store_lat', 'store_lng',
+            {{ $Customer->store_lat ?? 35.700954 }}, {{ $Customer->store_lng ?? 51.391173 }});
+    }
+
+    $(function() {
+        var locationTab = document.querySelector('[data-bs-target="#tab-location"]');
+        if (locationTab) {
+            locationTab.addEventListener('shown.bs.tab', initCustomerMaps);
+        }
+    });
+    @endif
+</script>
+</body>
 </html>

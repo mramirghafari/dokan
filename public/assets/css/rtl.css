@@ -675,8 +675,7 @@ html[dir=rtl] .ti {
     float: left;
     padding-right: var(--bs-breadcrumb-item-padding-x);
     color: var(--bs-breadcrumb-divider-color);
-    content: "\ea60";
-    font-family: "tabler-icons"
+    content: "/";
 }
 
 [dir="rtl"] .breadcrumb-style1 .breadcrumb-item + .breadcrumb-item::before {
@@ -960,4 +959,146 @@ table.dataTable {
 .menu-vertical .menu-sub .menu-link {
     font-size: 14px !important;
     padding-left: 0px !important;
+}
+
+/* هدر: آواتار راست، نام و سمت چپ آواتار */
+#layout-navbar .navbar-header-toolbar > .navbar-nav > .dropdown-user {
+    width: auto;
+    flex: 0 0 auto;
+}
+
+#layout-navbar .dropdown-user > .navbar-user-link {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    width: auto !important;
+    max-width: none !important;
+}
+
+#layout-navbar .dropdown-user .navbar-user-avatar {
+    flex: 0 0 auto;
+}
+
+#layout-navbar .dropdown-user .navbar-user-meta {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end;
+    text-align: right;
+    white-space: nowrap;
+    margin: 0 !important;
+    padding-inline-end: 0.15rem;
+}
+
+#layout-navbar .navbar-header-panel-section {
+    border-right: 1px solid rgba(67, 89, 113, 0.3);
+    padding-right: 1rem;
+    padding-left: 0.65rem;
+}
+
+.ui-icon {
+    display: inline-block;
+    vertical-align: -0.15em;
+    flex-shrink: 0;
+}
+
+/* Submenu bullets — clean pure-CSS round dots.
+   The tabler-icons font was removed from this project, so the vendor theme rule
+   `.bg-menu-theme .menu-sub > .menu-item > .menu-link:before { content:"\ea6b"; font-family:"tabler-icons" }`
+   (in vendor/css/rtl/theme-default.css) renders as an empty tofu □ square.
+   We override every submenu bullet — at any nesting depth — with a CSS circle.
+   Selector matches both the menu ID and the vendor's own `.bg-menu-theme` target
+   so the dot wins regardless of specificity quirks or the ID being absent. */
+#layout-menu .menu-sub > .menu-item > .menu-link::before,
+#layout-menu .menu-sub .menu-sub > .menu-item > .menu-link::before,
+.bg-menu-theme .menu-sub > .menu-item > .menu-link::before {
+    content: "" !important;
+    font-family: inherit !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    position: absolute !important;
+    display: block !important;
+    width: 6px !important;
+    height: 6px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    border: 1.4px solid currentColor !important;
+    border-radius: 50% !important;
+    background-color: transparent !important;
+    color: #a5a3ae !important;
+    opacity: 0.9 !important;
+    box-sizing: border-box !important;
+}
+
+[dir=rtl] #layout-menu .menu-sub > .menu-item > .menu-link::before,
+[dir=rtl] .bg-menu-theme .menu-sub > .menu-item > .menu-link::before {
+    right: 1.35rem !important;
+    left: auto !important;
+}
+
+html:not([dir=rtl]) #layout-menu .menu-sub > .menu-item > .menu-link::before,
+html:not([dir=rtl]) .bg-menu-theme .menu-sub > .menu-item > .menu-link::before {
+    left: 1.35rem !important;
+    right: auto !important;
+}
+
+#layout-menu .menu-sub .menu-item.active > .menu-link::before,
+#layout-menu .menu-sub .menu-item.open > .menu-link::before,
+.bg-menu-theme .menu-sub .menu-item.active > .menu-link::before,
+.bg-menu-theme .menu-sub .menu-item.open > .menu-link::before {
+    border-color: #543c92 !important;
+    background-color: #543c92 !important;
+    color: #543c92 !important;
+    opacity: 1 !important;
+}
+
+.menu-collapsed:not(:hover) .menu-inner > .menu-header::before,
+.menu-collapsed:not(:hover) .menu-block::before,
+.layout-menu-collapsed:not(.layout-menu-hover):not(.layout-menu-offcanvas):not(.layout-menu-fixed-offcanvas) .layout-menu .menu-vertical .menu-inner > .menu-header::before,
+.layout-menu-collapsed:not(.layout-menu-hover):not(.layout-menu-offcanvas):not(.layout-menu-fixed-offcanvas) .layout-menu .menu-vertical .menu-block::before,
+.layout-menu-collapsed:not(.layout-menu-hover):not(.layout-menu-offcanvas):not(.layout-menu-fixed-offcanvas) .layout-menu.menu-vertical .menu-inner > .menu-header::before,
+.layout-menu-collapsed:not(.layout-menu-hover):not(.layout-menu-offcanvas):not(.layout-menu-fixed-offcanvas) .layout-menu.menu-vertical .menu-block::before {
+    content: "⋯" !important;
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    line-height: 1;
+    letter-spacing: -0.12em;
+}
+
+table.dataTable thead .sorting::before,
+table.dataTable thead .sorting::after,
+table.dataTable thead .sorting_asc::before,
+table.dataTable thead .sorting_asc::after,
+table.dataTable thead .sorting_desc::before,
+table.dataTable thead .sorting_desc::after,
+table.dataTable thead .sorting_asc_disabled::before,
+table.dataTable thead .sorting_asc_disabled::after,
+table.dataTable thead .sorting_desc_disabled::before,
+table.dataTable thead .sorting_desc_disabled::after {
+    font-family: inherit !important;
+    width: auto !important;
+    height: auto !important;
+    font-size: 0.55rem !important;
+    opacity: 0.45;
+}
+
+table.dataTable thead .sorting::before,
+table.dataTable thead .sorting_asc::before,
+table.dataTable thead .sorting_desc::before,
+table.dataTable thead .sorting_asc_disabled::before,
+table.dataTable thead .sorting_desc_disabled::before {
+    content: "▲" !important;
+}
+
+table.dataTable thead .sorting::after,
+table.dataTable thead .sorting_asc::after,
+table.dataTable thead .sorting_desc::after,
+table.dataTable thead .sorting_asc_disabled::after,
+table.dataTable thead .sorting_desc_disabled::after {
+    content: "▼" !important;
+}
+
+table.dataTable thead .sorting_asc::before,
+table.dataTable thead .sorting_desc::after {
+    opacity: 0.9;
 }

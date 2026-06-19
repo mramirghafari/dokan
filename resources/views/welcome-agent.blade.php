@@ -8,18 +8,9 @@
         name="viewport" />
     <title>پیشخوان نماینده</title>
     <meta content="" name="description" />
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
 </head>
 
@@ -36,14 +27,14 @@
                             <div class="col-12 col-md-6 mb-3">
                                 <a class="btn btn-primary waves-effect waves-light w-100"
                                     href="{{ route('products.neworder') }}">
-                                    <i class="ti ti-plus me-2"></i>
+                                    <x-ui.icon name="plus" class="me-2" />
                                     ثبت سفارش جدید
                                 </a>
                             </div>
                             <div class="col-12 col-md-6 mb-3">
                                 <a class="btn btn-outline-primary waves-effect w-100"
                                     href="{{ route('invoices.myInvoices') }}">
-                                    <i class="ti ti-file-text me-2"></i>
+                                    <x-ui.icon name="file-text" class="me-2" />
                                     مرور فاکتورهای من
                                 </a>
                             </div>
@@ -171,11 +162,13 @@
     </div>
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <script src="{{ asset('assets/') }}/js/main.js"></script>
 </body>

@@ -1,18 +1,18 @@
 @php
     $hubActive = $hubActive ?? '';
 @endphp
-<div class="card mb-4 border-0 shadow-sm">
+<div class="card mb-4 border-0 shadow-sm" id="crm-tour-hub-bar">
     <div class="card-body py-3">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
             <div class="d-flex flex-wrap gap-2">
                 <a href="{{ route('crm.workbench.index') }}" class="btn btn-sm {{ $hubActive === 'workbench' ? 'btn-primary' : 'btn-label-primary' }}">
-                    <i class="ti ti-layout-dashboard me-1"></i>کارتابل
+                    <x-ui.icon name="layout-dashboard" class="me-1" />کارتابل
                 </a>
                 <a href="{{ route('crm.sales-boards.index') }}" class="btn btn-sm {{ $hubActive === 'boards' ? 'btn-primary' : 'btn-label-primary' }}">
-                    <i class="ti ti-layout-kanban me-1"></i>کاریز
+                    <x-ui.icon name="layout-kanban" class="me-1" />کاریز
                 </a>
                 <a href="{{ route('crm.dashboard.index') }}" class="btn btn-sm {{ $hubActive === 'dashboard' ? 'btn-primary' : 'btn-label-primary' }}">
-                    <i class="ti ti-chart-dots me-1"></i>داشبورد
+                    <x-ui.icon name="chart-dots" class="me-1" />داشبورد
                 </a>
                 <a href="{{ route('crm.followups.index') }}" class="btn btn-sm {{ $hubActive === 'followups' ? 'btn-primary' : 'btn-label-secondary' }}">پیگیری‌ها</a>
                 <a href="{{ route('crm.opportunities.index') }}" class="btn btn-sm {{ $hubActive === 'opportunities' ? 'btn-primary' : 'btn-label-secondary' }}">فرصت‌ها</a>
@@ -22,10 +22,10 @@
             </div>
             <div class="d-flex flex-wrap gap-2">
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#crmQuickFollowupModal">
-                    <i class="ti ti-plus me-1"></i>پیگیری سریع
+                    <x-ui.icon name="plus" class="me-1" />پیگیری سریع
                 </button>
                 <a href="{{ route('crm.sales-boards.index') }}#createBoardModal" class="btn btn-sm btn-outline-primary">
-                    <i class="ti ti-columns me-1"></i>بورد جدید
+                    <x-ui.icon name="columns" class="me-1" />بورد جدید
                 </a>
             </div>
         </div>

@@ -66,14 +66,14 @@
                             $ltv = $dashboard['ltv'];
                         @endphp
 
-                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4" id="crm-tour-page-header">
                             <div>
                                 <h4 class="mb-1"><span class="text-muted fw-light">CRM /</span> داشبورد فروش و پیش‌بینی</h4>
                                 <p class="text-muted mb-0">Forecast ماهانه، aging مرحله، منبع سرنخ و LTV — با drill-down به لیست‌های فیلترشده.</p>
                             </div>
-                            <div class="d-flex flex-wrap gap-2">
+                            <div class="d-flex flex-wrap gap-2" id="crm-tour-header-actions">
                                 <a class="btn btn-primary" href="{{ route('crm.opportunities.index', ['status' => 'open', 'close_month' => 'current']) }}">
-                                    <i class="ti ti-target me-1"></i>فرصت‌های ماه جاری
+                                    <x-ui.icon name="target" class="me-1" />فرصت‌های ماه جاری
                                 </a>
                                 <a class="btn btn-label-primary" href="{{ route('crm.sales-boards.index') }}">کاریز فروش</a>
                                 <a class="btn btn-label-secondary" href="{{ route('crm.followups.index') }}">پیگیری‌ها</a>
@@ -81,14 +81,14 @@
                         </div>
 
                         {{-- Forecast hero --}}
-                        <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card mb-4 border-0 shadow-sm" id="crm-tour-forecast-card">
                             <div class="card-body">
                                 <div class="row align-items-center g-4">
                                     <div class="col-lg-4">
                                         <div class="d-flex align-items-center gap-2 mb-2">
                                             <span class="badge bg-label-primary">Forecast {{ $forecast['month_label'] }}</span>
                                             @if($reconcile['pipeline_aligned'])
-                                                <span class="badge bg-label-success"><i class="ti ti-check me-1"></i>Reconcile</span>
+                                                <span class="badge bg-label-success"><x-ui.icon name="check" class="me-1" />Reconcile</span>
                                             @else
                                                 <span class="badge bg-label-warning">نیاز به بررسی</span>
                                             @endif
@@ -110,7 +110,7 @@
                         </div>
 
                         {{-- KPI cards --}}
-                        <div class="row g-3 mb-4">
+                        <div class="row g-3 mb-4" id="crm-tour-kpi-cards">
                             @foreach ([
                                 ['key' => 'weighted_pipeline', 'label' => 'Pipeline وزنی', 'value' => number_format($summary['weighted_pipeline']), 'sub' => 'ریال | همه فرصت‌های باز', 'icon' => 'ti-chart-arcs', 'color' => 'primary', 'url' => $drill['weighted_pipeline']],
                                 ['key' => 'open_opportunities', 'label' => 'فرصت‌های باز', 'value' => number_format($summary['open_opportunities']), 'sub' => 'نرخ برد ماه: ' . $summary['win_rate'] . '%', 'icon' => 'ti-briefcase', 'color' => 'info', 'url' => $drill['open_opportunities']],
@@ -119,7 +119,7 @@
                             ] as $kpi)
                                 <div class="col-sm-6 col-xl-3">
                                     <a href="{{ $kpi['url'] }}" class="text-body text-decoration-none d-block h-100">
-                                        <div class="card crm-kpi h-100">
+                                        <div class="card crm-kpi h-100" id="crm-tour-kpi-{{ $kpi['key'] }}">
                                             <div class="card-body d-flex gap-3 p-3">
                                                 <div class="accent bg-{{ $kpi['color'] }}"></div>
                                                 <div class="flex-grow-1">
@@ -130,10 +130,10 @@
                                                             <div class="text-muted small mt-1">{{ $kpi['sub'] }}</div>
                                                         </div>
                                                         <div class="kpi-icon bg-label-{{ $kpi['color'] }} text-{{ $kpi['color'] }}">
-                                                            <i class="ti {{ $kpi['icon'] }}"></i>
+                                                            <x-ui.icon :name="$kpi['icon']" />
                                                         </div>
                                                     </div>
-                                                    <div class="crm-drill-hint text-primary mt-2"><i class="ti ti-arrow-left me-1"></i>مشاهده لیست فیلترشده</div>
+                                                    <div class="crm-drill-hint text-primary mt-2"><x-ui.icon name="arrow-left" class="me-1" />مشاهده لیست فیلترشده</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -145,7 +145,7 @@
                         <div class="row g-4">
                             <div class="col-xl-8">
                                 {{-- Stage funnel --}}
-                                <div class="card mb-4">
+                                <div class="card mb-4" id="crm-tour-stage-funnel">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h5 class="mb-0">قیف فرصت‌های باز</h5>
                                         <span class="badge bg-label-secondary">{{ number_format($summary['open_opportunities']) }} فرصت</span>
@@ -166,7 +166,7 @@
                                                     <tr class="stage-row-link" onclick="window.location='{{ $row['url'] }}'">
                                                         <td>
                                                             <span class="fw-medium">{{ $row['title'] }}</span>
-                                                            <i class="ti ti-chevron-left text-muted small ms-1"></i>
+                                                            <x-ui.icon name="chevron-left" class="text-muted small ms-1" />
                                                         </td>
                                                         <td>{{ number_format($row['count']) }}</td>
                                                         <td>{{ number_format($row['amount']) }}</td>
@@ -190,7 +190,7 @@
                                 </div>
 
                                 {{-- Stage aging --}}
-                                <div class="card mb-4">
+                                <div class="card mb-4" id="crm-tour-stage-aging">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <div>
                                             <h5 class="mb-0">Aging مرحله</h5>
@@ -226,7 +226,7 @@
                                 </div>
 
                                 {{-- User performance --}}
-                                <div class="card">
+                                <div class="card" id="crm-tour-user-performance">
                                     <div class="card-header"><h5 class="mb-0">عملکرد کارشناس</h5></div>
                                     <div class="table-responsive">
                                         <table class="table table-hover mb-0">
@@ -257,7 +257,7 @@
 
                             <div class="col-xl-4">
                                 {{-- Reconcile --}}
-                                <div class="card mb-4">
+                                <div class="card mb-4" id="crm-tour-reconcile">
                                     <div class="card-header"><h5 class="mb-0">Reconcile Forecast</h5></div>
                                     <div class="card-body">
                                         <p class="small text-muted">{{ $reconcile['message'] }}</p>
@@ -281,7 +281,7 @@
                                 </div>
 
                                 {{-- Lead sources --}}
-                                <div class="card mb-4">
+                                <div class="card mb-4" id="crm-tour-lead-sources">
                                     <div class="card-header"><h5 class="mb-0">منبع سرنخ</h5></div>
                                     <div class="card-body">
                                         @if(count($dashboard['lead_sources']) > 0)
@@ -304,7 +304,7 @@
                                 </div>
 
                                 {{-- LTV --}}
-                                <div class="card mb-4">
+                                <div class="card mb-4" id="crm-tour-ltv">
                                     <div class="card-header"><h5 class="mb-0">LTV ساده</h5></div>
                                     <div class="card-body">
                                         <p class="small text-muted mb-3">{{ $ltv['message'] }}</p>
@@ -336,7 +336,7 @@
                                 </div>
 
                                 {{-- Alerts --}}
-                                <div class="card mb-4">
+                                <div class="card mb-4" id="crm-tour-alerts">
                                     <div class="card-header"><h5 class="mb-0">هشدارهای CRM</h5></div>
                                     <div class="card-body pt-2">
                                         @foreach ($dashboard['alerts'] as $alert)
@@ -351,7 +351,7 @@
                                     </div>
                                 </div>
 
-                                <div class="card">
+                                <div class="card" id="crm-tour-month-summary">
                                     <div class="card-header"><h5 class="mb-0">خلاصه ماه جاری</h5></div>
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between border-bottom pb-2 mb-2">

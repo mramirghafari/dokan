@@ -59,6 +59,37 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
         margin-right: 25px;
         list-style-type: circle;
     }
+
+    .navbar-user-link {
+        display: flex;
+    }
+
+    .navbar-user-meta {
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+    }
+
+    /* والد فعال بدون باز شدن زیرمنو */
+    .menu-vertical .menu-inner > .menu-item.active:not(.open) > .menu-sub {
+        display: none !important;
+    }
+
+    .menu-vertical .menu-item.active > .menu-link.menu-toggle,
+    .menu-vertical .menu-item.active:not(.open) > .menu-link.menu-toggle {
+        color: #543C92 !important;
+        background-color: rgba(84, 60, 146, 0.1) !important;
+    }
+
+    .menu-vertical .menu-item.active > .menu-link:not(.menu-toggle) {
+        color: #543C92 !important;
+        background-color: rgba(84, 60, 146, 0.12) !important;
+    }
+
+    .menu-vertical .menu-sub .menu-item.active > .menu-link {
+        color: #543C92 !important;
+        font-weight: 600;
+    }
 </style>
 
 <!-- Menu -->
@@ -76,18 +107,18 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                 </svg>
 
             </span>
-            <span class="app-brand-text demo menu-text fw-bold"> <img class="ms-3"
-                    src="{{ asset('assets/') }}/img/logo-sidebar.png" /></span>
+            <span class="app-brand-text demo menu-text fw-bold">
+                <img class="ms-2" src="{{ asset('img/') }}/logo.svg" width="110" /></span>
         </a>
         <a class="layout-menu-toggle menu-link text-large ms-auto" href="javascript:void(0);">
-            <i class="ti menu-toggle-icon d-none d-xl-block ti-sm align-middle"></i>
-            <i class="ti ti-x d-block d-xl-none ti-sm align-middle"></i>
+            <x-ui.icon name="chevron-right" class="d-none d-xl-block ti-sm align-middle menu-toggle-icon" />
+            <x-ui.icon name="x" class="d-block d-xl-none ti-sm align-middle" />
         </a>
     </div>
     <div class="menu-inner-shadow"></div>
     <ul class="menu-inner py-1">
         <!-- Dashboards -->
-        <li class="menu-item dokan {{ Request::routeIs(['index']) ? 'open' : '' }}" data-menu-key="dashboard">
+        <li class="menu-item dokan {{ Request::routeIs(['index']) ? 'active' : '' }}" data-menu-key="dashboard">
             <a class="menu-link" href="{{ asset('/') }}">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
@@ -98,7 +129,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                 <div>دکان</div>
             </a>
         </li>
-        <li class="menu-item dokan {{ Request::routeIs(['products.collection']) ? 'open' : '' }}"
+        <li class="menu-item dokan {{ Request::routeIs(['products.collection']) ? 'active' : '' }}"
             data-menu-key="product_catalog">
             <a class="menu-link" href="{{ route('products.collection') }}">
                 <svg width="18" height="19" viewBox="0 0 18 19" fill="none"
@@ -141,8 +172,9 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                 'settings.salesScenario',
                 'Account.index',
                 'Terminals.index',
+                'setup-guide.index',
             ])
-                ? 'open'
+                ? 'active'
                 : '' }}"
                 data-menu-key="basic_data">
                 <a class="menu-link menu-toggle" href="javascript:void(0);">
@@ -157,6 +189,11 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                     <div>اطلاعات پایه</div>
                 </a>
                 <ul class="menu-sub">
+                    <li class="menu-item setup-guide {{ Request::routeIs(['setup-guide.index']) ? 'active' : '' }}">
+                        <a class="menu-link" href="{{ route('setup-guide.index') }}">
+                            <div>راهنمای مرحله‌ای راه‌اندازی</div>
+                        </a>
+                    </li>
                     @if (auth()->user()->isGod == 1)
                         <li
                             class="menu-item panels {{ Request::routeIs(['tenants.index', 'tenants.edit', 'tenants.trashed.get']) ? 'active' : '' }}">
@@ -258,6 +295,12 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                                 <div>سناریوی فروش</div>
                             </a>
                         </li>
+                        <li
+                            class="menu-item dashboard-widgets {{ Request::routeIs(['settings.dashboardWidgets']) ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('settings.dashboardWidgets') }}">
+                                <div>ویجت‌های داشبورد</div>
+                            </a>
+                        </li>
                         @if (auth()->user()->isGod == 1)
                             <li
                                 class="menu-item notification-settings {{ Request::routeIs(['settings.notifications']) ? 'active' : '' }}">
@@ -284,7 +327,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
         @endcanany
         <!-- Front Pages -->
         @canany(['roles', 'permissions', 'users'])
-            <li class="menu-item users {{ Request::routeIs(['users.index', 'users.edit', 'users.update', 'users.trashed.get']) ? 'open' : '' }}"
+            <li class="menu-item users {{ Request::routeIs(['users.index', 'users.edit', 'users.update', 'users.trashed.get']) ? 'active' : '' }}"
                 data-menu-key="users">
                 <a class="menu-link menu-toggle" href="javascript:void(0);">
                     <svg width="20" height="18" viewBox="0 0 20 18" fill="none"
@@ -327,7 +370,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
         @endcan
         @if ($featureRouteManagement)
             @canany(['tasks-add', 'tasks'])
-                <li class="menu-item tasks {{ Request::routeIs(['tasks.index', 'tasks.edit', 'tasks.update', 'tasks.trashed', 'tasks.create', 'tasks.active_list']) ? 'open' : '' }}"
+                <li class="menu-item tasks {{ Request::routeIs(['tasks.index', 'tasks.edit', 'tasks.update', 'tasks.trashed', 'tasks.create', 'tasks.active_list']) ? 'active' : '' }}"
                     data-menu-key="routes">
                     <a class="menu-link menu-toggle" href="javascript:void(0);">
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
@@ -373,7 +416,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
         @endif
 
         @canany(['product-add'])
-            <li class="menu-item products {{ Request::routeIs(['products.index', 'products.edit', 'products.update', 'products.trashed', 'products.create']) ? 'open' : '' }}"
+            <li class="menu-item products {{ Request::routeIs(['products.index', 'products.edit', 'products.update', 'products.trashed', 'products.create', 'products.data-import.*', 'units.product.index', 'units.shipping.index', 'units.edit', 'units.update']) ? 'active' : '' }}"
                 data-menu-key="products">
                 <a class="menu-link menu-toggle" href="javascript:void(0);">
                     <svg width="18" height="19" viewBox="0 0 18 19" fill="none"
@@ -410,6 +453,22 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                             </li>
                         @endcan
                     @endif
+                    @can('units')
+                        <li class="menu-item units-product {{ Request::routeIs('units.product.index') || (Request::routeIs('units.edit') && optional(request()->route('unit'))->usage_scope !== 'shipping') ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('units.product.index') }}">
+                                <div>واحدهای محصول</div>
+                            </a>
+                        </li>
+                    @endcan
+                    @if ($featureDistribution)
+                        @can('units')
+                            <li class="menu-item units-shipping {{ Request::routeIs('units.shipping.index') || (Request::routeIs('units.edit') && optional(request()->route('unit'))->usage_scope === 'shipping') ? 'active' : '' }}">
+                                <a class="menu-link" href="{{ route('units.shipping.index') }}">
+                                    <div>واحدهای باربری</div>
+                                </a>
+                            </li>
+                        @endcan
+                    @endif
 
                     @can('materials')
                         <li
@@ -419,13 +478,20 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                             </a>
                         </li>
                     @endcan
+                    @can('products')
+                        <li class="menu-item products_data_import {{ Request::routeIs(['products.data-import.*']) ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('products.data-import.index') }}">
+                                <div>عملیات ورود دیتا</div>
+                            </a>
+                        </li>
+                    @endcan
                 </ul>
             </li>
         @endcan
 
         @if ($featureSalesTargets)
             @canany(['targets-add', 'targets', 'target-list'])
-                <li class="menu-item targets {{ Request::routeIs(['targets.index', 'targets.edit', 'targets.update', 'targets.trashed', 'targets.create', 'targets.history', 'commissions.index']) ? 'open' : '' }}"
+                <li class="menu-item targets {{ Request::routeIs(['targets.index', 'targets.edit', 'targets.update', 'targets.trashed', 'targets.create', 'targets.history', 'commissions.index']) ? 'active' : '' }}"
                     data-menu-key="targets">
                     <a class="menu-link menu-toggle" href="javascript:void(0);">
                         <svg width="22" height="22" viewBox="0 0 20 21" fill="none"
@@ -491,11 +557,6 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                                 <div>داشبورد CFO</div>
                             </a>
                         </li>
-                        <li class="menu-item bi_reconciliation {{ Request::routeIs(['bi.reconciliation.*']) ? 'active' : '' }}">
-                            <a class="menu-link" href="{{ route('bi.reconciliation.index') }}">
-                                <div>مغایرت‌گیری BI</div>
-                            </a>
-                        </li>
                         <li class="menu-item bi_insights {{ Request::routeIs(['bi.insights.*']) ? 'active' : '' }}">
                             <a class="menu-link" href="{{ route('bi.insights.index') }}">
                                 <div>هشدار و پیش بینی BI</div>
@@ -513,7 +574,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
         @endif
 
         @canany(['customers-add', 'customers'])
-            <li class="menu-item customers {{ Request::routeIs(['customers.index', 'customers.search', 'customers.edit', 'customers.update', 'customers.trashed', 'customers.create', 'customers.createdByMe', 'crm.dashboard.*', 'crm.health.*', 'crm.workbench.*', 'crm.followups.*', 'crm.leads.*', 'crm.service-tickets.*', 'crm.call-center.*', 'crm.campaigns.*', 'crm.loyalty.*', 'crm.customer-portal.*', 'crm.public-api.*', 'crm.integrations.*', 'crm.employee-performance.*', 'crm.opportunities.*', 'crm.sales-boards.*']) ? 'open' : '' }}"
+            <li class="menu-item customers {{ Request::routeIs(['customers.index', 'customers.show', 'customers.360', 'customers.search', 'customers.edit', 'customers.update', 'customers.trashed', 'customers.create', 'customers.createdByMe', 'customers.activeCustomers', 'customers.orders', 'tasks.CustomerInfo', 'customers.data-import.*', 'crm.dashboard.*', 'crm.health.*', 'crm.workbench.*', 'crm.followups.*', 'crm.leads.*', 'crm.service-tickets.*', 'crm.call-center.*', 'crm.campaigns.*', 'crm.loyalty.*', 'crm.customer-portal.*', 'crm.public-api.*', 'crm.integrations.*', 'crm.employee-performance.*', 'crm.opportunities.*', 'crm.sales-boards.*']) ? 'active' : '' }}"
                 data-menu-key="customers">
                 <a class="menu-link menu-toggle" href="javascript:void(0);">
                     <svg width="22" height="22" viewBox="0 0 19 19" fill="none"
@@ -548,7 +609,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                             </a>
                         </li>
                         <li
-                            class="menu-item list {{ Request::routeIs(['customers.index', 'customers.trashed.get']) ? 'active' : '' }}">
+                            class="menu-item list {{ Request::routeIs(['customers.index', 'customers.show', 'customers.360', 'customers.edit', 'customers.update', 'customers.orders', 'tasks.CustomerInfo', 'customers.trashed.get']) ? 'active' : '' }}">
                             <a class="menu-link" href="{{ route('customers.index') }}">
                                 <div>لیست مشتریان</div>
                             </a>
@@ -560,7 +621,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                             </a>
                         </li>
                         <li class="menu-item crm-dashboard {{ Request::routeIs(['crm.dashboard.*']) ? 'active' : '' }}">
-                            <a class="menu-link" href="{{ route('crm.dashboard.index') }}">
+                            <a class="menu-link" id="tour-menu-crm-dashboard" href="{{ route('crm.dashboard.index') }}">
                                 <div>داشبورد CRM</div>
                             </a>
                         </li>
@@ -645,13 +706,21 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                             </a>
                         </li>
                     @endcan
+                    @can('customers')
+                        <li
+                            class="menu-item customers_data_import {{ Request::routeIs(['customers.data-import.*']) ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('customers.data-import.index') }}">
+                                <div>عملیات ورود دیتا</div>
+                            </a>
+                        </li>
+                    @endcan
                 </ul>
             </li>
         @endcan
 
         @if ($featureWarehouseManagement)
             @can('stocks')
-                <li class="menu-item stocks {{ Request::routeIs(['stocks.create', 'stocks.index', 'stocks.need_entity', 'stocks.entrance', 'stocks.entrance_transfer', 'stocks.import_stock', 'stocks.PrCartex', 'stocks.PrCartexList', 'stocks.store_cartex', 'stocks.inventoryBalances', 'stocks.inventoryMovements', 'stocks.inventoryReorder', 'stocks.inventoryAdjustments', 'stocks.inventoryAdjustments.create', 'stocks.ProductionByExtraction', 'stocks.productionFormulas.*', 'stocks.ProductionByFormulaProcess', 'stocks.storeProducts', 'stocks.StoreProductsCartex']) ? 'open' : '' }}"
+                <li class="menu-item stocks {{ Request::routeIs(['stocks.create', 'stocks.index', 'stocks.need_entity', 'stocks.entrance', 'stocks.entrance_transfer', 'stocks.import_stock', 'stocks.PrCartex', 'stocks.PrCartexList', 'stocks.store_cartex', 'stocks.inventoryBalances', 'stocks.inventoryMovements', 'stocks.inventoryReorder', 'stocks.inventoryAdjustments', 'stocks.inventoryAdjustments.create', 'stocks.ProductionByExtraction', 'stocks.productionFormulas.*', 'stocks.ProductionByFormulaProcess', 'stocks.storeProducts', 'stocks.StoreProductsCartex']) ? 'active' : '' }}"
                     data-menu-key="production">
                     <a class="menu-link menu-toggle" href="javascript:void(0);">
                         <svg width="18" height="20" viewBox="0 0 18 20" fill="none"
@@ -700,7 +769,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
 
         @if ($featureWarehouseManagement)
             @canany(['store-delivery', 'stocks'])
-                <li class="menu-item anbarotozi {{ Request::routeIs(['deliveries.Outgoing', 'deliveries.Outgoing_by_items', 'deliveries.compeleted', 'invoices.assigned_to_drivers', 'purchase-orders.index', 'purchase-orders.create', 'purchase-orders.directSupply', 'purchase-orders.approvals', 'purchase-orders.report', 'purchase-service-invoices.index', 'receipt.index', 'stocks.storeReceipts', 'stocks.storeReceiptShow', 'stocks.inventoryBalances', 'stocks.inventoryMovements', 'stocks.inventoryReorder', 'stocks.inventoryAdjustments', 'stocks.inventoryAdjustments.create', 'stocks.PrCartex', 'stocks.PrCartexList', 'stocks.store_cartex']) ? 'open' : '' }}"
+                <li class="menu-item anbarotozi {{ Request::routeIs(['deliveries.Outgoing', 'deliveries.Outgoing_by_items', 'deliveries.compeleted', 'invoices.assigned_to_drivers', 'purchase-orders.index', 'purchase-orders.create', 'purchase-orders.directSupply', 'purchase-orders.approvals', 'purchase-orders.report', 'purchase-service-invoices.index', 'receipt.index', 'stocks.storeReceipts', 'stocks.storeReceiptShow', 'stocks.inventoryBalances', 'stocks.inventoryMovements', 'stocks.inventoryReorder', 'stocks.inventoryAdjustments', 'stocks.inventoryAdjustments.create', 'stocks.PrCartex', 'stocks.PrCartexList', 'stocks.store_cartex']) ? 'active' : '' }}"
                     data-menu-key="warehouse_supply">
                     <a class="menu-link menu-toggle" href="javascript:void(0);">
                         <svg width="22" height="20" viewBox="0 0 22 20" fill="none"
@@ -865,7 +934,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
 
         @if ($IsVisitor == 1 && $featureRouteManagement)
             @can('tasks-list')
-                <li class="menu-item tasks {{ Request::routeIs(['tasks.MyTasks']) ? 'open' : '' }}"
+                <li class="menu-item tasks {{ Request::routeIs(['tasks.MyTasks']) ? 'active' : '' }}"
                     data-menu-key="visitor_tasks">
                     <a class="menu-link" href="{{ route('tasks.MyTasks') }}">
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
@@ -923,7 +992,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
 
         @if ($IsVisitor == 0)
             @can('invoices')
-                <li class="menu-item factors {{ Request::routeIs(['invoices.index', 'invoices.active_list', 'invoices.denciled', 'invoices.compeleted', 'invoices.edit', 'invoices.all_invoices', 'invoices.trashed', 'invoices.reporter', 'invoices.create', 'details.list', 'pishFactorInfo', 'invoices.myInvoices', 'ecommerce.index']) ? 'open' : '' }}"
+                <li class="menu-item factors {{ Request::routeIs(['invoices.index', 'invoices.active_list', 'invoices.denciled', 'invoices.compeleted', 'invoices.edit', 'invoices.all_invoices', 'invoices.trashed', 'invoices.reporter', 'invoices.create', 'details.list', 'pishFactorInfo', 'invoices.myInvoices', 'ecommerce.index']) ? 'active' : '' }}"
                     data-menu-key="sales">
                     <a class="menu-link menu-toggle" href="javascript:void(0);">
                         <svg width="16" height="20" viewBox="0 0 16 20" fill="none"
@@ -1030,7 +1099,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
 
         @if ($featureDistribution)
             @can('drivers')
-                <li class="menu-item {{ Request::routeIs(['deliveries.shipments', 'deliveries.addShipment', 'deliveries.storeShipments', 'deliveries.EditShipment']) ? 'open' : '' }}"
+                <li class="menu-item {{ Request::routeIs(['deliveries.shipments', 'deliveries.addShipment', 'deliveries.storeShipments', 'deliveries.EditShipment']) ? 'active' : '' }}"
                     data-menu-key="shipping_distribution">
                     <a class="menu-link menu-toggle" href="javascript:void(0)">
                         <svg width="21" height="17" viewBox="0 0 21 17" fill="none"
@@ -1067,7 +1136,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
         @endif
 
         @can('Accounting')
-            <li class="menu-item accounting {{ Request::routeIs(['Accounting.index', 'Accounting.AccountingReviews', 'Accounting.vouchers', 'Accounting.vouchers.create', 'Accounting.vouchers.edit', 'Accounting.voucherTemplates', 'Accounting.legalLedgers', 'Accounting.detailedLedgers', 'Accounting.analyticDimensions', 'Accounting.currencyBalances', 'Accounting.financialStatements', 'Accounting.revenueCenters', 'Accounting.incomes', 'Accounting.fiscalClosing', 'Accounting.expenses', 'Accounting.payroll', 'contracting.projects', 'taxpayer.index', 'Accounting.treasury', 'Accounting.treasury.create', 'Accounting.treasury.transfer.create', 'Accounting.treasury.cheques', 'Accounting.treasury.cheques.aging', 'Accounting.treasury.chequeBooks', 'Accounting.treasury.bankReconciliation', 'Accounting.treasury.liquidity', 'Accounting.treasury.cashForecast', 'Accounting.treasury.pettyCash', 'Accounting.payed', 'Accounting.unpayed', 'Accounting.cashpay', 'Accounting.checkpay', 'Accounting.unknown']) ? 'open' : '' }}"
+            <li class="menu-item accounting {{ Request::routeIs(['Accounting.index', 'Accounting.AccountingReviews', 'Accounting.vouchers', 'Accounting.vouchers.create', 'Accounting.vouchers.edit', 'Accounting.vouchers.opening', 'Accounting.voucherTemplates', 'Accounting.legalLedgers', 'Accounting.detailedLedgers', 'Accounting.analyticDimensions', 'Accounting.currencyBalances', 'Accounting.financialStatements', 'Accounting.revenueCenters', 'Accounting.incomes', 'Accounting.fiscalClosing', 'Accounting.expenses', 'Accounting.payroll', 'contracting.projects', 'taxpayer.index', 'Accounting.treasury', 'Accounting.treasury.create', 'Accounting.treasury.transfer.create', 'Accounting.treasury.cheques', 'Accounting.treasury.cheques.aging', 'Accounting.treasury.chequeBooks', 'Accounting.treasury.bankReconciliation', 'Accounting.treasury.liquidity', 'Accounting.treasury.cashForecast', 'Accounting.treasury.pettyCash', 'Accounting.payed', 'Accounting.unpayed', 'Accounting.cashpay', 'Accounting.checkpay', 'Accounting.unknown']) ? 'active' : '' }}"
                 data-menu-key="accounting">
                 <a class="menu-link menu-toggle" href="javascript:void(0)">
                     <svg width="21" height="17" viewBox="0 0 21 17" fill="none"
@@ -1088,7 +1157,10 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                     </li>
                     <li
                         class="menu-item {{ Request::routeIs(['Accounting.vouchers', 'Accounting.vouchers.create', 'Accounting.vouchers.edit']) ? 'active' : '' }}">
-                        <a class="menu-link" href="{{ route('Accounting.vouchers') }}">اسناد حسابداری</a>
+                        <a id="tour-menu-accounting-vouchers" class="menu-link" href="{{ route('Accounting.vouchers') }}">اسناد حسابداری</a>
+                    </li>
+                    <li class="menu-item {{ Request::routeIs(['Accounting.vouchers.opening']) ? 'active' : '' }}">
+                        <a class="menu-link" href="{{ route('Accounting.vouchers.opening') }}">سند افتتاحیه</a>
                     </li>
                     <li class="menu-item {{ Request::routeIs(['Accounting.voucherTemplates']) ? 'active' : '' }}">
                         <a class="menu-link" href="{{ route('Accounting.voucherTemplates') }}">الگوهای سند</a>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
+use App\Services\PanelMembershipService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -14,17 +15,7 @@ class LoginController extends Controller
 {
     use AuthenticatesUsers;
 
-    /**
-     * مسیر بعد از لاگین موفق
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::HOME;
-
-    /**
-     * ایجاد کنترلر
-     */
-    public function __construct()
+    public function __construct(private PanelMembershipService $panels)
     {
         $this->middleware('guest')->except('logout');
     }
@@ -35,18 +26,32 @@ class LoginController extends Controller
     protected function attemptLogin(Request $request)
     {
         $login = trim((string) $request->get($this->username()));
-        $user = User::where('email', $login)
-            ->orWhere('username', $login)
-            ->orWhere('mobile', $login)
-            ->first();
+        $users = User::query()
+            ->where(function ($query) use ($login) {
+                $query->where('email', $login)
+                    ->orWhere('username', $login)
+                    ->orWhere('mobile', $login);
+            })
+            ->where('isActive', 1)
+            ->get();
 
-        if ($user && $message = $user->loginBlockMessage()) {
-            throw ValidationException::withMessages([
-                $this->username() => [$message],
-            ]);
-        }
+        $user = $users->first(function (User $candidate) use ($request) {
+            if (!Hash::check($request->get('password'), $candidate->password)) {
+                return false;
+            }
 
-        if (!$user || !Hash::check($request->get('password'), $user->password)) {
+            return $this->panels->accessiblePanelsForUser($candidate)->isNotEmpty();
+        });
+
+        if (!$user) {
+            $blockedUser = $users->first(fn (User $candidate) => Hash::check($request->get('password'), $candidate->password));
+
+            if ($blockedUser && $message = $blockedUser->loginBlockMessage()) {
+                throw ValidationException::withMessages([
+                    $this->username() => [$message],
+                ]);
+            }
+
             return false;
         }
 
@@ -54,6 +59,18 @@ class LoginController extends Controller
 
         return true;
     }
+
+    protected function authenticated(Request $request, $user)
+    {
+        return $this->panels->redirectAfterLogin($user);
+    }
+
+    /**
+     * مسیر بعد از لاگین موفق
+     *
+     * @var string
+     */
+    protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
      * پارامترهای اعتبارسنجی کاربر

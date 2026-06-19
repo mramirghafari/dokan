@@ -22,8 +22,10 @@ use App\Models\Pishfactor;
 use App\Models\CustomerSegment;
 use App\Models\CrmFollowup;
 use App\Models\CrmOpportunity;
+use App\Services\CustomerListColumnService;
 use App\Services\CustomerListService;
 use App\Services\CustomerListSummaryService;
+use App\Services\CustomerProfilePageService;
 use App\Services\CustomerTimelineService;
 use App\Services\PishFactorListService;
 use App\Services\TenantSettings;
@@ -36,7 +38,7 @@ class CustomersController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:customers,user')->only(['index', 'datatable', 'destroy', 'trashGet', 'trashPost', 'restore', 'profile360']);
+        $this->middleware('can:customers,user')->only(['index', 'datatable', 'destroy', 'trashGet', 'trashPost', 'restore', 'profile360', 'saveListColumns']);
         $this->middleware('can:customers-add,user')->only(['create', 'store', 'edit', 'update']);
         $this->middleware('can:customers-edit,user')->only(['edit', 'update']);
     }
@@ -56,6 +58,8 @@ class CustomersController extends Controller
         $leader_id = $request->filled('leader_id') && (int) $request->leader_id !== 0 ? (int) $request->leader_id : null;
         $visitor_id = $request->filled('visitor_id') && (int) $request->visitor_id !== 0 ? (int) $request->visitor_id : null;
         $status = $request->filled('status') ? (int) $request->status : null;
+        $columnService = app(CustomerListColumnService::class);
+        $tenantId = $user->tenant_id ?: $user->tenants_id;
 
         return view('customers.index', array_merge($filterContext, compact(
             'customersTotal',
@@ -67,7 +71,43 @@ class CustomersController extends Controller
             'leader_id',
             'visitor_id',
             'status',
-        )));
+        ), [
+            'customerListColumnCatalog' => $columnService->catalog($tenantId),
+            'customerListVisibleColumns' => $columnService->visibleKeys($tenantId),
+            'customerListHiddenIndexes' => $columnService->hiddenColumnIndexes($tenantId),
+            'customerListHeaders' => $columnService->headers($tenantId),
+            'customerListFixedIndexes' => $columnService->fixedColumnIndexes($tenantId),
+            'customerListColumnCount' => $columnService->columnCount($tenantId),
+            'customerListNonSortableIndexes' => array_values(array_diff(
+                range(0, max(0, $columnService->columnCount($tenantId) - 1)),
+                array_keys($columnService->sortableColumnsMap($tenantId))
+            )),
+            'customerListIsSubscriptionPanel' => $columnService->isSubscriptionPanel($tenantId),
+        ]));
+    }
+
+    public function saveListColumns(Request $request)
+    {
+        $data = $request->validate([
+            'columns' => ['required', 'array'],
+            'columns.*' => ['string', 'max:60'],
+        ]);
+
+        $user = Auth::user();
+        $columnService = app(CustomerListColumnService::class);
+        $saved = $columnService->saveVisibleKeys($data['columns'], $user);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'message' => 'ستون‌های نمایشی برای این پنل ذخیره شد.',
+                'columns' => $saved,
+                'hidden_indexes' => $columnService->hiddenColumnIndexes($user->tenant_id ?: $user->tenants_id),
+            ]);
+        }
+
+        Alert::success('ذخیره شد', 'ستون‌های نمایشی لیست مشتریان برای این پنل ذخیره شد.');
+
+        return back();
     }
 
     public function datatable(Request $request)
@@ -75,6 +115,7 @@ class CustomersController extends Controller
         $user = Auth::user();
         $listService = app(CustomerListService::class);
         $summaryService = app(CustomerListSummaryService::class);
+        $columnService = app(CustomerListColumnService::class);
         $draw = (int) $request->input('draw', 1);
         $start = max((int) $request->input('start', 0), 0);
         $length = min(max((int) $request->input('length', 50), 10), 100);
@@ -86,24 +127,20 @@ class CustomersController extends Controller
 
         $orderColumn = (int) data_get($request->input('order.0.column'), 0);
         $orderDirection = data_get($request->input('order.0.dir'), 'desc') === 'asc' ? 'asc' : 'desc';
-        $sortableColumns = [
-            0 => 'customers.id',
-            1 => 'customers.customer_code',
-            2 => 'customers.name',
-            3 => 'customers.tablo',
-            6 => 'active_orders_count',
-            7 => 'active_orders_sum',
-            9 => 'customers.status',
-        ];
+        $sortableColumns = $columnService->sortableColumnsMap($user->tenant_id ?: $user->tenants_id);
 
-        $customers = (clone $filteredQuery)
+        $customers = $listService->appendListMetricSelects(clone $filteredQuery)
             ->with([
                 'region:id,name',
                 'Area:id,name',
                 'leader:id,name',
+                'creator:id,name',
+                'latestPishfactor.visitor:id,name',
             ])
             ->withCount('activeOrders as active_orders_count')
             ->withSum('activeOrders as active_orders_sum', 'fullPrice')
+            ->withCount('pishfactors as purchases_count')
+            ->withSum('pishfactors as purchases_sum', 'fullPrice')
             ->when(isset($sortableColumns[$orderColumn]), function (Builder $query) use ($sortableColumns, $orderColumn, $orderDirection) {
                 $query->orderBy($sortableColumns[$orderColumn], $orderDirection);
             }, function (Builder $query) {
@@ -115,39 +152,30 @@ class CustomersController extends Controller
 
         $canDelete = (int) $user->isAdmin === 1;
         $csrf = csrf_token();
-        $data = $customers->values()->map(function (Customers $customer, int $index) use ($start, $canDelete, $csrf) {
+        $data = $customers->values()->map(function (Customers $customer, int $index) use ($start, $canDelete, $csrf, $columnService, $user) {
             $showUrl = route('customers.show', $customer->id);
             $ordersUrl = route('customers.orders', $customer->id);
-            $regionName = e($customer->region->name ?? '');
-            $areaName = e($customer->Area->name ?? '');
-            $leaderName = e($customer->leader->name ?? '');
-            $statusBadge = (int) $customer->status === 1
-                ? '<span class="badge bg-label-success">فعال</span>'
-                : '<span class="badge bg-label-danger">غیرفعال</span>';
 
-            $actions = '<a href="' . $showUrl . '" style="font-size:20px;float:right;margin-left:15px"><i class="fa fa-edit" style="color:#04a9f5;"></i></a>';
+            $actions = '<a href="' . $showUrl . '" style="font-size:20px;float:right;margin-left:15px;color:#04a9f5;display:inline-flex">'
+                . \App\Support\UiIcon::html('fa-edit') . '</a>';
             if ($canDelete && (int) ($customer->active_orders_count ?? 0) === 0) {
                 $destroyUrl = route('customers.destroy', $customer->id);
                 $actions .= '<form action="' . $destroyUrl . '" method="POST" onsubmit="return confirm(\'آیا از این مشتری اطمینان دارید؟\');" style="display:inline">'
                     . '<input type="hidden" name="_method" value="delete">'
                     . '<input type="hidden" name="_token" value="' . $csrf . '">'
-                    . '<button type="submit" style="font-size:20px;border:none;background-color:transparent;float:right"><i class="fa fa-trash" style="color:#dc3545;"></i></button>'
+                    . '<button type="submit" style="font-size:20px;border:none;background-color:transparent;float:right;color:#dc3545;display:inline-flex">'
+                    . \App\Support\UiIcon::html('fa-trash') . '</button>'
                     . '</form>';
             }
 
-            return [
+            return $columnService->buildDatatableRow(
+                $customer,
                 $start + $index + 1,
-                '<a href="' . $showUrl . '">' . e($customer->customer_code) . '</a>',
-                '<a href="' . $showUrl . '">' . e($customer->name) . '</a>',
-                '<a href="' . $showUrl . '"><small>' . e($customer->tablo) . '</small></a>',
-                '<small>' . $regionName . ' / ' . $areaName . '</small>',
-                '<small>' . e($customer->senf) . ' / ' . e($customer->channel) . '</small>',
-                '<a href="' . $ordersUrl . '">' . number_format((int) ($customer->active_orders_count ?? 0)) . '</a>',
-                '<a href="' . $ordersUrl . '">' . number_format((int) ($customer->active_orders_sum ?? 0)) . '</a>',
-                $leaderName,
-                $statusBadge,
+                $showUrl,
+                $ordersUrl,
                 $actions,
-            ];
+                $user->tenant_id ?: $user->tenants_id
+            );
         });
 
         return response()->json([
@@ -229,49 +257,22 @@ class CustomersController extends Controller
         $Customer = Customers::find($Customer);
         abort_if(!$Customer, 404);
 
-        if ($task != null) {
-            $MyTask = Tasks::find($task);
-        } else {
-            $MyTask = null;
-        }
-        $Factors = Pishfactor::where('customer_id', $Customer->id)->get();
-        $FactorsAccepted = Pishfactor::where('customer_id', $Customer->id)->whereIn('status', [1, 4])->get();
-        $crmFollowupsQuery = CrmFollowup::query()->with(['assignedUser', 'creator'])->where('customer_id', $Customer->id);
-        $crmOpportunitiesQuery = CrmOpportunity::query()->with(['assignedUser'])->where('customer_id', $Customer->id);
-
-        if ((int) auth()->user()->isGod !== 1) {
-            $crmFollowupsQuery->forOrganizations(auth()->user());
-            $crmOpportunitiesQuery->forOrganizations(auth()->user());
-        }
-
-        $CrmFollowups = (clone $crmFollowupsQuery)
-            ->orderByRaw("FIELD(status, 'open', 'in_progress', 'done', 'canceled')")
-            ->orderByRaw('due_date_en IS NULL')
-            ->orderBy('due_date_en')
-            ->orderByDesc('id')
-            ->limit(8)
-            ->get();
-        $CrmOpportunities = (clone $crmOpportunitiesQuery)
-            ->orderByRaw("FIELD(status, 'open', 'won', 'lost', 'canceled')")
-            ->orderByRaw("FIELD(stage, 'negotiation', 'proposal', 'qualified', 'new', 'won', 'lost')")
-            ->orderByDesc('id')
-            ->limit(8)
-            ->get();
-        $CrmStats = [
-            'open_followups' => (clone $crmFollowupsQuery)->whereIn('status', ['open', 'in_progress'])->count(),
-            'overdue_followups' => (clone $crmFollowupsQuery)->whereIn('status', ['open', 'in_progress'])->whereDate('due_date_en', '<', now()->toDateString())->count(),
-            'open_opportunities' => (clone $crmOpportunitiesQuery)->where('status', 'open')->count(),
-            'open_opportunity_amount' => (clone $crmOpportunitiesQuery)->where('status', 'open')->sum('amount'),
-        ];
-        $FactorsPriceCount = 0;
-        foreach ($FactorsAccepted as $factor) {
-            $price = intval(str_replace(',', '', $factor->fullPrice));
-            $FactorsPriceCount += $price;
-        }
-        //$FactorsPriceCount = Pishfactor::where('customer_id', $id)->sum('fullPrice');
+        $MyTask = $task !== null ? Tasks::find($task) : null;
+        $profile = app(CustomerProfilePageService::class)->build($Customer, Auth::user(), $MyTask);
 
         session()->put('backlink', asset('/customers'));
-        return view('customers.show', compact('Customer', 'Factors', 'FactorsPriceCount', 'FactorsAccepted', 'MyTask', 'CrmFollowups', 'CrmOpportunities', 'CrmStats'));
+
+        return view('customers.show', array_merge($profile, [
+            'Customer' => $profile['customer'],
+            'Factors' => $profile['orders'],
+            'FactorsPriceCount' => $profile['metrics']['revenue_total'],
+            'FactorsAccepted' => collect(),
+            'MyTask' => $MyTask,
+            'CrmFollowups' => $profile['crm']['followups'],
+            'CrmOpportunities' => $profile['crm']['opportunities'],
+            'CrmStats' => $profile['crm']['stats'],
+            'profileService' => app(CustomerProfilePageService::class),
+        ]));
     }
 
     public function search(Request $request)
@@ -463,6 +464,8 @@ class CustomersController extends Controller
             'national_id' => $request->national_id,
             'economic_number' => $request->economic_number,
             'customer_code' => $request->customer_code,
+            'max_purchase_amount' => $this->moneyInput($request->input('max_purchase_amount')),
+            'max_discount_amount' => $this->moneyInput($request->input('max_discount_amount')),
             'phone' => $request->phone,
             'mobile' => $request->mobile,
             'tablo' => $request->tablo,
@@ -835,5 +838,12 @@ class CustomersController extends Controller
     private function legacyCustomerStatus(string $title): int
     {
         return in_array($title, ['غیرفعال', 'مسدود'], true) ? 0 : 1;
+    }
+
+    private function moneyInput($value, $default = null)
+    {
+        $value = str_replace(',', '', trim((string) ($value ?? '')));
+
+        return $value === '' ? $default : $value;
     }
 }

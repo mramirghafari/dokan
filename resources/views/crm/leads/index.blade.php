@@ -7,17 +7,9 @@
     <meta content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
         name="viewport" />
     <title>سرنخ های CRM - دکان دارمینو</title>
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" />
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
     <style>
         .lead-form-grid {
@@ -56,8 +48,8 @@
                                 <div class="text-muted">ثبت دستی، import اکسل با dedupe، تبدیل به مشتری و فرصت.</div>
                             </div>
                             <div class="d-flex gap-2">
-                                <a class="btn btn-label-secondary" href="{{ route('crm.leads.import.template') }}"><i class="ti ti-download me-1"></i>قالب CSV</a>
-                                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#leadImportModal"><i class="ti ti-upload me-1"></i>Import اکسل</button>
+                                <a class="btn btn-label-secondary" href="{{ route('crm.leads.import.template') }}"><x-ui.icon name="download" class="me-1" />قالب CSV</a>
+                                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#leadImportModal"><x-ui.icon name="upload" class="me-1" />Import اکسل</button>
                             </div>
                         </div>
 
@@ -418,11 +410,13 @@
 
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/select2/select2.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <script src="{{ asset('assets/') }}/js/main.js"></script>
     @include('partials.erp-remote-select-assets')

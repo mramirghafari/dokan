@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Jobs\ExportReportJob;
 use App\Jobs\ImportCrmLeadsJob;
 use App\Jobs\ImportCustomersJob;
+use App\Jobs\ImportProductsJob;
 use App\Models\DataExchangeRun;
 use App\Models\User;
 
@@ -66,7 +67,7 @@ class DataExchangeService
         return $run->fresh() ?: $run;
     }
 
-    public function dispatchCustomerImport(User $user, string $storagePath, array $options = []): DataExchangeRun
+    public function dispatchCustomerImport(User $user, string $storagePath, array $options = [], ?string $originalFileName = null): DataExchangeRun
     {
         $context = app(TenantContextService::class)->fromUser($user);
 
@@ -74,11 +75,28 @@ class DataExchangeService
             'tenant_id' => $context['tenant_id'],
             'organization_id' => $context['organization_id'],
             'user_id' => $user->id,
-            'file_name' => basename($storagePath),
+            'file_name' => $originalFileName ?: basename($storagePath),
             'options' => $options,
         ]);
 
         ImportCustomersJob::dispatch($run->id, $user->id, $storagePath, $options);
+
+        return $run;
+    }
+
+    public function dispatchProductImport(User $user, string $storagePath, array $options = [], ?string $originalFileName = null): DataExchangeRun
+    {
+        $context = app(TenantContextService::class)->fromUser($user);
+
+        $run = $this->start('import', 'products', [
+            'tenant_id' => $context['tenant_id'],
+            'organization_id' => $context['organization_id'],
+            'user_id' => $user->id,
+            'file_name' => $originalFileName ?: basename($storagePath),
+            'options' => $options,
+        ]);
+
+        ImportProductsJob::dispatch($run->id, $user->id, $storagePath, $options);
 
         return $run;
     }

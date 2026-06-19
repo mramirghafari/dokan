@@ -8,17 +8,9 @@
         name="viewport" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>کاریز فروش کانبان - دکان دارمینو</title>
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" />
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
     <style>
         .board-grid {
@@ -311,7 +303,7 @@
                                                 <img src="{{ asset('storage/' . $board->cover_image_path) }}"
                                                     alt="{{ $board->title }}">
                                             @else
-                                                <i class="ti ti-layout-kanban" style="font-size: 54px;"></i>
+                                                <x-ui.icon name="layout-kanban" />
                                             @endif
                                         </div>
                                         <div class="board-card-body">
@@ -367,8 +359,7 @@
                                 <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
                                     <div class="d-flex align-items-center gap-3">
                                         <a class="btn btn-icon btn-label-secondary"
-                                            href="{{ route('crm.sales-boards.index') }}"><i
-                                                class="ti ti-arrow-right"></i></a>
+                                            href="{{ route('crm.sales-boards.index') }}"><x-ui.icon name="arrow-right" /></a>
                                         <div>
                                             <h4 class="mb-1">{{ $activeBoard->title }}</h4>
                                             <div class="text-muted">مسئول:
@@ -378,14 +369,13 @@
                                     </div>
                                     <div class="d-flex gap-2 flex-wrap">
                                         <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal"
-                                            data-bs-target="#createListModal"><i class="ti ti-columns-3 me-1"></i>
+                                            data-bs-target="#createListModal"><x-ui.icon name="columns-3" class="me-1" />
                                             افزودن لیست</button>
                                         <button class="btn btn-outline-info" type="button" data-bs-toggle="modal"
-                                            data-bs-target="#createAutomationRuleModal"><i
-                                                class="ti ti-bolt me-1"></i>
+                                            data-bs-target="#createAutomationRuleModal"><x-ui.icon name="bolt" class="me-1" />
                                             قانون اتوماسیون</button>
                                         <button class="btn btn-primary" type="button" data-bs-toggle="modal"
-                                            data-bs-target="#createBoardModal"><i class="ti ti-plus me-1"></i> بورد
+                                            data-bs-target="#createBoardModal"><x-ui.icon name="plus" class="me-1" /> بورد
                                             جدید</button>
                                     </div>
                                 </div>
@@ -465,8 +455,7 @@
                                             و اعلان برای مسئولان ارسال می شود.</small>
                                     </div>
                                     <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="modal"
-                                        data-bs-target="#createAutomationRuleModal"><i
-                                            class="ti ti-plus me-1"></i>افزودن قانون</button>
+                                        data-bs-target="#createAutomationRuleModal"><x-ui.icon name="plus" class="me-1" />افزودن قانون</button>
                                 </div>
                                 <div class="card-body">
                                     @if ($activeBoard->automationRules->isEmpty())
@@ -535,8 +524,7 @@
                                             <div class="kanban-list-header">
                                                 <div class="d-flex justify-content-between align-items-start gap-2">
                                                     <div>
-                                                        <h6 class="mb-1"><i
-                                                                class="ti ti-grip-vertical list-drag-handle me-1"></i>{{ $list->title }}
+                                                        <h6 class="mb-1"><x-ui.icon name="grip-vertical" class="list-drag-handle me-1" />{{ $list->title }}
                                                         </h6>
                                                         <div class="kanban-meta">{{ number_format($count) }} کارت /
                                                             {{ number_format($amount) }} ریال</div>
@@ -611,10 +599,10 @@
                                                         @endif
                                                         @if ($card->customer_id)
                                                             <div class="d-flex flex-wrap gap-1 mt-2">
-                                                                <a class="btn btn-xs btn-label-secondary btn-sm py-0 px-2" href="{{ route('customers.360', $card->customer_id) }}" title="پرونده ۳۶۰"><i class="ti ti-user-search"></i></a>
-                                                                <button type="button" class="btn btn-xs btn-label-info btn-sm py-0 px-2 crm-quick-note" data-note-url="{{ route('crm.quick.card-note', $card) }}" title="یادداشت سریع"><i class="ti ti-note"></i></button>
+                                                                <a class="btn btn-xs btn-label-secondary btn-sm py-0 px-2" href="{{ route('customers.360', $card->customer_id) }}" title="پرونده ۳۶۰"><x-ui.icon name="user-search" /></a>
+                                                                <button type="button" class="btn btn-xs btn-label-info btn-sm py-0 px-2 crm-quick-note" data-note-url="{{ route('crm.quick.card-note', $card) }}" title="یادداشت سریع"><x-ui.icon name="note" /></button>
                                                                 @if ($card->pishfactor_id)
-                                                                    <a class="btn btn-xs btn-label-success btn-sm py-0 px-2" href="{{ url('/pishFactorInfo/' . $card->pishfactor_id) }}" title="پیش‌فاکتور"><i class="ti ti-file-invoice"></i></a>
+                                                                    <a class="btn btn-xs btn-label-success btn-sm py-0 px-2" href="{{ url('/pishFactorInfo/' . $card->pishfactor_id) }}" title="پیش‌فاکتور"><x-ui.icon name="file-invoice" /></a>
                                                                 @endif
                                                             </div>
                                                         @endif
@@ -638,7 +626,7 @@
                                                 <button class="add-card-tile mt-2" type="button"
                                                     data-list-id="{{ $list->id }}" data-bs-toggle="modal"
                                                     data-bs-target="#addCustomersModal">
-                                                    <i class="ti ti-users-plus"></i> افزودن مشتری به این لیست
+                                                    <x-ui.icon name="users-plus" /> افزودن مشتری به این لیست
                                                 </button>
                                             </div>
                                         </section>
@@ -974,11 +962,13 @@
 
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/select2/select2.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <script src="{{ asset('assets/') }}/js/main.js"></script>
     @include('partials.erp-remote-select-assets')

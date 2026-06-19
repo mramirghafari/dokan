@@ -21,6 +21,9 @@ use App\Models\Shipments;
 use App\Models\ShipmentRoute;
 use App\Models\Cargo;
 use App\Models\User;
+use App\Services\PanelDashboardWidgetService;
+use App\Services\PanelMembershipService;
+use App\Services\PanelOnboardingService;
 use App\Services\WarehouseDashboardService;
 use Auth;
 use Illuminate\Support\Facades\Hash;
@@ -59,8 +62,8 @@ class HomeController extends Controller
         $isDriver = false;
         $isStore = false;
         $isAgent = false;
-        foreach ($User->roles as $role) {
-            if ($role->title == 'expert') {
+        foreach ($User->rolesForActiveTenant() as $role) {
+            if (in_array($role->title, ['expert', 'admin'], true)) {
                 $isManager = true;
             }
             if ($role->title == 'leader') {
@@ -274,6 +277,9 @@ class HomeController extends Controller
 
             return view('welcome-leader', compact('User', 'Target', 'employees', 'repairs', 'logs', 'AllFactorPrices', 'AllFactorCount', 'todaySum', 'weekSum', 'monthSum', 'topProducts', 'topVisitors', 'MyTasks', 'MyCustomersCount', 'MyAcceptedFactorsCount', 'MyActiveCustomers', 'MyFactorsCount', 'MyVisitors', 'Factors', 'DriverFactors'));
         } elseif ($isManager) {
+            $teamScope = $this->managerTeamUserIds($User->id);
+            $leaderIds = $teamScope['leaders'];
+            $visitorIds = $teamScope['visitors'];
 
             $Target = Targets::where('status', 1)->where('user_id', $User->id)->first();
             if ($Target) {
@@ -290,19 +296,19 @@ class HomeController extends Controller
 
                 // امروز
                 $todaySum = Pishfactor::whereIn('status', [1, 4])
-                    ->where('sarparast_id', $User->id)
+                    ->whereIn('visitor_id', $visitorIds)
                     ->whereDate('created_at', Carbon::today())
                     ->sum(DB::raw("REPLACE(fullPrice, ',', '')"));
 
                 // این هفته
                 $weekSum = Pishfactor::whereIn('status', [1, 4])
-                    ->where('sarparast_id', $User->id)
+                    ->whereIn('visitor_id', $visitorIds)
                     ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
                     ->sum(DB::raw("REPLACE(fullPrice, ',', '')"));
 
                 // این ماه
                 $monthSum = Pishfactor::whereIn('status', [1, 4])
-                    ->where('sarparast_id', $User->id)
+                    ->whereIn('visitor_id', $visitorIds)
                     ->whereBetween('created_at', [$Target->start_date_en, Carbon::today()])
                     ->sum(DB::raw("REPLACE(fullPrice, ',', '')"));
             } else {
@@ -315,7 +321,7 @@ class HomeController extends Controller
             }
 
             $myFactorIds = Pishfactor::whereIn('status', [1, 4])
-                ->where('sarparast_id', $User->id)
+                ->whereIn('visitor_id', $visitorIds)
                 ->pluck('id');
 
             $topProducts = PishFactorItems::whereIn('pishfactor_id', $myFactorIds)
@@ -325,10 +331,10 @@ class HomeController extends Controller
                 ->get();
 
 
-            $MyLeadersIds = User::where('leader_id', $User->id)->pluck('id');
-            $MyVisitors = User::whereIn('leader_id', $MyLeadersIds)->pluck('id');
+            $MyVisitors = $visitorIds;
             if ($Target) {
-                $topVisitors = Pishfactor::whereIn('visitor_id', $MyVisitors)
+                $topVisitors = Pishfactor::with('visitor')
+                    ->whereIn('visitor_id', $MyVisitors)
                     ->whereIn('status', [1, 4])
                     ->whereBetween('created_at', [$Target->start_date_en, $Target->end_date_en])
                     ->select(
@@ -341,7 +347,8 @@ class HomeController extends Controller
                     ->orderByDesc('total_fullPrice')
                     ->get();
             } else {
-                $topVisitors = Pishfactor::whereIn('visitor_id', $MyVisitors)
+                $topVisitors = Pishfactor::with('visitor')
+                    ->whereIn('visitor_id', $MyVisitors)
                     ->whereIn('status', [1, 4])
                     ->select(
                         'visitor_id',
@@ -355,19 +362,19 @@ class HomeController extends Controller
             }
 
 
-            $MyFactorsCount = Pishfactor::where('sarparast_id', auth()->user()->id)->count();
-            $MyAcceptedFactorsCount = Pishfactor::where('sarparast_id', auth()->user()->id)->whereIn('status', [1, 4])->count();
+            $MyFactorsCount = Pishfactor::whereIn('visitor_id', $visitorIds)->count();
+            $MyAcceptedFactorsCount = Pishfactor::whereIn('visitor_id', $visitorIds)->whereIn('status', [1, 4])->count();
             $MyActiveCustomers = Pishfactor::select('customer_id')
-                ->where('sarparast_id', auth()->user()->id)
+                ->whereIn('visitor_id', $visitorIds)
                 ->whereIn('status', [1, 4])
                 ->groupBy('customer_id')
                 ->havingRaw('COUNT(*) > 1')
                 ->count();
-            $DayFactors = Pishfactor::where('visitor_id', $User->id)
+            $DayFactors = Pishfactor::whereIn('visitor_id', $visitorIds)
                 ->whereDate('created_at', Carbon::today())
                 ->get();
 
-            $MyRegions = Region::where('leader_id', $User->id)->pluck('id');
+            $MyRegions = Region::whereIn('leader_id', $leaderIds)->pluck('id');
             $MyAreas = Area::whereIn('region_id', $MyRegions)->pluck('id');
             $MyCustomersCount = Customers::whereIn('area', $MyAreas)->get();
 
@@ -379,9 +386,9 @@ class HomeController extends Controller
 
             // dd($MyVisitors);
 
-            $Factors = $this->ManagerTeamFactors();
+            $Factors = $this->ManagerTeamFactors($visitorIds);
 
-            $DriverFactors = Pishfactor::where('sarparast_id', $User->id)
+            $DriverFactors = Pishfactor::whereIn('visitor_id', $visitorIds)
                 ->where('step', 3)
                 ->whereDate('created_at', Carbon::today())->get();
 
@@ -431,7 +438,7 @@ class HomeController extends Controller
 
                 $OrganManagers = User::where('organization_id', $morgan->id)
                     ->whereHas('roles', function ($q) {
-                        $q->where('title', 'expert');
+                        $q->whereIn('title', ['expert', 'admin']);
                     })
                     ->pluck('id')
                     ->toArray();
@@ -601,7 +608,7 @@ class HomeController extends Controller
 
                 $OrganManagers = User::whereJsonContains('organization_id', ["$morgan->id"])
                     ->whereHas('roles', function ($q) {
-                        $q->where('title', 'expert');
+                        $q->whereIn('title', ['expert', 'admin']);
                     })
                     ->pluck('id')
                     ->toArray();
@@ -753,8 +760,12 @@ class HomeController extends Controller
                 ->limit(50)
                 ->get();
 
+            $user = $User;
+            $panelOnboarding = app(PanelOnboardingService::class)->dashboardState($User);
+            $dashboardWidgets = app(PanelDashboardWidgetService::class)->visibilityMap($User);
+            $showSetupCard = !empty($panelOnboarding['show_setup_card']);
 
-            return view('welcome', compact('employees', 'repairs', 'logs', 'OrganInfos', 'FullTargetsPrices', 'AllFactorPrices', 'StartTarget', 'EndTarget', 'topVisitors', 'MyLeaders', 'Factors', 'AcceptedFactorFullPrices', 'CompletedFactorFullPrices', 'warehouseDashboard'));
+            return view('welcome', compact('user', 'employees', 'repairs', 'logs', 'OrganInfos', 'FullTargetsPrices', 'AllFactorPrices', 'StartTarget', 'EndTarget', 'topVisitors', 'MyLeaders', 'Factors', 'AcceptedFactorFullPrices', 'CompletedFactorFullPrices', 'warehouseDashboard', 'panelOnboarding', 'dashboardWidgets', 'showSetupCard'));
         }
     }
 
@@ -910,26 +921,48 @@ class HomeController extends Controller
         dd($result);
     }
 
-    private function ManagerTeamFactors()
+    private function managerTeamUserIds(int $managerId): array
     {
+        $activeTenantId = app(PanelMembershipService::class)->activeTenantId(auth()->user());
 
-        $userId = auth()->user()->id;
-        // گرفتن آیدی سرپرست‌های زیرمجموعه من
-        $leaders = User::where('leader_id', $userId)
-            ->whereHas('roles', function ($q) {
+        $leaders = User::query()
+            ->where('leader_id', $managerId)
+            ->whereHas('roles', function ($q) use ($activeTenantId) {
                 $q->where('title', 'leader');
+
+                if ($activeTenantId) {
+                    $q->where(function ($roleQuery) use ($activeTenantId) {
+                        $roleQuery->whereNull('tenant_id')
+                            ->orWhere('tenant_id', $activeTenantId);
+                    });
+                }
             })
             ->pluck('id');
 
-        // گرفتن آیدی ویزیتورهای زیرمجموعه سرپرست‌ها
-        $visitors = User::whereIn('leader_id', $leaders)
-            ->whereHas('roles', function ($q) {
+        $visitors = User::query()
+            ->whereIn('leader_id', $leaders)
+            ->whereHas('roles', function ($q) use ($activeTenantId) {
                 $q->where('title', 'visitor');
+
+                if ($activeTenantId) {
+                    $q->where(function ($roleQuery) use ($activeTenantId) {
+                        $roleQuery->whereNull('tenant_id')
+                            ->orWhere('tenant_id', $activeTenantId);
+                    });
+                }
             })
             ->pluck('id');
 
-        // گرفتن فاکتورهای ویزیتورها
-        $pishfactors = Pishfactor::whereIn('visitor_id', $visitors)
+        return [
+            'leaders' => $leaders,
+            'visitors' => $visitors,
+        ];
+    }
+
+    private function ManagerTeamFactors($visitorIds)
+    {
+        // گرفتن فاکتورهای ویزیتورهای زیرمجموعه مدیر در پنل فعال
+        $pishfactors = Pishfactor::whereIn('visitor_id', $visitorIds)
             ->whereDate('created_at', \Carbon\Carbon::today())
             ->orderBy('id', 'desc')->get();
 

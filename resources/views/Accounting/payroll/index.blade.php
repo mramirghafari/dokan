@@ -7,21 +7,13 @@
     <meta content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
         name="viewport" />
     <title>حقوق و دستمزد - دکان دارمینو</title>
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
 </head>
 
 <body>
-    @include('sweetalert::alert')
+    @include('partials.panel-toasts')
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
             @include('sections.sidebar')
@@ -29,7 +21,7 @@
                 @include('sections.header')
                 <div class="content-wrapper">
                     <div class="container-xxl flex-grow-1 container-p-y">
-                        <h4 class="mb-4"><span class="text-muted fw-light">مالی و حسابداری /</span> حقوق و دستمزد</h4>
+                        <h4 id="tour-payroll-page" class="mb-4"><span class="text-muted fw-light">مالی و حسابداری /</span> حقوق و دستمزد</h4>
 
                         @if ($errors->any())
                             <div class="alert alert-danger">
@@ -68,7 +60,7 @@
 
                         <div class="row g-4 mb-4">
                             <div class="col-lg-6">
-                                <div class="card h-100">
+                                <div id="tour-payroll-contracts" class="card h-100">
                                     <div class="card-header">
                                         <h5 class="mb-0">قرارداد حقوقی پرسنل</h5>
                                     </div>
@@ -393,7 +385,7 @@
                             </form>
                         </div>
 
-                        <div class="card">
+                        <div id="tour-payroll-runs" class="card">
                             <div class="card-header">
                                 <h5 class="mb-0">لیست های حقوق</h5>
                             </div>
@@ -582,10 +574,12 @@
 
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <script src="{{ asset('assets/') }}/js/main.js"></script>
 </body>

@@ -8,19 +8,10 @@
         name="viewport" />
     <title>{{ $pageTitle ?? 'تنظیمات پنل' }} - دکان دارمینو</title>
     <meta content="" name="description" />
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" />
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
     <style>
         .settings-grid {
@@ -34,6 +25,46 @@
             border-radius: 8px;
             padding: 14px 16px;
             min-height: 78px;
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+        }
+
+        .setting-row__control {
+            width: 100%;
+        }
+
+        .setting-row__control .form-select,
+        .setting-row__control .form-control,
+        .setting-row__control textarea {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .setting-row .select2-container {
+            width: 100% !important;
+            max-width: 100%;
+        }
+
+        .setting-row .select2-selection--multiple {
+            min-height: 42px;
+            padding: .35rem .5rem;
+        }
+
+        .setting-row .select2-selection--multiple .select2-selection__rendered {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .25rem;
+        }
+
+        .setting-row .select2-selection--single {
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+        }
+
+        .setting-row .select2-selection__placeholder {
+            color: #a8a8b0 !important;
         }
 
         .setting-row .form-check-input {
@@ -117,12 +148,12 @@
                 @include('sections.header')
                 <div class="content-wrapper">
                     <div class="container-xxl flex-grow-1 container-p-y">
-                        <h4 class="py-3 mb-4">
+                        <h4 class="py-3 mb-4" id="tour-settings-page-title">
                             <span class="text-muted fw-light">اطلاعات پایه /</span>
                             {{ $pageTitle ?? 'تنظیمات اختصاصی پنل' }}
                         </h4>
 
-                        <div class="card mb-4">
+                        <div class="card mb-4" id="tour-settings-intro">
                             <div
                                 class="card-body d-flex flex-column flex-lg-row gap-3 justify-content-between align-items-lg-center">
                                 <div>
@@ -133,7 +164,13 @@
                                 </div>
                                 @if ($user->isGod == 1)
                                     <form
-                                        action="{{ route(($settingsSection ?? null) === 'sales_scenario' ? 'settings.salesScenario' : (($settingsSection ?? null) === 'notification_sms' ? 'settings.notifications' : 'settings.index')) }}"
+                                        id="tour-settings-tenant-switch"
+                                        action="{{ route(match ($settingsSection ?? null) {
+                                            'sales_scenario' => 'settings.salesScenario',
+                                            'notification_sms' => 'settings.notifications',
+                                            'dashboard_widgets' => 'settings.dashboardWidgets',
+                                            default => 'settings.index',
+                                        }) }}"
                                         class="d-flex gap-2 align-items-center flex-wrap" method="GET">
                                         <select class="select2 form-select" name="target_tenant_id"
                                             style="min-width: 260px;">
@@ -171,39 +208,20 @@
                             @endif
 
                             @if (!($settingsSection ?? null))
-                                <div class="card mb-4">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h5 class="mb-0">چینش منوی پنل</h5>
-                                            <small class="text-muted">عدد کوچکتر بالاتر نمایش داده می شود؛ بعد از ذخیره،
-                                                ترتیب از اول تا آخر مرتب سازی می شود.</small>
-                                        </div>
-                                        <span class="badge bg-label-primary">{{ $navigationItems->count() }}
-                                            آیتم</span>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="navigation-grid">
-                                            @foreach ($navigationItems as $navigationItem)
-                                                <div class="navigation-row">
-                                                    <label class="form-label mb-2"
-                                                        for="navigation_{{ $navigationItem['key'] }}">{{ $navigationItem['title'] }}</label>
-                                                    <input class="form-control"
-                                                        id="navigation_{{ $navigationItem['key'] }}" min="1"
-                                                        name="navigation_order[{{ $navigationItem['key'] }}]"
-                                                        step="1" type="number"
-                                                        value="{{ $navigationItem['order'] }}">
-                                                    <small class="text-muted">پیش فرض:
-                                                        {{ $navigationItem['default_order'] }}</small>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
+                                <div class="alert alert-label-info mb-4" id="tour-settings-feature-help">
+                                    <div class="fw-semibold mb-1">راهنمای سریع اثر سوییچ‌ها</div>
+                                    <small class="d-block">
+                                        خاموش‌کردن «مسیر فروش و ویزیت روزانه» منوهای مسیرها و امکانات مسیرمحور را غیرفعال می‌کند.
+                                    </small>
+                                    <small class="d-block">
+                                        خاموش‌کردن «مدیریت انبار و موجودی» منوهای انبار/تولید و عملیات موجودی مرتبط را غیرفعال می‌کند.
+                                    </small>
+                                    <small class="d-block mt-1">
+                                        مسیر تغییر: <strong>اطلاعات پایه → تنظیمات پنل → کارت‌های قابلیت‌ها</strong>.
+                                    </small>
                                 </div>
-                            @endif
-
-                            @if (!($settingsSection ?? null))
                                 @foreach ($featureModules as $module)
-                                    <div class="card mb-4">
+                                    <div class="card mb-4" @if ($loop->first) id="tour-settings-features" @endif>
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <div>
                                                 <h5 class="mb-0">{{ $module->title }}</h5>
@@ -217,8 +235,11 @@
                                                 @foreach ($module->features as $feature)
                                                     @php
                                                         $state = $feature->state;
+                                                        $featureDescription = trim(
+                                                            (string) ($feature->description ?? config("panel_settings.definitions.{$feature->key}.description", '')),
+                                                        );
                                                     @endphp
-                                                    <div class="feature-row">
+                                                    <div class="feature-row" id="tour-feature-{{ $feature->key }}">
                                                         <div
                                                             class="d-flex justify-content-between gap-3 align-items-start">
                                                             <div>
@@ -228,6 +249,11 @@
                                                                     مقدار پایه:
                                                                     {{ $state['global_value'] === 'yes' ? 'فعال' : ($state['global_value'] === 'no' ? 'غیرفعال' : $state['global_value']) }}
                                                                 </div>
+                                                                @if ($featureDescription !== '')
+                                                                    <div class="setting-meta text-muted mt-1">
+                                                                        {{ $featureDescription }}
+                                                                    </div>
+                                                                @endif
                                                                 <div class="feature-state">
                                                                     @if ($state['has_tenant_override'])
                                                                         <span class="badge bg-label-info">اختصاصی
@@ -303,7 +329,7 @@
                                 @if ($visibleItems->isEmpty())
                                     @continue
                                 @endif
-                                <div class="card mb-4">
+                                <div class="card mb-4" id="tour-settings-group-{{ $groupKey }}">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h5 class="mb-0">{{ $groups[$groupKey] ?? $groupKey }}</h5>
                                         <span class="badge bg-label-secondary">{{ $visibleItems->count() }}
@@ -330,89 +356,83 @@
                                                         $setting['organization_value'] ?? $setting['value'];
                                                     $organizationSelectedValues = is_array($organizationValue)
                                                         ? $organizationValue
-                                                        : [$organizationValue];
+                                                        : [];
+                                                    $settingInputValue = is_array($setting['value'] ?? null)
+                                                        ? json_encode($setting['value'], JSON_UNESCAPED_UNICODE)
+                                                        : ($setting['value'] ?? '');
+                                                    $organizationInputValue = is_array($organizationValue)
+                                                        ? json_encode($organizationValue, JSON_UNESCAPED_UNICODE)
+                                                        : ($organizationValue ?? '');
                                                 @endphp
-                                                <div class="setting-row">
-                                                    <div
-                                                        class="d-flex justify-content-between gap-3 align-items-start">
-                                                        <div>
-                                                            <label class="form-label mb-1"
-                                                                for="setting_{{ $settingKey }}">{{ $setting['label'] }}</label>
-                                                            @php
-                                                                $inheritedDisplayValue = is_array(
-                                                                    $setting['inherited_value'],
-                                                                )
-                                                                    ? collect($setting['inherited_value'])
-                                                                        ->map(
-                                                                            fn($value) => $setting['options'][$value] ??
-                                                                                $value,
-                                                                        )
-                                                                        ->implode('، ')
-                                                                    : $setting['options'][
-                                                                            $setting['inherited_value']
-                                                                        ] ?? $setting['inherited_value'];
-                                                            @endphp
-                                                            <div class="setting-meta text-muted">
-                                                                مقدار پایه:
-                                                                {{ $setting['inherited_value'] === 'yes' ? 'فعال' : ($setting['inherited_value'] === 'no' ? 'غیرفعال' : $inheritedDisplayValue) }}
-                                                                @if ($setting['has_override'])
-                                                                    <span class="badge bg-label-info ms-2">اختصاصی
-                                                                        پنل</span>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                        <div class="text-nowrap">
-                                                            @if (($setting['type'] ?? 'text') === 'boolean')
-                                                                <input name="settings[{{ $settingKey }}]"
-                                                                    type="hidden" value="no">
-                                                                <div class="form-check form-switch mb-0">
-                                                                    <input class="form-check-input"
-                                                                        id="setting_{{ $settingKey }}"
-                                                                        name="settings[{{ $settingKey }}]"
-                                                                        type="checkbox" value="yes"
-                                                                        @if ($setting['value'] === 'yes') checked @endif>
-                                                                </div>
-                                                            @elseif (($setting['type'] ?? 'text') === 'select')
-                                                                <select class="form-select"
-                                                                    id="setting_{{ $settingKey }}"
-                                                                    name="settings[{{ $settingKey }}]">
-                                                                    @foreach ($setting['options'] ?? [] as $value => $label)
-                                                                        <option value="{{ $value }}"
-                                                                            @if ((string) $setting['value'] === (string) $value) selected @endif>
-                                                                            {{ $label }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            @elseif (($setting['type'] ?? 'text') === 'multiselect')
-                                                                @php
-                                                                    $selectedValues = is_array($setting['value'])
-                                                                        ? $setting['value']
-                                                                        : [$setting['value']];
-                                                                @endphp
-                                                                <select class="form-select select2"
-                                                                    id="setting_{{ $settingKey }}" multiple
-                                                                    name="settings[{{ $settingKey }}][]">
-                                                                    @foreach ($setting['options'] ?? [] as $value => $label)
-                                                                        <option value="{{ $value }}"
-                                                                            @if (in_array((string) $value, array_map('strval', $selectedValues), true)) selected @endif>
-                                                                            {{ $label }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            @elseif (($setting['type'] ?? 'text') === 'number')
-                                                                <input class="form-control"
-                                                                    id="setting_{{ $settingKey }}"
-                                                                    name="settings[{{ $settingKey }}]"
-                                                                    step="0.01" type="number"
-                                                                    value="{{ $setting['value'] }}">
-                                                            @elseif (($setting['type'] ?? 'text') === 'textarea')
-                                                                <textarea class="form-control" id="setting_{{ $settingKey }}" name="settings[{{ $settingKey }}]"
-                                                                    rows="3">{{ $setting['value'] }}</textarea>
-                                                            @else
-                                                                <input class="form-control"
-                                                                    id="setting_{{ $settingKey }}"
-                                                                    name="settings[{{ $settingKey }}]"
-                                                                    type="text" value="{{ $setting['value'] }}">
+                                                <div class="setting-row" id="tour-setting-{{ $settingKey }}">
+                                                    <div class="setting-row__head">
+                                                        <label class="form-label mb-1"
+                                                            for="setting_{{ $settingKey }}">{{ $setting['label'] }}</label>
+                                                        <div class="setting-meta text-muted">
+                                                            مقدار پایه:
+                                                            {{ $setting['inherited_display'] ?? '—' }}
+                                                            @if ($setting['has_override'])
+                                                                <span class="badge bg-label-info ms-2">اختصاصی
+                                                                    پنل</span>
                                                             @endif
                                                         </div>
+                                                    </div>
+                                                    <div class="setting-row__control">
+                                                        @if (($setting['type'] ?? 'text') === 'boolean')
+                                                            <input name="settings[{{ $settingKey }}]"
+                                                                type="hidden" value="no">
+                                                            <div class="form-check form-switch mb-0">
+                                                                <input class="form-check-input"
+                                                                    id="setting_{{ $settingKey }}"
+                                                                    name="settings[{{ $settingKey }}]"
+                                                                    type="checkbox" value="yes"
+                                                                    @if ($setting['value'] === 'yes') checked @endif>
+                                                            </div>
+                                                        @elseif (($setting['type'] ?? 'text') === 'select')
+                                                            <select class="form-select"
+                                                                id="setting_{{ $settingKey }}"
+                                                                name="settings[{{ $settingKey }}]">
+                                                                @foreach ($setting['options'] ?? [] as $value => $label)
+                                                                    <option value="{{ $value }}"
+                                                                        @if ((string) $setting['value'] === (string) $value) selected @endif>
+                                                                        {{ $label }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        @elseif (($setting['type'] ?? 'text') === 'multiselect')
+                                                            @php
+                                                                $selectedValues = is_array($setting['value'])
+                                                                    ? $setting['value']
+                                                                    : [];
+                                                            @endphp
+                                                            <select class="form-select select2-multiselect"
+                                                                id="setting_{{ $settingKey }}" multiple
+                                                                name="settings[{{ $settingKey }}][]"
+                                                                data-placeholder="انتخاب کنید...">
+                                                                @foreach ($setting['options'] ?? [] as $value => $label)
+                                                                    <option value="{{ $value }}"
+                                                                        @if (in_array((string) $value, array_map('strval', $selectedValues), true)) selected @endif>
+                                                                        {{ $label }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        @elseif (($setting['type'] ?? 'text') === 'number')
+                                                            <input class="form-control"
+                                                                id="setting_{{ $settingKey }}"
+                                                                name="settings[{{ $settingKey }}]"
+                                                                step="0.01" type="number"
+                                                                value="{{ $setting['value'] ?? ($setting['default'] ?? '') }}">
+                                                        @elseif (($setting['type'] ?? 'text') === 'textarea')
+                                                            <textarea class="form-control" id="setting_{{ $settingKey }}" name="settings[{{ $settingKey }}]"
+                                                                rows="3">{{ $settingInputValue }}</textarea>
+                                                        @elseif (($setting['type'] ?? 'text') === 'json')
+                                                            <textarea class="form-control font-monospace" id="setting_{{ $settingKey }}"
+                                                                name="settings[{{ $settingKey }}]" rows="4" readonly>{{ $settingInputValue }}</textarea>
+                                                            <small class="text-muted d-block mt-1">این مقدار از صفحه مربوطه تنظیم می‌شود و اینجا فقط نمایشی است.</small>
+                                                        @else
+                                                            <input class="form-control"
+                                                                id="setting_{{ $settingKey }}"
+                                                                name="settings[{{ $settingKey }}]"
+                                                                type="text" value="{{ $settingInputValue }}">
+                                                        @endif
                                                     </div>
                                                     @if ($targetOrganizationId)
                                                         <div class="organization-setting-override mt-3 pt-3">
@@ -467,10 +487,11 @@
                                                                         @endforeach
                                                                     </select>
                                                                 @elseif (($setting['type'] ?? 'text') === 'multiselect')
-                                                                    <select class="form-select select2"
+                                                                    <select class="form-select select2-multiselect"
                                                                         id="organization_setting_{{ $settingKey }}"
                                                                         multiple
-                                                                        name="organization_settings[{{ $settingKey }}][value][]">
+                                                                        name="organization_settings[{{ $settingKey }}][value][]"
+                                                                        data-placeholder="انتخاب کنید...">
                                                                         @foreach ($setting['options'] ?? [] as $value => $label)
                                                                             <option value="{{ $value }}"
                                                                                 @if (in_array((string) $value, array_map('strval', $organizationSelectedValues), true)) selected @endif>
@@ -485,13 +506,16 @@
                                                                         value="{{ $organizationValue }}">
                                                                 @elseif (($setting['type'] ?? 'text') === 'textarea')
                                                                     <textarea class="form-control" id="organization_setting_{{ $settingKey }}"
-                                                                        name="organization_settings[{{ $settingKey }}][value]" rows="3">{{ $organizationValue }}</textarea>
+                                                                        name="organization_settings[{{ $settingKey }}][value]" rows="3">{{ $organizationInputValue }}</textarea>
+                                                                @elseif (($setting['type'] ?? 'text') === 'json')
+                                                                    <textarea class="form-control font-monospace" id="organization_setting_{{ $settingKey }}"
+                                                                        rows="4" readonly>{{ $organizationInputValue }}</textarea>
                                                                 @else
                                                                     <input class="form-control"
                                                                         id="organization_setting_{{ $settingKey }}"
                                                                         name="organization_settings[{{ $settingKey }}][value]"
                                                                         type="text"
-                                                                        value="{{ $organizationValue }}">
+                                                                        value="{{ $organizationInputValue }}">
                                                                 @endif
                                                             </div>
                                                         </div>
@@ -503,10 +527,41 @@
                                 </div>
                             @endforeach
 
-                            <div class="card">
+                            @if (!($settingsSection ?? null))
+                                <div class="card mb-4" id="tour-settings-navigation">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0">چینش منوی پنل</h5>
+                                            <small class="text-muted">عدد کوچکتر بالاتر نمایش داده می‌شود؛ بعد از ذخیره،
+                                                ترتیب از اول تا آخر مرتب‌سازی می‌شود.</small>
+                                        </div>
+                                        <span class="badge bg-label-primary">{{ $navigationItems->count() }}
+                                            آیتم</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="navigation-grid">
+                                            @foreach ($navigationItems as $navigationItem)
+                                                <div class="navigation-row">
+                                                    <label class="form-label mb-2"
+                                                        for="navigation_{{ $navigationItem['key'] }}">{{ $navigationItem['title'] }}</label>
+                                                    <input class="form-control"
+                                                        id="navigation_{{ $navigationItem['key'] }}" min="1"
+                                                        name="navigation_order[{{ $navigationItem['key'] }}]"
+                                                        step="1" type="number"
+                                                        value="{{ $navigationItem['order'] }}">
+                                                    <small class="text-muted">پیش‌فرض:
+                                                        {{ $navigationItem['default_order'] }}</small>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <div class="card" id="tour-settings-save">
                                 <div class="card-body d-flex justify-content-end gap-2">
                                     <button class="btn btn-primary" type="submit">
-                                        <i class="ti ti-device-floppy me-1"></i>
+                                        <x-ui.icon name="device-floppy" class="me-1" />
                                         ذخیره تنظیمات پنل
                                     </button>
                                 </div>
@@ -523,18 +578,25 @@
     </div>
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/select2/select2.js"></script>
     <script src="{{ asset('assets/') }}/js/main.js"></script>
     <script>
         $(function() {
-            $('.select2').select2({
-                dir: 'rtl'
+            $('.select2-multiselect').each(function() {
+                $(this).select2({
+                    dir: 'rtl',
+                    width: '100%',
+                    placeholder: $(this).data('placeholder') || 'انتخاب کنید...',
+                    closeOnSelect: false,
+                });
             });
         });
     </script>

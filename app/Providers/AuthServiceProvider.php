@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Permission;
+use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
@@ -26,6 +26,26 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
+        Gate::before(function ($user, $ability) {
+            if (!$user instanceof User) {
+                return null;
+            }
+
+            if ((int) $user->isGod === 1) {
+                return true;
+            }
+
+            if ($ability === 'tenants') {
+                return null;
+            }
+
+            if ($user->isAdminForActivePanel()) {
+                return true;
+            }
+
+            return null;
+        });
 
         try {
             foreach (Permission::with('aliases')->where('isActive', 1)->get() as $permission) {

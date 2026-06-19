@@ -7,20 +7,14 @@
     <title>تعریف بار / مرسولات - دکان دارمینو</title>
     <meta content="" name="description"/>
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/>
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet"/>
-    <!-- Core CSS -->
-    <link rel="stylesheet" href="https://static.neshan.org/sdk/mapboxgl/v1.13.2/neshan-sdk/v1.1.1/index.css" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/><!-- Icons -->
+<!-- Core CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-ui/jquery-ui.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/neshan-sdk/v1.1.1/index.css') }}" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet"/>
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables.bootstrap5.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css" rel="stylesheet"/>
@@ -28,10 +22,7 @@
 
     <!-- Page CSS -->
     <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet"/>
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet"/>
@@ -261,11 +252,13 @@
 <!-- build:js assets/vendor/js/core.js -->
 <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
 <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
 <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
 <!-- endbuild -->
 <script src="{{ asset('assets/') }}/vendor/libs/jquery-sticky/jquery-sticky.js"></script>
@@ -279,11 +272,11 @@
 <script src="{{ asset('assets/') }}/js/form-layouts.js"></script>
 <link rel="stylesheet" href="{{ asset('/css/jalalidatepicker.min.css') }}" />
 <script src="{{ asset('/js/jalalidatepicker.min.js') }}"></script>
-<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.2/dist/sweetalert2.all.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.2/dist/sweetalert2.min.css" rel="stylesheet">
-<script src="https://static.neshan.org/sdk/mapboxgl/v1.13.2/neshan-sdk/v1.1.1/index.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-polyline/1.2.1/polyline.js"></script>
+<script src="{{ asset('assets/vendor/libs/jquery-ui/jquery-ui.min.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
+<link href="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.css') }}" rel="stylesheet">
+<script src="{{ asset('assets/vendor/libs/neshan-sdk/v1.1.1/index.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/mapbox-polyline/polyline.js') }}"></script>
 <script>
     $(function(){
         $("#sortable").sortable({

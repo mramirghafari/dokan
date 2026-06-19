@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Accounts;
 use App\Models\Log;
+use App\Services\StandardChartImporter;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -32,6 +33,31 @@ class AccountController extends Controller
     public function create()
     {
         //
+    }
+
+    /**
+     * ساخت خودکار سرفصل‌های استاندارد (الگوی سپیدار) برای پنل جاری.
+     */
+    public function importStandard(StandardChartImporter $importer)
+    {
+        $user = Auth::user();
+        $result = $importer->import();
+
+        Log::create([
+            'ip' => $_SERVER['REMOTE_ADDR'],
+            'user_id' => $user->id,
+            'action' => 'create',
+            'description' => 'سرفصل‌های استاندارد (الگوی سپیدار) ایجاد شد — ' . $result['created'] . ' حساب جدید',
+            'tenants_id' => $user->tenants_id,
+        ]);
+
+        if ($result['created'] > 0) {
+            Alert::success('انجام شد', $result['created'] . ' سرفصل استاندارد ساخته شد' . ($result['skipped'] ? ' و ' . $result['skipped'] . ' مورد تکراری رد شد.' : '.'));
+        } else {
+            Alert::info('بدون تغییر', 'همهٔ سرفصل‌های استاندارد از قبل وجود داشتند.');
+        }
+
+        return redirect()->back();
     }
 
     /**
@@ -97,12 +123,15 @@ class AccountController extends Controller
             'parent_id' => $request->parent_id,
             'type' => $request->type,
             'account_category' => $request->account_category,
+            'asset_class' => in_array($request->account_category, ['asset', 'liability'], true) ? $request->asset_class : null,
+            'asset_type' => $request->asset_type,
             'detail_type' => $request->detail_type,
             'is_control' => $request->boolean('is_control'),
             'is_system' => $request->boolean('is_system'),
             'cost_center_required' => $request->boolean('cost_center_required'),
             'floating_detail_required' => $request->boolean('floating_detail_required'),
             'nature' => $request->nature,
+            'opening_balance' => $request->opening_balance,
             'account_number' => $request->account_number,
             'card_number' => $request->card_number,
             'iban' => $request->iban,

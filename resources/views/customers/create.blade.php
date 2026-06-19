@@ -9,22 +9,15 @@
     <title>ثبت مشتری جدید - دکان دارمینو</title>
     <meta content="" name="description" />
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet" />
-    <!-- Core CSS -->
-    <link rel="stylesheet" href="https://static.neshan.org/sdk/mapboxgl/v1.13.2/neshan-sdk/v1.1.5/index.css" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><!-- Icons -->
+<!-- Core CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/neshan-sdk/v1.1.5/index.css') }}" />
 
 
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables.bootstrap5.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css"
         rel="stylesheet" />
@@ -36,10 +29,7 @@
 
     <!-- Page CSS -->
     <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet" />
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
@@ -77,160 +67,207 @@
                                 </a>
                             </div>
                         </div>
-                        <!-- Sticky Actions -->
-                        <div class="row mt-3">
-                            <div class="col-12 order-1 order-lg-2 mb-4 mb-lg-0">
-                                <div class="card mb-4 p-3">
-                                    <form class="row" id="addCustomer" action="{{ route('customers.store') }}"
-                                        method="POST" novalidate>
-                                        @csrf
-                                        @include('errors.errors')
-                                        <div class="col-6 mb-3">
-                                            <label for="fullname">نام کامل مشتری<small
-                                                    style="color: red">*</small></label>
-                                            <input class="form-control" id="fullname" placeholder="نام و نام خانوادگی"
-                                                name="name" type="text" required />
-                                        </div>
-                                        <div class="col-6 col-md-6 mb-3">
-                                            <label for="tablo">تابلو مشتری<small style="color: red">*</small></label>
-                                            <input class="form-control" id="tablo" placeholder="تابلو مشتری"
-                                                name="tablo" type="text" required />
-                                        </div>
-                                        <div class="col-6 col-md-6 mb-3">
-                                            <label for="customer_code">کد مشتری<small
-                                                    style="color: red">*</small></label>
-                                            <input class="form-control" id="customer_code" placeholder="کد مشتری"
-                                                name="customer_code" type="text" required />
-                                        </div>
-                                        <div class="col-6 col-md-4 mb-3">
-                                            <label for="fullname">شماره تلفن مشتری<small
-                                                    style="color: red">*</small></label>
-                                            <input class="form-control" id="fullname" placeholder="شماره تلفن مشتری"
-                                                name="phone" type="text" required />
-                                        </div>
-                                        <div class="col-6 col-md-4 mb-3">
-                                            <label for="mobile">شماره موبایل مشتری<small
-                                                    style="color: red">*</small></label>
-                                            <input class="form-control" id="mobile"
-                                                placeholder="شماره موبایل مشتری" name="mobile" type="text"
-                                                required />
-                                        </div>
-                                        <div class="col-6 col-md-4 mb-3">
-                                            <label for="code">کدملی مشتری<small
-                                                    style="color: red">*</small></label>
-                                            <input class="form-control" id="code" placeholder="کدملی مشتری"
-                                                name="national_id" type="text" required />
-                                        </div>
+                        <div class="card mb-4 erp-form-card">
+                            <div class="card-header border-bottom">
+                                <div>
+                                    <h5 class="mb-1">فرم ثبت مشتری</h5>
+                                    <small class="text-muted">اطلاعات مشتری را در بخش‌های زیر تکمیل کنید. فیلدهای
+                                        <span class="text-danger">*</span> الزامی هستند.</small>
+                                </div>
+                            </div>
+                            <form id="addCustomer" class="erp-form-card__form" action="{{ route('customers.store') }}" method="POST" novalidate>
+                                @csrf
+                                <div class="card-body">
+                                    @include('errors.errors')
 
-                                        <div class="col-6 col-md-6 mb-3">
-                                            <label for="mapcode">مپ کد مشتری</label>
-                                            <input class="form-control" id="mapcode" placeholder="مپ کد مشتری"
-                                                name="mapcode" type="text" />
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold text-body border-bottom pb-2 mb-3">اطلاعات اصلی</h6>
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label" for="fullname">نام کامل مشتری <span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control" id="fullname"
+                                                    placeholder="نام و نام خانوادگی" name="name" type="text"
+                                                    value="{{ old('name') }}" required />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label" for="tablo">تابلو مشتری <span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control" id="tablo" placeholder="تابلو مشتری"
+                                                    name="tablo" type="text" value="{{ old('tablo') }}" required />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label" for="customer_code">کد مشتری <span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control" id="customer_code" placeholder="کد مشتری"
+                                                    name="customer_code" type="text"
+                                                    value="{{ old('customer_code') }}" required />
+                                            </div>
                                         </div>
-                                        <div class="col-6 col-md-3 mb-3">
-                                            <label for="customer_group_id">گروه مشتری</label>
-                                            <select class="select2 form-select" id="customer_group_id"
-                                                name="customer_group_id" required>
-                                                <option value="0">انتخاب کنید</option>
-                                                @foreach ($customerGroups as $segment)
-                                                    <option value="{{ $segment->id }}"
-                                                        @if (old('customer_group_id') == $segment->id) selected @endif>
-                                                        {{ $segment->title }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-6 col-md-3 mb-3">
-                                            <label for="sales_channel_id">کانال فروش</label>
-                                            <select class="select2 form-select" id="sales_channel_id"
-                                                name="sales_channel_id" required>
-                                                <option value="0">انتخاب کنید</option>
-                                                @foreach ($salesChannels as $segment)
-                                                    <option value="{{ $segment->id }}"
-                                                        @if (old('sales_channel_id') == $segment->id) selected @endif>
-                                                        {{ $segment->title }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-6 col-md-3 mb-3">
-                                            <label for="customer_status_id">وضعیت مشتری</label>
-                                            <select class="select2 form-select" id="customer_status_id"
-                                                name="customer_status_id">
-                                                <option value="0">انتخاب کنید</option>
-                                                @foreach ($customerStatuses as $segment)
-                                                    <option value="{{ $segment->id }}"
-                                                        @if (old('customer_status_id') == $segment->id || (!old('customer_status_id') && $segment->title === 'فعال')) selected @endif>
-                                                        {{ $segment->title }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                    </div>
 
-                                        @if ($usesAreaWorkflow)
-                                            <div class="col-6 col-md-3 mb-3">
-                                                <label for="region_id">منطقه مشتری@if ($requiresAreaWorkflow)
-                                                        <small style="color: red">*</small>
-                                                    @endif
-                                                </label>
-                                                <select class="select2 form-select" id="region_id" name="region_id"
-                                                    @if ($requiresAreaWorkflow) required @endif>
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold text-body border-bottom pb-2 mb-3">اطلاعات تماس</h6>
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label" for="phone">شماره تلفن <span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control" id="phone" placeholder="مثال: 02112345678"
+                                                    name="phone" type="text" value="{{ old('phone') }}" required />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label" for="mobile">شماره موبایل <span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control" id="mobile" placeholder="مثال: 09121234567"
+                                                    name="mobile" type="text" value="{{ old('mobile') }}" required />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label" for="national_id">کد ملی <span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control" id="national_id" placeholder="۱۰ رقم"
+                                                    name="national_id" type="text" value="{{ old('national_id') }}"
+                                                    required />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold text-body border-bottom pb-2 mb-3">طبقه‌بندی</h6>
+                                        <div class="row g-3">
+                                            <div class="col-md-4 col-lg-3">
+                                                <label class="form-label" for="mapcode">مپ کد</label>
+                                                <input class="form-control" id="mapcode" placeholder="مپ کد مشتری"
+                                                    name="mapcode" type="text" value="{{ old('mapcode') }}" />
+                                            </div>
+                                            <div class="col-md-4 col-lg-3">
+                                                <label class="form-label" for="customer_group_id">گروه مشتری <span
+                                                        class="text-danger">*</span></label>
+                                                <select class="select2 form-select w-100" id="customer_group_id"
+                                                    name="customer_group_id" required>
                                                     <option value="0">انتخاب کنید</option>
-                                                    @foreach ($Regions as $region)
-                                                        <option value="{{ $region->id }}"> {{ $region->name }}
-                                                        </option>
+                                                    @foreach ($customerGroups as $segment)
+                                                        <option value="{{ $segment->id }}"
+                                                            @if (old('customer_group_id') == $segment->id) selected @endif>
+                                                            {{ $segment->title }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
-                                        @else
-                                            <input name="region_id" type="hidden" value="0">
-                                        @endif
-
-                                        @if ($usesRouteWorkflow)
-                                            <div class="col-6 col-md-3 mb-3">
-                                                <label for="areas">انتخاب مسیر@if ($requiresRouteWorkflow)
-                                                        <small style="color: red">*</small>
-                                                    @endif
-                                                </label>
-                                                <select class="select2 form-select" id="areas" name="area"
-                                                    @if ($requiresRouteWorkflow) required @endif>
+                                            <div class="col-md-4 col-lg-3">
+                                                <label class="form-label" for="sales_channel_id">کانال فروش <span
+                                                        class="text-danger">*</span></label>
+                                                <select class="select2 form-select w-100" id="sales_channel_id"
+                                                    name="sales_channel_id" required>
                                                     <option value="0">انتخاب کنید</option>
+                                                    @foreach ($salesChannels as $segment)
+                                                        <option value="{{ $segment->id }}"
+                                                            @if (old('sales_channel_id') == $segment->id) selected @endif>
+                                                            {{ $segment->title }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
-                                        @else
-                                            <input name="area" type="hidden" value="0">
-                                        @endif
+                                            <div class="col-md-4 col-lg-3">
+                                                <label class="form-label" for="customer_status_id">وضعیت مشتری</label>
+                                                <select class="select2 form-select w-100" id="customer_status_id"
+                                                    name="customer_status_id">
+                                                    <option value="0">انتخاب کنید</option>
+                                                    @foreach ($customerStatuses as $segment)
+                                                        <option value="{{ $segment->id }}"
+                                                            @if (old('customer_status_id') == $segment->id || (!old('customer_status_id') && $segment->title === 'فعال')) selected @endif>
+                                                            {{ $segment->title }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
 
+                                            @if ($usesAreaWorkflow)
+                                                <div class="col-md-4 col-lg-3">
+                                                    <label class="form-label" for="region_id">منطقه مشتری
+                                                        @if ($requiresAreaWorkflow)
+                                                            <span class="text-danger">*</span>
+                                                        @endif
+                                                    </label>
+                                                    <select class="select2 form-select w-100" id="region_id"
+                                                        name="region_id"
+                                                        @if ($requiresAreaWorkflow) required @endif>
+                                                        <option value="0">انتخاب کنید</option>
+                                                        @foreach ($Regions as $region)
+                                                            <option value="{{ $region->id }}"
+                                                                @if (old('region_id') == $region->id) selected @endif>
+                                                                {{ $region->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            @else
+                                                <input name="region_id" type="hidden" value="0">
+                                            @endif
 
-                                        <div class="col-6 col-md-6 mb-3">
-                                            <label for="multicol-username">آدرس فروشگاه:<small
-                                                    style="color: red">*</small></label>
-                                            <textarea class="form-control" name="address" required placeholder="آدرس کامل فروشگاه مشتری"></textarea>
+                                            @if ($usesRouteWorkflow)
+                                                <div class="col-md-4 col-lg-3">
+                                                    <label class="form-label" for="areas">انتخاب مسیر
+                                                        @if ($requiresRouteWorkflow)
+                                                            <span class="text-danger">*</span>
+                                                        @endif
+                                                    </label>
+                                                    <select class="select2 form-select w-100" id="areas" name="area"
+                                                        @if ($requiresRouteWorkflow) required @endif>
+                                                        <option value="0">انتخاب کنید</option>
+                                                    </select>
+                                                </div>
+                                            @else
+                                                <input name="area" type="hidden" value="0">
+                                            @endif
                                         </div>
-                                        <div class="col-6 col-md-6 mb-3">
-                                            <label for="multicol-username">آدرس انبار:</label>
-                                            <textarea class="form-control" name="store_address" placeholder="آدرس کامل انبار مشتری"></textarea>
-                                        </div>
+                                    </div>
 
-                                        <div class="col-6 col-12 mb-3">
-                                            <h5>لوکیشن فروشگاه</h5>
-                                            <div id="map_get" style="height: 400px"></div>
-                                            <input type="hidden" id="shop_lat" name="shop_lat" value="" />
-                                            <input type="hidden" id="shop_lng" name="shop_lng" value="" />
-                                        </div>
+                                    <div class="mb-0">
+                                        <h6 class="fw-semibold text-body border-bottom pb-2 mb-3">آدرس و موقعیت</h6>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="address">آدرس فروشگاه <span
+                                                        class="text-danger">*</span></label>
+                                                <textarea class="form-control" id="address" name="address" rows="3"
+                                                    required placeholder="آدرس کامل فروشگاه مشتری">{{ old('address') }}</textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="store_address">آدرس انبار</label>
+                                                <textarea class="form-control" id="store_address" name="store_address"
+                                                    rows="3"
+                                                    placeholder="در صورت متفاوت بودن با آدرس فروشگاه">{{ old('store_address') }}</textarea>
+                                                <small class="text-muted">اختیاری — در صورت یکسان بودن با فروشگاه خالی
+                                                    بگذارید.</small>
+                                            </div>
 
-                                        <div class="col-6 col-12 mb-3">
-                                            <h5>لوکیشن انبار</h5>
-                                            <div id="map_get_store" style="height: 400px"></div>
-                                            <input type="hidden" id="store_lat" name="store_lat" value="" />
-                                            <input type="hidden" id="store_lng" name="store_lng" value="" />
+                                            <div class="col-12">
+                                                <label class="form-label" for="map_get">لوکیشن فروشگاه</label>
+                                                <small class="text-muted d-block mb-2">نشانگر را روی محل فروشگاه
+                                                    بکشید.</small>
+                                                <div id="map_get" class="customer-form-map rounded border"></div>
+                                                <input type="hidden" id="shop_lat" name="shop_lat"
+                                                    value="{{ old('shop_lat') }}" />
+                                                <input type="hidden" id="shop_lng" name="shop_lng"
+                                                    value="{{ old('shop_lng') }}" />
+                                            </div>
+
+                                            <div class="col-12">
+                                                <label class="form-label" for="map_get_store">لوکیشن انبار</label>
+                                                <small class="text-muted d-block mb-2">در صورت نبود انبار جداگانه، همان
+                                                    موقعیت فروشگاه را انتخاب کنید.</small>
+                                                <div id="map_get_store" class="customer-form-map rounded border"></div>
+                                                <input type="hidden" id="store_lat" name="store_lat"
+                                                    value="{{ old('store_lat') }}" />
+                                                <input type="hidden" id="store_lng" name="store_lng"
+                                                    value="{{ old('store_lng') }}" />
+                                            </div>
                                         </div>
-                                        <div class="pt-4">
-                                            <button class="btn btn-primary me-sm-3 me-1" type="submit">ثبت
-                                                مشتری</button>
-                                        </div>
-                                    </form>
+                                    </div>
                                 </div>
-                            </div>
+                                @include('partials.erp-form-card-footer', [
+                                    'hintText' => 'پس از تکمیل فرم، روی «ثبت مشتری» کلیک کنید.',
+                                    'cancelUrl' => session('backlink'),
+                                    'submitLabel' => 'ثبت مشتری',
+                                    'submitIcon' => 'ti-check',
+                                ])
+                            </form>
                         </div>
-                        <!-- /Sticky Actions -->
                     </div>
                     <!-- / Content -->
                     @include('sections.footer')
@@ -250,11 +287,13 @@
     <!-- build:js assets/vendor/js/core.js -->
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <!-- endbuild -->
     <script src="{{ asset('assets/') }}/vendor/libs/jquery-sticky/jquery-sticky.js"></script>
@@ -267,7 +306,7 @@
     <!-- Page JS -->
     <script src="{{ asset('assets/') }}/js/form-layouts.js"></script>
 
-    <script src="https://static.neshan.org/sdk/mapboxgl/v1.13.2/neshan-sdk/v1.1.5/index.js"></script>
+    <script src="{{ asset('assets/vendor/libs/neshan-sdk/v1.1.5/index.js') }}"></script>
 
     <script>
         $(document).ready(function() {

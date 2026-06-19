@@ -7,37 +7,25 @@
     <title>مشتریان - دکان دارمینو</title>
     <meta content="" name="description"/>
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/>
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet"/>
-    <!-- Core CSS -->
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/><!-- Icons -->
+<!-- Core CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet"/>
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables.bootstrap5.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css" rel="stylesheet"/>
 
     <!-- Page CSS -->
     <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet"/>
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet"/>
 </head>
 
 <body>
-@include('sweetalert::alert')
-<!-- Layout wrapper -->
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
         @include('sections.sidebar')
@@ -64,7 +52,7 @@
                                             </div>
                                             <p class="mb-0">مجموع کل مشتریان</p>
                                         </div>
-                                        <div class="avatar"> <span class="avatar-initial rounded bg-label-primary"> <i class="ti ti-user ti-sm"></i> </span> </div>
+                                        <div class="avatar"> <span class="avatar-initial rounded bg-label-primary"> <x-ui.icon name="user" class="ti-sm" /> </span> </div>
                                     </div>
                                 </div>
                             </div>
@@ -79,7 +67,7 @@
                                             </div>
                                             <p class="mb-0">مشتریان با سابقه خرید</p>
                                         </div>
-                                        <div class="avatar"> <span class="avatar-initial rounded bg-label-success"> <i class="ti ti-user-check ti-sm"></i> </span> </div>
+                                        <div class="avatar"> <span class="avatar-initial rounded bg-label-success"> <x-ui.icon name="user-check" class="ti-sm" /> </span> </div>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +82,7 @@
                                             </div>
                                             <p class="mb-0">مشتریان با محدودیت خرید</p>
                                         </div>
-                                        <div class="avatar"> <span class="avatar-initial rounded bg-label-danger"> <i class="ti ti-user-plus ti-sm"></i> </span> </div>
+                                        <div class="avatar"> <span class="avatar-initial rounded bg-label-danger"> <x-ui.icon name="user-plus" class="ti-sm" /> </span> </div>
                                     </div>
                                 </div>
                             </div>
@@ -109,7 +97,7 @@
                                             </div>
                                             <p class="mb-0">مشتریان بدهکار یا بن شده</p>
                                         </div>
-                                        <div class="avatar"> <span class="avatar-initial rounded bg-label-warning"> <i class="ti ti-user-exclamation ti-sm"></i> </span> </div>
+                                        <div class="avatar"> <span class="avatar-initial rounded bg-label-warning"> <x-ui.icon name="user-exclamation" class="ti-sm" /> </span> </div>
                                     </div>
                                 </div>
                             </div>
@@ -182,23 +170,76 @@
 
                     <div class="row">
                         <div class="col-12 order-1 order-lg-2 mb-4 mb-lg-0">
-
                             <div class="card">
-                                <div class="card-datatable table-responsive py-0">
+                                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div>
+                                        <h5 class="card-title mb-0">لیست مشتریان</h5>
+                                        <small class="text-muted">ستون‌های نمایشی برای همین پنل قابل تنظیم است.</small>
+                                    </div>
+                                    <button type="button"
+                                        class="btn btn-label-secondary btn-sm"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#customer-columns-collapse"
+                                        aria-expanded="false"
+                                        aria-controls="customer-columns-collapse"
+                                        id="customer-columns-toggle">
+                                        <x-ui.icon name="columns-3" class="me-1" />ستون‌های جدول
+                                    </button>
+                                </div>
+
+                                <div class="collapse border-bottom" id="customer-columns-collapse">
+                                    <div class="card-body py-3">
+                                        <div class="row g-3" id="customer-columns-form">
+                                            @foreach ($customerListColumnCatalog as $columnKey => $column)
+                                                <div class="col-md-4 col-lg-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input customer-column-toggle"
+                                                            type="checkbox"
+                                                            value="{{ $columnKey }}"
+                                                            id="customer-column-{{ $columnKey }}"
+                                                            @checked(in_array($columnKey, $customerListVisibleColumns, true))>
+                                                        <label class="form-check-label" for="customer-column-{{ $columnKey }}">
+                                                            <span class="fw-medium">{{ $column['label'] }}</span>
+                                                            <span class="d-block small text-muted">{{ $column['description'] }}</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
+                                            <small class="text-muted">
+                                                ستون‌های «ردیف»، «نام مشتری»، «وضعیت» و «عملیات» همیشه نمایش داده می‌شوند.
+                                                کنار نام: تیک سبز = فعال، قلب طلایی = وفادار (بیش از یک خرید).
+                                                @if ($customerListIsSubscriptionPanel)
+                                                    ستون «مانده اشتراک» فقط برای پنل‌های دوره‌ای/اشتراکی فعال است.
+                                                @endif
+                                            </small>
+                                            <button type="button" class="btn btn-primary btn-sm" id="customer-columns-save">
+                                                <x-ui.icon name="device-floppy" class="me-1" />ذخیره برای این پنل
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-datatable table-responsive py-0 customers-table-shell">
+                                    <div id="customers-table-loading" class="dokan-table-loading is-active" aria-live="polite" aria-busy="true">
+                                        <div class="dokan-table-loading__panel">
+                                            <div class="dokan-table-loading__spinner" aria-hidden="true"></div>
+                                            <p class="dokan-table-loading__title">در حال بارگذاری لیست مشتریان...</p>
+                                            <p class="dokan-table-loading__subtitle">لطفاً چند لحظه صبر کنید</p>
+                                        </div>
+                                        <div class="dokan-table-loading__skeleton" aria-hidden="true">
+                                            @for ($i = 0; $i < 6; $i++)
+                                                <div class="dokan-table-loading__skeleton-row"></div>
+                                            @endfor
+                                        </div>
+                                    </div>
                                     <table class="datatables-customers-server table" id="customers-table">
                                         <thead>
                                         <tr>
-                                            <th>ردیف</th>
-                                            <th>کد مشتری</th>
-                                            <th>نام مشتری</th>
-                                            <th>تابلو</th>
-                                            <th>منطقه / مسیر</th>
-                                            <th>صنف / کانال</th>
-                                            <th>تعداد سفارش</th>
-                                            <th>مجموع سفارشات</th>
-                                            <th>سرپرست</th>
-                                            <th>وضعیت</th>
-                                            <th>عملیات</th>
+                                            @foreach ($customerListHeaders as $header)
+                                                <th>{{ $header['label'] }}</th>
+                                            @endforeach
                                         </tr>
                                         </thead>
                                         <tbody></tbody>
@@ -222,21 +263,26 @@
     <!-- Drag Target Area To SlideIn Menu On Small Screens -->
     <div class="drag-target"></div>
 </div>
-<!-- / Layout wrapper -->
+
+@include('partials.panel-toasts')
+
 <!-- Core JS -->
 <!-- build:js assets/vendor/js/core.js -->
 <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
 <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
 <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
 <!-- endbuild -->
 <script src="{{ asset('assets/') }}/vendor/libs/jquery-sticky/jquery-sticky.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/select2/select2.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+<script src="{{ asset('assets/') }}/js/dokan-datatables.js"></script>
 <!-- Main JS -->
 <script src="{{ asset('assets/') }}/js/main.js"></script>
 <!-- Page JS -->
@@ -245,6 +291,13 @@
 <script>
     $(function () {
         const customersTable = $('#customers-table');
+        const $tableLoading = $('#customers-table-loading');
+        const hiddenColumnIndexes = @json($customerListHiddenIndexes);
+        const fixedColumnIndexes = @json($customerListFixedIndexes);
+        const nonSortableIndexes = @json($customerListNonSortableIndexes);
+        const columnCount = @json($customerListColumnCount);
+        const columnsSaveUrl = @json(route('customers.list-columns.save'));
+        const csrfToken = @json(csrf_token());
 
         const datatableLanguage = {
             search: 'جستجو: ',
@@ -254,7 +307,7 @@
             infoFiltered: '(فیلتر شده از _MAX_ مورد)',
             lengthMenu: 'نمایش _MENU_ مورد در صفحه',
             zeroRecords: 'متاسفانه موردی پیدا نشد',
-            processing: 'در حال بارگذاری...',
+            processing: '',
             paginate: {
                 previous: 'قبلی',
                 next: 'بعدی',
@@ -271,9 +324,34 @@
             };
         };
 
+        function setTableLoading(isLoading) {
+            $tableLoading.toggleClass('is-active', !!isLoading);
+        }
+
+        function applyColumnVisibility(dt) {
+            hiddenColumnIndexes.forEach(function (index) {
+                dt.column(index).visible(false, false);
+            });
+            dt.columns.adjust().draw(false);
+        }
+
+        function collectSelectedColumns() {
+            return $('.customer-column-toggle:checked').map(function () {
+                return $(this).val();
+            }).get();
+        }
+
         if (customersTable.length) {
+            const dtColumns = Array.from({ length: columnCount }, function (_, index) {
+                return {
+                    data: index,
+                    orderable: nonSortableIndexes.indexOf(index) === -1,
+                    searchable: index !== columnCount - 1,
+                };
+            });
+
             const dtCustomers = customersTable.DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
                 searching: true,
                 lengthChange: true,
@@ -288,29 +366,69 @@
                         return Object.assign(data, filterPayload());
                     }
                 },
-                columns: [
-                    { data: 0, orderable: true },
-                    { data: 1, orderable: true },
-                    { data: 2, orderable: true },
-                    { data: 3, orderable: true },
-                    { data: 4, orderable: false },
-                    { data: 5, orderable: false },
-                    { data: 6, orderable: true },
-                    { data: 7, orderable: true },
-                    { data: 8, orderable: false },
-                    { data: 9, orderable: true },
-                    { data: 10, orderable: false },
-                ],
+                columns: dtColumns,
                 columnDefs: [
-                    { targets: [4, 5, 8, 10], orderable: false },
-                    { targets: [9, 10], searchable: false },
+                    { targets: nonSortableIndexes, orderable: false },
+                    { targets: [columnCount - 1], searchable: false },
                 ],
                 language: datatableLanguage,
+                initComplete: function () {
+                    applyColumnVisibility(dtCustomers);
+                    setTableLoading(false);
+                },
+            });
+
+            customersTable.on('preXhr.dt', function () {
+                setTableLoading(true);
+            });
+
+            customersTable.on('draw.dt', function () {
+                setTableLoading(false);
             });
 
             $('#customers-filter-form').on('submit', function (event) {
                 event.preventDefault();
                 dtCustomers.ajax.reload();
+            });
+
+            $('#customer-columns-save').on('click', function () {
+                const $button = $(this);
+                const selected = collectSelectedColumns();
+
+                $button.prop('disabled', true);
+
+                $.ajax({
+                    url: columnsSaveUrl,
+                    method: 'POST',
+                    data: {
+                        _token: csrfToken,
+                        columns: selected,
+                    },
+                }).done(function (response) {
+                    const hidden = response.hidden_indexes || [];
+
+                    dtCustomers.columns().every(function (index) {
+                        if (fixedColumnIndexes.indexOf(index) !== -1) {
+                            this.visible(true, false);
+                            return;
+                        }
+
+                        this.visible(hidden.indexOf(index) === -1, false);
+                    });
+
+                    dtCustomers.columns.adjust().draw(false);
+
+                    if (window.DokanToast) {
+                        DokanToast.success(response.message || 'ستون‌ها ذخیره شد.');
+                    }
+                }).fail(function (xhr) {
+                    const message = xhr.responseJSON?.message || 'ذخیره ستون‌ها ناموفق بود.';
+                    if (window.DokanToast) {
+                        DokanToast.error(message);
+                    }
+                }).always(function () {
+                    $button.prop('disabled', false);
+                });
             });
         }
     });

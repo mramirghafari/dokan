@@ -10,10 +10,13 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Role;
 use App\Models\Permission;
+use App\Models\TenantUserMembership;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\HasOrganizationFilter;
 use App\Traits\HasOrganizationScopes;
+use App\Services\TenantContextService;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class User extends Authenticatable
 {
@@ -66,6 +69,44 @@ class User extends Authenticatable
     public function roles()
     {
         return $this->BelongsToMany(Role::class);
+    }
+
+    public function panelMemberships()
+    {
+        return $this->hasMany(TenantUserMembership::class);
+    }
+
+    public function rolesForActiveTenant(): Collection
+    {
+        $tenantId = app(TenantContextService::class)->tenantId($this);
+        $roles = $this->relationLoaded('roles') ? $this->roles : $this->roles()->get();
+
+        return $roles->filter(function ($role) use ($tenantId) {
+            if (!$tenantId || empty($role->tenant_id)) {
+                return true;
+            }
+
+            return (int) $role->tenant_id === (int) $tenantId;
+        });
+    }
+
+    public function isAdminForActivePanel(): bool
+    {
+        if ((int) $this->isAdmin === 1) {
+            return true;
+        }
+
+        $tenantId = app(TenantContextService::class)->tenantId($this);
+
+        if (!$tenantId) {
+            return false;
+        }
+
+        return TenantUserMembership::query()
+            ->where('user_id', $this->id)
+            ->where('tenant_id', $tenantId)
+            ->where('is_admin', true)
+            ->exists();
     }
 
     public function scopes()
@@ -154,19 +195,25 @@ class User extends Authenticatable
             return true;
         }
 
-        if ($this->isAdmin == 1 && $permission->title !== 'tenants') {
+        if ($this->isGod == 1) {
             return true;
         }
+
+        if ($this->isAdminForActivePanel() && $permission->title !== 'tenants') {
+            return true;
+        }
+
+        $activeRoles = $this->rolesForActiveTenant();
 
         return $this->permissions->contains('id', $permission->id)
             || $this->permissions->contains('title', $permission->title)
             || ($permission->canonical_title && $this->permissions->contains('canonical_title', $permission->canonical_title))
-            || $this->hasRole($permission->roles);
+            || !! $permission->roles->intersect($activeRoles)->all();
     }
 
     public function hasRole($roles)
     {
-        return !! $roles->intersect($this->roles)->all();
+        return !! $roles->intersect($this->rolesForActiveTenant())->all();
     }
 
     public function getOrganizationIdsForSearchAttribute()
@@ -249,5 +296,10 @@ class User extends Authenticatable
     public function subordinates()
     {
         return $this->hasMany(User::class, 'leader_id', 'id');
+    }
+
+    public function leader()
+    {
+        return $this->belongsTo(User::class, 'leader_id', 'id');
     }
 }

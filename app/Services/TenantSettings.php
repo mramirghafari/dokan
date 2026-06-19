@@ -20,6 +20,58 @@ class TenantSettings
         return static::get($key, $tenantId, 'no') === 'yes';
     }
 
+    public static function userMatchesRoleSetting(string $settingKey, ?\App\Models\User $user = null, ?int $tenantId = null): bool
+    {
+        $user = $user ?: auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        $definition = (array) config("panel_settings.definitions.{$settingKey}", []);
+        $default = $definition['default'] ?? [];
+        $allowed = static::get($settingKey, $tenantId, $default);
+
+        if (is_string($allowed)) {
+            $decoded = json_decode($allowed, true);
+            $allowed = is_array($decoded) ? $decoded : [];
+        }
+
+        if (!is_array($allowed) || $allowed === []) {
+            return false;
+        }
+
+        if (in_array('all', $allowed, true)) {
+            return true;
+        }
+
+        if ((int) ($user->isGod ?? 0) === 1 && in_array('god', $allowed, true)) {
+            return true;
+        }
+
+        $user->loadMissing('roles');
+
+        foreach ($user->roles as $role) {
+            $title = (string) ($role->title ?? '');
+
+            if ($title !== '' && in_array($title, $allowed, true)) {
+                return true;
+            }
+        }
+
+        if ((int) ($user->isAdmin ?? 0) === 1 && in_array('panel_manager', $allowed, true)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function shouldCaptureInvoiceLocation(?\App\Models\User $user = null, ?int $tenantId = null): bool
+    {
+        return static::enabled('feature_gps_tracking', $tenantId)
+            && static::userMatchesRoleSetting('invoice_location_roles', $user, $tenantId);
+    }
+
     public static function all(?int $tenantId = null): array
     {
         $settings = [];
@@ -33,29 +85,11 @@ class TenantSettings
 
     private static function currentTenantId(): ?int
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return null;
-        }
-
-        return $user->tenant_id ?: $user->tenants_id;
+        return app(TenantContextService::class)->tenantId();
     }
 
     private static function currentOrganizationId(): ?int
     {
-        $user = auth()->user();
-
-        if (!$user || empty($user->organization_id)) {
-            return null;
-        }
-
-        $decoded = json_decode((string) $user->organization_id, true);
-
-        if (is_array($decoded)) {
-            return (int) ($decoded[0] ?? 0) ?: null;
-        }
-
-        return (int) $user->organization_id ?: null;
+        return app(TenantContextService::class)->organizationId();
     }
 }

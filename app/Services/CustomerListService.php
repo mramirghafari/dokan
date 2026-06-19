@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Area;
 use App\Models\Customers;
+use App\Models\Pishfactor;
 use App\Models\Region;
 use App\Models\Tasks;
 use App\Models\User;
@@ -122,6 +123,36 @@ class CustomerListService
                 }
             });
         }
+
+        return $query;
+    }
+
+    public function appendListMetricSelects(Builder $query): Builder
+    {
+        $customerTable = (new Customers())->getTable();
+        $invoiceTable = (new Pishfactor())->getTable();
+        $priceExpression = "CAST(REPLACE(REPLACE(IFNULL({$invoiceTable}.fullPrice, '0'), ',', ''), ' ', '') AS DECIMAL(18,2))";
+
+        $query->addSelect([
+            'list_account_balance' => Pishfactor::query()
+                ->selectRaw('COALESCE(SUM(' . $priceExpression . '), 0)')
+                ->whereColumn("{$invoiceTable}.customer_id", "{$customerTable}.id")
+                ->whereIn("{$invoiceTable}.status", [1, 4])
+                ->where(function (Builder $inner) use ($invoiceTable) {
+                    $inner->where("{$invoiceTable}.payment_type", 3)
+                        ->orWhereNull("{$invoiceTable}.payment_type")
+                        ->orWhereNull("{$invoiceTable}.settlement_status")
+                        ->orWhereNotIn("{$invoiceTable}.settlement_status", ['settled', 'paid']);
+                })
+                ->limit(1),
+            'list_subscription_end' => Pishfactor::query()
+                ->select("{$invoiceTable}.recive_date_en")
+                ->whereColumn("{$invoiceTable}.customer_id", "{$customerTable}.id")
+                ->whereIn("{$invoiceTable}.status", [1, 4])
+                ->whereNotNull("{$invoiceTable}.recive_date_en")
+                ->orderByDesc("{$invoiceTable}.recive_date_en")
+                ->limit(1),
+        ]);
 
         return $query;
     }

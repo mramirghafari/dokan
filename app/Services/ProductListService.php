@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Organization;
 use App\Models\Product;
 use App\Models\Store;
@@ -12,10 +14,15 @@ use Illuminate\Support\Collection;
 
 class ProductListService
 {
+    public function __construct(
+        private readonly ProductListColumnService $columnService,
+    ) {}
+
     public function filterValues(Request $request): array
     {
         return [
             'status_filter' => $this->normalizeStatusFilter($request->input('status_filter', 'active')),
+            'sales_filter' => $this->normalizeSalesFilter($request->input('sales_filter', 'all')),
             'store_id' => $request->filled('store_id') ? (int) $request->store_id : null,
         ];
     }
@@ -30,7 +37,7 @@ class ProductListService
 
     public function filteredQuery(User $user, Request $request): Builder
     {
-        return $this->applyFilters($this->scopedQuery($user), $request);
+        return $this->applyFilters($this->scopedQuery($user), $request, $user);
     }
 
     public function count(User $user, Request $request): int
@@ -46,19 +53,14 @@ class ProductListService
         int $orderColumn,
         string $orderDirection
     ): array {
+        $tenantId = $user->tenant_id ?: $user->tenants_id;
         $scopedQuery = $this->scopedQuery($user);
         $recordsTotal = (clone $scopedQuery)->count('products.id');
 
-        $filteredQuery = $this->applyFilters(clone $scopedQuery, $request);
+        $filteredQuery = $this->applyFilters(clone $scopedQuery, $request, $user);
         $recordsFiltered = (clone $filteredQuery)->count('products.id');
 
-        $sortableColumns = [
-            1 => 'products.sku',
-            2 => 'products.title',
-            6 => 'products.pr_unit',
-            7 => 'products.pr_sub_unit',
-            8 => 'products.price',
-        ];
+        $sortableColumns = $this->columnService->sortableColumnsMap($tenantId ? (int) $tenantId : null);
 
         $products = (clone $filteredQuery)
             ->when(isset($sortableColumns[$orderColumn]), function (Builder $query) use ($sortableColumns, $orderColumn, $orderDirection) {
@@ -72,13 +74,27 @@ class ProductListService
 
         $storesById = $this->resolveStoresMap($products);
         $organizationsById = $this->resolveOrganizationsMap($products);
+        $brandsById = $this->resolveBrandsMap($products);
+        $categoriesById = $this->resolveCategoriesMap($products);
 
         $data = $products->values()->map(function (Product $product, int $index) use (
             $start,
             $storesById,
-            $organizationsById
+            $organizationsById,
+            $brandsById,
+            $categoriesById,
+            $tenantId
         ) {
-            return $this->formatDatatableRow($product, $start + $index + 1, $storesById, $organizationsById);
+            return $this->columnService->buildDatatableRow(
+                $product,
+                $start + $index + 1,
+                route('products.edit', $product->id),
+                $storesById,
+                $organizationsById,
+                $brandsById,
+                $categoriesById,
+                $tenantId ? (int) $tenantId : null
+            );
         });
 
         return [
@@ -88,9 +104,11 @@ class ProductListService
         ];
     }
 
-    private function applyFilters(Builder $query, Request $request): Builder
+    private function applyFilters(Builder $query, Request $request, User $user): Builder
     {
+        $tenantId = $user->tenant_id ?: $user->tenants_id;
         $statusFilter = $this->normalizeStatusFilter($request->input('status_filter', 'active'));
+        $salesFilter = $this->normalizeSalesFilter($request->input('sales_filter', 'all'));
 
         if ($statusFilter === 'active') {
             $query->where('products.isActive', 1);
@@ -98,7 +116,24 @@ class ProductListService
             $query->where('products.isActive', 0);
         }
 
-        if ($request->filled('store_id')) {
+        if ($salesFilter === 'sold') {
+            $query->whereHas('pishfactorItems', function (Builder $items) {
+                $items->whereHas('pishfactor', function (Builder $invoice) {
+                    $invoice->whereIn('status', [1, 4]);
+                });
+            });
+        } elseif ($salesFilter === 'unsold') {
+            $query->whereDoesntHave('pishfactorItems', function (Builder $items) {
+                $items->whereHas('pishfactor', function (Builder $invoice) {
+                    $invoice->whereIn('status', [1, 4]);
+                });
+            });
+        }
+
+        if (
+            $this->columnService->warehouseModuleEnabled($tenantId ? (int) $tenantId : null)
+            && $request->filled('store_id')
+        ) {
             $storeId = (int) $request->store_id;
             $query->where(function (Builder $inner) use ($storeId) {
                 $inner->where('products.store_id', 'like', '%"' . $storeId . '"%')
@@ -123,6 +158,11 @@ class ProductListService
         return in_array($statusFilter, ['active', 'inactive', 'all'], true) ? $statusFilter : 'active';
     }
 
+    private function normalizeSalesFilter(?string $salesFilter): string
+    {
+        return in_array($salesFilter, ['all', 'sold', 'unsold'], true) ? $salesFilter : 'all';
+    }
+
     private function resolveStoresMap(Collection $products): Collection
     {
         $ids = $this->collectJsonIds($products, 'store_id');
@@ -145,6 +185,37 @@ class ProductListService
         return Organization::query()->whereIn('id', $ids)->pluck('title', 'id');
     }
 
+    private function resolveBrandsMap(Collection $products): Collection
+    {
+        $ids = $products
+            ->pluck('brand_id')
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return collect();
+        }
+
+        return Brand::query()->whereIn('id', $ids)->pluck('title', 'id');
+    }
+
+    private function resolveCategoriesMap(Collection $products): Collection
+    {
+        $ids = $products
+            ->flatMap(fn (Product $product) => [(int) $product->parentCategory_id, (int) $product->childCategory_id])
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return collect();
+        }
+
+        return Category::query()->whereIn('id', $ids)->pluck('title', 'id');
+    }
+
     private function collectJsonIds(Collection $products, string $attribute): Collection
     {
         return $products
@@ -157,45 +228,5 @@ class ProductListService
             ->filter(fn ($id) => $id > 0)
             ->unique()
             ->values();
-    }
-
-    private function formatDatatableRow(
-        Product $product,
-        int $rowNumber,
-        Collection $storesById,
-        Collection $organizationsById
-    ): array {
-        $editUrl = route('products.edit', $product->id);
-        $title = trim($product->title . ' ' . ($product->display_name ?? ''));
-        $price = (int) $product->price > 0
-            ? number_format((int) $product->price)
-            : (string) (int) $product->price;
-
-        return [
-            (string) $rowNumber,
-            '<a href="' . $editUrl . '">' . e($product->sku) . '</a>',
-            '<a href="' . $editUrl . '">' . e($title) . '</a>',
-            e($this->titlesFromJsonIds((string) $product->store_id, $storesById)),
-            e($this->titlesFromJsonIds((string) $product->organization_id, $organizationsById)),
-            (string) $product->currentStock(),
-            e($product->pr_unit ?? ''),
-            e($product->pr_sub_unit ?? ''),
-            $price,
-            '<a href="' . $editUrl . '" style="font-size:20px;float:right;margin-left:5px"><i class="fa fa-edit" style="color:#04a9f5;"></i></a>',
-        ];
-    }
-
-    private function titlesFromJsonIds(string $rawValue, Collection $titlesById): string
-    {
-        $decoded = json_decode($rawValue, true);
-
-        if (!is_array($decoded)) {
-            return '';
-        }
-
-        return collect($decoded)
-            ->map(fn ($id) => $titlesById->get((int) $id))
-            ->filter()
-            ->implode('، ');
     }
 }

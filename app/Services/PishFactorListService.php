@@ -375,7 +375,8 @@ class PishFactorListService
 
     private function actionButtons(Pishfactor $factor, string $infoUrl, bool $canDelete, string $csrf): string
     {
-        $viewIcon = '<a class="d-inline-block me-3" href="' . $infoUrl . '"><i class="fa fa-eye" style="color:#248230"></i></a>';
+        $viewIcon = '<a class="d-inline-block me-3" style="color:#248230;display:inline-flex" href="' . $infoUrl . '">'
+            . \App\Support\UiIcon::html('eye') . '</a>';
 
         if (!$canDelete) {
             return $viewIcon;
@@ -386,7 +387,8 @@ class PishFactorListService
         return $viewIcon
             . '<form class="d-inline" action="' . $destroyUrl . '" method="POST" onsubmit="return confirm(\'آیا از حذف فاکتور مورد نظر اطمینان دارید؟\');">'
             . '<input type="hidden" name="_token" value="' . e($csrf) . '">'
-            . '<button type="submit" class="d-inline" style="border:0 none;background:transparent"><i class="fa fa-trash" style="color:#C1292E"></i></button>'
+            . '<button type="submit" class="d-inline" style="border:0 none;background:transparent;color:#C1292E;display:inline-flex">'
+            . \App\Support\UiIcon::html('fa-trash') . '</button>'
             . '</form>';
     }
 }

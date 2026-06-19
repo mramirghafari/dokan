@@ -41,7 +41,7 @@
                                         </div>
 
                                         <button type="submit" class="btn btn-outline-success mb-2 mr-2"
-                                            style="float:left;"><i class="fa fa-save"></i> ذخیره</button>
+                                            style="float:left;"><x-ui.icon name="fa-save" /> ذخیره</button>
                                     </form>
                                 </div>
                             </div>

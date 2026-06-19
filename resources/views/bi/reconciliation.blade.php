@@ -45,7 +45,7 @@
                                 <button class="btn btn-label-secondary btn-sm" type="submit">Refresh امروز</button>
                             </form>
                             <form method="POST" action="{{ route('bi.reconciliation.run') }}">@csrf
-                                <button class="btn btn-primary btn-sm" type="submit"><i class="ti ti-refresh me-1"></i>اجرای مغایرت‌گیری</button>
+                                <button class="btn btn-primary btn-sm" type="submit"><x-ui.icon name="refresh" class="me-1" />اجرای مغایرت‌گیری</button>
                             </form>
                             <a href="{{ route('bi.executive.index') }}" class="btn btn-label-primary btn-sm">Executive</a>
                         </div>
@@ -105,7 +105,7 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <button class="btn btn-primary w-100" type="submit" onclick="return confirm('Backfill در صف قرار بگیرد؟');">
-                                                    <i class="ti ti-history me-1"></i>شروع Backfill
+                                                    <x-ui.icon name="history" class="me-1" />شروع Backfill
                                                 </button>
                                             </div>
                                         </div>
@@ -136,7 +136,7 @@
                                                 <h6 class="mb-0">{{ $check['title'] }}</h6>
                                             </div>
                                             <span class="badge bg-label-{{ $check['status'] === 'aligned' ? 'success' : ($check['status'] === 'critical' ? 'danger' : 'warning') }}">
-                                                <i class="ti {{ $check['icon'] }}"></i>
+                                                <x-ui.icon :name="$check['icon']" />
                                             </span>
                                         </div>
                                         <div class="d-flex justify-content-between small mb-1">

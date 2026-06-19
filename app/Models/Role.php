@@ -16,9 +16,16 @@ class Role extends Model
     protected $fillable = [
         'title',
         'description',
+        'max_discount_percent',
+        'max_discount_amount',
         'tenant_id',
         'scope_type',
         'isActive',
+    ];
+
+    protected $casts = [
+        'max_discount_percent' => 'decimal:2',
+        'max_discount_amount' => 'decimal:2',
     ];
 
     public function tenant()

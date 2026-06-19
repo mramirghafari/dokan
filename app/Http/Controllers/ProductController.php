@@ -18,9 +18,13 @@ use App\Models\Region;
 use App\Models\Area;
 use App\Models\OrganizationScope;
 use App\Models\PriceLog;
+use App\Models\ProductPricePeriod;
 use App\Models\Unit;
+use App\Services\ProductListColumnService;
 use App\Services\ProductListService;
+use App\Services\ProductPricePeriodService;
 use App\Services\TenantSettings;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -30,7 +34,7 @@ class ProductController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:products,user')->only(['index', 'datatable', 'destroy', 'trashGet', 'trashPost', 'restore']);
+        $this->middleware('can:products,user')->only(['index', 'datatable', 'destroy', 'trashGet', 'trashPost', 'restore', 'saveListColumns']);
         $this->middleware('can:product-add,user,neworder')->only(['create', 'store', 'edit', 'update']);
         $this->middleware(function ($request, $next) {
             if (!TenantSettings::enabled('feature_multi_price')) {
@@ -81,53 +85,91 @@ class ProductController extends Controller
 
         if ($isVisitor) {
             $MyAreas = Tasks::where('user_id', auth()->user()->id)->pluck('area_id')->toArray();
-            $Customers = Customers::whereIn('area', $MyAreas)->get();
+            $Customers = $this->customersForNewOrder($user, true, false, false);
             if ($request->has('Task')) {
                 $Task = $request->Task;
             } else {
                 $Task = null;
             }
 
-            return view('products.visitor_index', compact('products', 'stores', 'categories', 'brands', 'organizations', 'Customers', 'Task', 'isAgent'));
+            return view('products.visitor_index', $this->newOrderViewData(compact('products', 'stores', 'categories', 'brands', 'organizations', 'Customers', 'Task', 'isAgent')));
         } elseif ($isAgent) {
             $Customers = collect();
             $Task = null;
 
-            return view('products.visitor_index', compact('products', 'stores', 'categories', 'brands', 'organizations', 'Customers', 'Task', 'isAgent'));
+            return view('products.visitor_index', $this->newOrderViewData(compact('products', 'stores', 'categories', 'brands', 'organizations', 'Customers', 'Task', 'isAgent')));
         } elseif ($isLeader) {
-            $MyAreas = Tasks::where('leader_id', auth()->user()->id)->pluck('area_id')->toArray();
-            $Customers = Customers::whereIn('area', $MyAreas)->get();
+            $Customers = $this->customersForNewOrder($user, false, true, false);
             if ($request->has('Task')) {
                 $Task = $request->Task;
             } else {
                 $Task = null;
             }
 
-            return view('products.visitor_index', compact('products', 'stores', 'categories', 'brands', 'organizations', 'Customers', 'Task', 'isAgent'));
+            return view('products.visitor_index', $this->newOrderViewData(compact('products', 'stores', 'categories', 'brands', 'organizations', 'Customers', 'Task', 'isAgent')));
         } else {
 
             if ($request->has('neworder') && $isVisitor == false && $isLeader == false) {
                 $products = Product::forOrganizations($user)->where('isActive', 1)->where('isMaterial', 0)->orderBy('id', 'desc')->get();
                 $Task = null;
-                $Customers = Customers::forOrganizations($user)->orderBy('id', 'desc')->get();
-                return view('products.visitor_index', compact('products', 'stores', 'categories', 'brands', 'organizations', 'Customers', 'Task', 'isAgent'));
+                $Customers = $this->customersForNewOrder($user, false, false, false);
+                return view('products.visitor_index', $this->newOrderViewData(compact('products', 'stores', 'categories', 'brands', 'organizations', 'Customers', 'Task', 'isAgent')));
             }
 
 
             $service = app(ProductListService::class);
+            $columnService = app(ProductListColumnService::class);
             $productsTotal = $service->count($user, $request);
             $filterValues = $service->filterValues($request);
+            $tenantId = $user->tenant_id ?: $user->tenants_id;
+            $warehouseModuleEnabled = $columnService->warehouseModuleEnabled($tenantId ? (int) $tenantId : null);
 
-            return view('products.index', compact(
+            return view('products.index', array_merge(compact(
                 'stores',
                 'categories',
                 'brands',
                 'organizations',
                 'statusFilter',
                 'productsTotal',
-                'filterValues'
-            ));
+                'filterValues',
+                'warehouseModuleEnabled',
+            ), [
+                'productListColumnCatalog' => $columnService->catalog($tenantId),
+                'productListVisibleColumns' => $columnService->visibleKeys($tenantId),
+                'productListHiddenIndexes' => $columnService->hiddenColumnIndexes($tenantId),
+                'productListHeaders' => $columnService->headers($tenantId),
+                'productListFixedIndexes' => $columnService->fixedColumnIndexes($tenantId),
+                'productListColumnCount' => $columnService->columnCount($tenantId),
+                'productListNonSortableIndexes' => array_values(array_diff(
+                    range(0, max(0, $columnService->columnCount($tenantId) - 1)),
+                    array_keys($columnService->sortableColumnsMap($tenantId))
+                )),
+            ]));
         }
+    }
+
+    public function saveListColumns(Request $request)
+    {
+        $data = $request->validate([
+            'columns' => ['required', 'array'],
+            'columns.*' => ['string', 'max:60'],
+        ]);
+
+        $user = Auth::user();
+        $columnService = app(ProductListColumnService::class);
+        $saved = $columnService->saveVisibleKeys($data['columns'], $user);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'message' => 'ستون‌های نمایشی برای این پنل ذخیره شد.',
+                'columns' => $saved,
+                'hidden_indexes' => $columnService->hiddenColumnIndexes($user->tenant_id ?: $user->tenants_id),
+            ]);
+        }
+
+        Alert::success('ذخیره شد', 'ستون‌های نمایشی لیست محصولات برای این پنل ذخیره شد.');
+
+        return back();
     }
 
     public function datatable(Request $request)
@@ -210,27 +252,107 @@ class ProductController extends Controller
             $stores = Store::whereIn('id', $storesUser)->where('isActive', 1)->get();
         }
 
+        if ($isAgent) {
+            $Customers = collect();
+        } elseif ((int) $user->isAdmin === 1) {
+            $Customers = $this->customersForNewOrder($user, false, false, false);
+        } elseif ($isVisitor) {
+            $Customers = $this->customersForNewOrder($user, true, false, false);
+        } elseif ($isLeader) {
+            $Customers = $this->customersForNewOrder($user, false, true, false);
+        } else {
+            $Customers = $this->customersForNewOrder($user, false, false, false);
+        }
+
+
+        return view('products.visitor_index', $this->newOrderViewData(compact('products', 'stores', 'categories', 'brands', 'organizations', 'productCount', 'Customers', 'isAgent')));
+    }
+
+    private function newOrderViewData(array $data): array
+    {
+        $user = Auth::user();
+        $tenantId = $user?->tenants_id ?: $user?->tenant_id;
+        $limitService = app(\App\Services\OrderDiscountLimitService::class);
+        $products = $data['products'] ?? collect();
+        $productDiscountLimits = [];
+
+        if ($products instanceof \Illuminate\Support\Collection) {
+            foreach ($products as $product) {
+                $productDiscountLimits[$product->id] = $limitService->effectiveLimits($user, $product);
+            }
+        }
+
+        return array_merge($data, [
+            'captureInvoiceLocation' => TenantSettings::shouldCaptureInvoiceLocation($user, $tenantId ? (int) $tenantId : null),
+            'featureWarehouseManagement' => TenantSettings::enabled('feature_warehouse_management', $tenantId ? (int) $tenantId : null),
+            'productDiscountLimits' => $productDiscountLimits,
+        ]);
+    }
+
+    private function customersForNewOrder($user, bool $isVisitor, bool $isLeader, bool $isAgent): Collection
+    {
+        if ($isAgent) {
+            return collect();
+        }
+
         if ($isVisitor) {
-            $MyAreas = Tasks::where('user_id', auth()->user()->id)->pluck('area_id')->toArray();
-            $Customers = Customers::whereIn('area', $MyAreas)
+            $myAreas = Tasks::query()
+                ->where('user_id', $user->id)
+                ->pluck('area_id')
+                ->unique()
+                ->filter()
+                ->values()
+                ->all();
+
+            $customers = Customers::query()
+                ->whereIn('area', $myAreas)
                 ->orderBy('name')
                 ->get();
         } elseif ($isLeader) {
-            $MyRegions = Region::where('leader_id', auth()->user()->id)->pluck('id')->toArray();
-            $MyAreas = Area::whereIn('region_id', $MyRegions)->pluck('id')->toArray();
-            $Customers = Customers::whereIn('area', $MyAreas)
+            $myRegions = Region::query()
+                ->where('leader_id', $user->id)
+                ->pluck('id')
+                ->all();
+
+            $myAreas = Area::query()
+                ->whereIn('region_id', $myRegions)
+                ->pluck('id')
+                ->unique()
+                ->filter()
+                ->values()
+                ->all();
+
+            $customers = Customers::query()
+                ->whereIn('area', $myAreas)
                 ->orderBy('name')
                 ->get();
-        } elseif ($isAgent) {
-            $Customers = collect();
         } else {
-            $Customers = Customers::forOrganizations($user)
+            $customers = Customers::forOrganizations($user)
                 ->orderBy('name')
                 ->get();
         }
 
+        return $this->deduplicateCustomersForSelect($customers);
+    }
 
-        return view('products.visitor_index', compact('products', 'stores', 'categories', 'brands', 'organizations', 'productCount', 'Customers', 'isAgent'));
+    private function deduplicateCustomersForSelect(Collection $customers): Collection
+    {
+        return $customers
+            ->unique('id')
+            ->groupBy(function (Customers $customer) {
+                $name = mb_strtolower(trim((string) ($customer->name ?? '')));
+                $mobile = preg_replace('/\D+/', '', (string) ($customer->mobile ?? ''));
+                $tablo = mb_strtolower(trim((string) ($customer->tablo ?? '')));
+
+                if ($mobile !== '') {
+                    return $name . '|' . $mobile;
+                }
+
+                return $name . '|' . $tablo . '|' . mb_strtolower(trim((string) ($customer->address ?? '')));
+            })
+            ->map(fn (Collection $group) => $group->sortByDesc('id')->first())
+            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
     }
 
     private function isAgentLikeRole($role): bool
@@ -264,8 +386,27 @@ class ProductController extends Controller
         $productTypes = Product::PRODUCT_TYPE_LABELS;
         $stockTrackingModes = Product::STOCK_TRACKING_LABELS;
         $valuationMethods = Product::VALUATION_METHOD_LABELS;
+        $productUnits = $this->availableUnits($user, Unit::SCOPE_PRODUCT);
+        $featureDistribution = TenantSettings::enabled('feature_distribution');
+        $shippingUnits = $featureDistribution ? $this->availableUnits($user, Unit::SCOPE_SHIPPING) : collect();
+        $featureAgencySales = TenantSettings::enabled('feature_agency_sales');
+        $pricePeriodTypes = ProductPricePeriod::PRICE_TYPES;
 
-        return view('products.create', compact('products', 'stores', 'categories', 'brands', 'organizations', 'units', 'productTypes', 'stockTrackingModes', 'valuationMethods'));
+        return view('products.create', compact(
+            'products',
+            'stores',
+            'categories',
+            'brands',
+            'organizations',
+            'productUnits',
+            'shippingUnits',
+            'productTypes',
+            'stockTrackingModes',
+            'valuationMethods',
+            'featureDistribution',
+            'featureAgencySales',
+            'pricePeriodTypes'
+        ));
     }
 
     private function normalizeProductPanelScopes(Request $request, $user): bool
@@ -321,6 +462,22 @@ class ProductController extends Controller
         ]);
     }
 
+    private function normalizeOrderQuantityMode(Request $request): void
+    {
+        $mode = (string) $request->input('order_quantity_mode', 'main_unit');
+        if (!isset(Product::ORDER_QUANTITY_MODES[$mode])) {
+            $mode = 'main_unit';
+        }
+
+        $flags = Product::saleFlagsForQuantityMode($mode);
+
+        $request->merge([
+            'order_quantity_mode' => $mode,
+            'item_sale_status' => $flags['item_sale_status'],
+            'pack_sale_status' => $flags['pack_sale_status'],
+        ]);
+    }
+
     private function requestedIds($value): array
     {
         $values = is_array($value) ? $value : [$value];
@@ -353,6 +510,7 @@ class ProductController extends Controller
             return back()->withInput();
         }
         $this->normalizeProductUnits($request);
+        $this->normalizeOrderQuantityMode($request);
 
         $organizationIds = $request->organization_id;
         $storeIds = $request->store_id;
@@ -361,8 +519,6 @@ class ProductController extends Controller
         $request['store_id'] = json_encode($storeIds);
         $request->merge([
             'isActive' => $request->input('isActive') === 'on' ? 1 : 0,
-            'item_sale_status' => $request->input('item_sale_status') === 'on' ? 1 : 0,
-            'pack_sale_status' => $request->input('pack_sale_status') === 'on' ? 1 : 0,
             'set_price' => $request->input('set_price') === 'on' ? 1 : 0,
             'isMaterial' => $request->input('isMaterial') === 'on' ? 1 : 0,
             'price' => $this->moneyInput($request->input('price'), 0),
@@ -372,6 +528,7 @@ class ProductController extends Controller
             'wholesale_price' => $this->moneyInput($request->input('wholesale_price')),
             'fee_masraf' => $this->moneyInput($request->input('fee_masraf'), 0),
             'consumer_price' => $this->moneyInput($request->input('consumer_price', $request->input('fee_masraf')), 0),
+            'max_discount_amount' => $this->moneyInput($request->input('max_discount_amount')),
         ]);
         $product = Product::create($request->all());
         $this->syncProductOrganizationScopes($product, $organizationIds);
@@ -442,6 +599,11 @@ class ProductController extends Controller
         $PriceLog->user_id = auth()->user()->id;
 
         $PriceLog->save();
+        app(ProductPricePeriodService::class)->syncForProduct(
+            $product,
+            $this->buildPriceRangesFromRequest($request),
+            true
+        );
 
 
 
@@ -522,8 +684,37 @@ class ProductController extends Controller
         $productTypes = Product::PRODUCT_TYPE_LABELS;
         $stockTrackingModes = Product::STOCK_TRACKING_LABELS;
         $valuationMethods = Product::VALUATION_METHOD_LABELS;
+        $productUnits = $this->availableUnits($user, Unit::SCOPE_PRODUCT);
+        $featureDistribution = TenantSettings::enabled('feature_distribution');
+        $shippingUnits = $featureDistribution ? $this->availableUnits($user, Unit::SCOPE_SHIPPING) : collect();
+        $featureAgencySales = TenantSettings::enabled('feature_agency_sales');
+        $pricePeriodTypes = ProductPricePeriod::PRICE_TYPES;
+        $pricePeriods = $product->pricePeriods()
+            ->orderBy('starts_at')
+            ->orderBy('price_type')
+            ->get();
 
-        return view('products.edit', compact('product', 'categories', 'brands', 'parents', 'organizations', 'stores', 'PriceLogs', 'PriceLogLast', 'my_organ', 'Depots', 'units', 'productTypes', 'stockTrackingModes', 'valuationMethods'));
+        return view('products.edit', compact(
+            'product',
+            'categories',
+            'brands',
+            'parents',
+            'organizations',
+            'stores',
+            'PriceLogs',
+            'PriceLogLast',
+            'my_organ',
+            'Depots',
+            'productUnits',
+            'shippingUnits',
+            'productTypes',
+            'stockTrackingModes',
+            'valuationMethods',
+            'featureDistribution',
+            'featureAgencySales',
+            'pricePeriodTypes',
+            'pricePeriods'
+        ));
     }
 
     public function update(Request $request, Product $product)
@@ -537,6 +728,7 @@ class ProductController extends Controller
             return back()->withInput();
         }
         $this->normalizeProductUnits($request);
+        $this->normalizeOrderQuantityMode($request);
         $request->merge([
             'price' => $this->moneyInput($request->input('price'), 0),
             'purchase_price' => $this->moneyInput($request->input('purchase_price')),
@@ -611,15 +803,19 @@ class ProductController extends Controller
         $PriceLog->user_id = auth()->user()->id;
 
         $PriceLog->save();
+        app(ProductPricePeriodService::class)->syncForProduct(
+            $product,
+            $this->buildPriceRangesFromRequest($request),
+            true
+        );
 
 
         $entity = $product->entity;
-        $itemSaleStatus = $request->input('item_sale_status') === 'on' ? 1 : 0;
-        $packSaleStatus = $request->input('pack_sale_status') === 'on' ? 1 : 0;
         $isFreez = $request->input('isFreez') === 'on' ? 1 : 0;
         $isActive = $request->input('isActive') === 'on' ? 1 : 0;
         $isMaterial = $request->input('isMaterial') === 'on' ? 1 : 0;
         $setPrice = $request->input('set_price') === 'on' ? 1 : 0;
+        $saleFlags = Product::saleFlagsForQuantityMode((string) $request->input('order_quantity_mode', $product->resolveOrderQuantityMode()));
         $product->update([
             'orderLimit' => $request->orderLimit,
             'title' => $request->title,
@@ -643,6 +839,7 @@ class ProductController extends Controller
             'wholesale_price' => $this->moneyInput($request->wholesale_price),
             'consumer_price' => $this->moneyInput($request->consumer_price, $this->moneyInput($request->fee_masraf, 0)),
             'discount' => $request->discount != '' ? $this->moneyInput($request->discount) : null,
+            'max_discount_amount' => $this->moneyInput($request->input('max_discount_amount')),
             'tax' => $request->tax != '' ? $this->moneyInput($request->tax) : null,
             'fee_masraf' => $this->moneyInput($request->fee_masraf, 0),
             'entity' => isset($Active_Depot) ? $Active_Depot->entity : 0,
@@ -651,8 +848,9 @@ class ProductController extends Controller
             'parentCategory_id' => $request->parentCategory_id,
             'chaildCategory_id' => isset($request->chaildCategory_id) ? $request->chaildCategory_id : $product->chaildCategory_id,
             'isActive' => $isActive,
-            'item_sale_status' => $itemSaleStatus,
-            'pack_sale_status' => $packSaleStatus,
+            'item_sale_status' => $saleFlags['item_sale_status'],
+            'pack_sale_status' => $saleFlags['pack_sale_status'],
+            'order_quantity_mode' => $request->input('order_quantity_mode', $product->resolveOrderQuantityMode()),
             'isFreez' => $isFreez,
             'isMaterial' => $isMaterial,
             'set_price' => $setPrice,
@@ -705,16 +903,21 @@ class ProductController extends Controller
         return redirect(asset('products'));
     }
 
-    private function availableUnits($user)
+    private function availableUnits($user, ?string $scope = null)
     {
         if ($user->isGod == 1) {
-            return Unit::where('isActive', 1)->orderBy('title')->get();
+            $query = Unit::where('isActive', 1)->orderBy('title');
+        } else {
+            $query = Unit::forOrganizations($user)
+                ->where('isActive', 1)
+                ->orderBy('title');
         }
 
-        return Unit::forOrganizations($user)
-            ->where('isActive', 1)
-            ->orderBy('title')
-            ->get();
+        if ($scope) {
+            $query->where('usage_scope', $scope);
+        }
+
+        return $query->get();
     }
 
     private function moneyInput($value, $default = null)
@@ -722,6 +925,47 @@ class ProductController extends Controller
         $value = str_replace(',', '', trim((string) ($value ?? '')));
 
         return $value === '' ? $default : $value;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildPriceRangesFromRequest(Request $request): array
+    {
+        $ranges = [];
+        $inputRows = $request->input('price_ranges', []);
+        if (is_array($inputRows)) {
+            foreach ($inputRows as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                $ranges[] = [
+                    'price_type' => $row['price_type'] ?? null,
+                    'amount' => $this->moneyInput($row['amount'] ?? null),
+                    'starts_at' => $row['starts_at'] ?? null,
+                    'ends_at' => $row['ends_at'] ?? null,
+                    'priority' => $row['priority'] ?? 0,
+                ];
+            }
+        }
+
+        if ($ranges !== []) {
+            return $ranges;
+        }
+
+        $legacyStart = $request->input('price_date');
+        $legacyEnd = $request->input('price_date_exp');
+        if (trim((string) $legacyStart) !== '' || trim((string) $legacyEnd) !== '') {
+            return [[
+                'price_type' => ProductPricePeriod::TYPE_SALE,
+                'amount' => $this->moneyInput($request->input('price'), 0),
+                'starts_at' => $legacyStart,
+                'ends_at' => $legacyEnd,
+                'priority' => 0,
+            ]];
+        }
+
+        return [];
     }
 
     private function syncProductOrganizationScopes(Product $product, $organizationIds): void

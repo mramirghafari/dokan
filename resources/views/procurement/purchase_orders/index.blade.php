@@ -7,17 +7,9 @@
     <meta content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
         name="viewport" />
     <title>سفارش خرید - دکان دارمینو</title>
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
 </head>
 
 <body>
@@ -33,35 +25,35 @@
                             <h4 class="mb-0"><span class="text-muted fw-light">انبار و تامین /</span> سفارش خرید</h4>
                             <div class="d-flex gap-2">
                                 <a class="btn btn-outline-secondary" href="{{ route('purchase-requisitions.index') }}">
-                                    <i class="ti ti-list-check me-1"></i> استعلام بها
+                                    <x-ui.icon name="list-check" class="me-1" /> استعلام بها
                                 </a>
                                 <a class="btn btn-outline-secondary" href="{{ route('purchase-orders.approvals') }}">
-                                    <i class="ti ti-checkup-list me-1"></i> تایید و بودجه
+                                    <x-ui.icon name="checkup-list" class="me-1" /> تایید و بودجه
                                 </a>
                                 <a class="btn btn-outline-secondary" href="{{ route('purchase-orders.priceReport') }}">
-                                    <i class="ti ti-chart-line me-1"></i> کنترل قیمت
+                                    <x-ui.icon name="chart-line" class="me-1" /> کنترل قیمت
                                 </a>
                                 <a class="btn btn-outline-secondary"
                                     href="{{ route('purchase-orders.foreignImports') }}">
-                                    <i class="ti ti-ship me-1"></i> واردات
+                                    <x-ui.icon name="ship" class="me-1" /> واردات
                                 </a>
                                 <a class="btn btn-outline-secondary"
                                     href="{{ route('purchase-orders.commitmentReport') }}">
-                                    <i class="ti ti-clipboard-check me-1"></i> تعهد و دریافت
+                                    <x-ui.icon name="clipboard-check" class="me-1" /> تعهد و دریافت
                                 </a>
                                 <a class="btn btn-outline-secondary"
                                     href="{{ route('purchase-orders.supplierLedger') }}">
-                                    <i class="ti ti-file-analytics me-1"></i> گردش تامین کننده
+                                    <x-ui.icon name="file-analytics" class="me-1" /> گردش تامین کننده
                                 </a>
                                 <a class="btn btn-outline-secondary" href="{{ route('purchase-orders.report') }}">
-                                    <i class="ti ti-report-analytics me-1"></i> گزارش خرید
+                                    <x-ui.icon name="report-analytics" class="me-1" /> گزارش خرید
                                 </a>
                                 <a class="btn btn-outline-secondary"
                                     href="{{ route('purchase-orders.directSupply') }}">
-                                    <i class="ti ti-bolt me-1"></i> تامین مستقیم
+                                    <x-ui.icon name="bolt" class="me-1" /> تامین مستقیم
                                 </a>
                                 <a class="btn btn-primary" href="{{ route('purchase-orders.create') }}">
-                                    <i class="ti ti-plus me-1"></i> ثبت سفارش خرید
+                                    <x-ui.icon name="plus" class="me-1" /> ثبت سفارش خرید
                                 </a>
                             </div>
                         </div>
@@ -299,7 +291,7 @@
                                                             @endif
 
                                                             @if (in_array($purchaseOrder->status, ['partial_received', 'received'], true))
-                                                                @php
+                                                                <?php
                                                                     $invoicedQuantities = $purchaseOrder->invoices
                                                                         ->where('status', '<>', 'canceled')
                                                                         ->flatMap->items->groupBy(
@@ -324,7 +316,7 @@
                                                                             ) > 0;
                                                                         },
                                                                     );
-                                                                @endphp
+                                                                ?>
                                                                 @if ($hasInvoiceableQuantity)
                                                                     <form method="POST"
                                                                         action="{{ route('purchase-orders.invoice.store', $purchaseOrder) }}"
@@ -357,7 +349,7 @@
                                                                             </thead>
                                                                             <tbody>
                                                                                 @foreach ($purchaseOrder->items as $item)
-                                                                                    @php
+                                                                                    <?php
                                                                                         $alreadyInvoiced =
                                                                                             (float) ($invoicedQuantities[
                                                                                                 $item->id
@@ -370,7 +362,7 @@
                                                                                                 3,
                                                                                             ),
                                                                                         );
-                                                                                    @endphp
+                                                                                    ?>
                                                                                     <tr>
                                                                                         <td>{{ optional($item->product)->title }}
                                                                                             {{ optional($item->product)->display_name }}
@@ -588,10 +580,12 @@
 
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <script src="{{ asset('assets/') }}/js/main.js"></script>
 </body>

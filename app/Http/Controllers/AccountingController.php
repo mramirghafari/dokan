@@ -51,6 +51,7 @@ use App\Services\AccountingCurrencyReportService;
 use App\Services\AccountingFinancialStatementService;
 use App\Services\AccountingLedgerReportService;
 use App\Services\AccountingPeriodClosingService;
+use App\Services\OpeningVoucherService;
 use App\Services\FixedAssetCapitalAdditionService;
 use App\Services\FixedAssetDisposalService;
 use App\Services\FixedAssetDepreciationService;
@@ -1529,8 +1530,73 @@ class AccountingController extends Controller
     {
         $accounts = $this->accountingAccounts();
         $today = now()->toDateString();
+        $fiscalYears = $this->fiscalYearsForCurrentUser();
+        $selectedFiscalYear = $fiscalYears->firstWhere('is_default', true) ?: $fiscalYears->first();
 
-        return view('Accounting.vouchers.create', array_merge(compact('accounts', 'today'), $this->voucherDimensionOptions()));
+        return view('Accounting.vouchers.create', array_merge(compact('accounts', 'today', 'fiscalYears', 'selectedFiscalYear'), $this->voucherDimensionOptions()));
+    }
+
+    public function createOpeningVoucher(Request $request, OpeningVoucherService $service)
+    {
+        $fiscalYears = $this->fiscalYearsForCurrentUser();
+        $selectedFiscalYear = $fiscalYears->firstWhere('id', (int) $request->get('fiscal_year_id'))
+            ?: $fiscalYears->firstWhere('is_default', true)
+            ?: $fiscalYears->first();
+
+        $accounts = $this->accountingAccounts();
+        $rows = $selectedFiscalYear ? $service->buildRows(Auth::user(), $selectedFiscalYear) : [];
+        $existingDraft = $selectedFiscalYear ? $service->existingDraft(Auth::user(), $selectedFiscalYear) : null;
+        $today = optional(optional($selectedFiscalYear)->starts_at)->toDateString() ?: now()->toDateString();
+
+        return view('Accounting.vouchers.opening', array_merge(
+            compact('accounts', 'today', 'fiscalYears', 'selectedFiscalYear', 'rows', 'existingDraft'),
+            $this->voucherDimensionOptions()
+        ));
+    }
+
+    public function storeOpeningVoucher(Request $request, OpeningVoucherService $service)
+    {
+        $request->validate([
+            'fiscal_year_id' => ['required', 'integer', 'exists:fiscal_years,id'],
+            'voucher_date_en' => ['nullable', 'date'],
+            'reference_number' => ['nullable', 'string', 'max:60'],
+            'description' => ['nullable', 'string'],
+            'account_id' => ['required', 'array'],
+            'account_id.*' => ['nullable', 'integer', 'exists:accounts,id'],
+            'debit_amount' => ['nullable', 'array'],
+            'credit_amount' => ['nullable', 'array'],
+            'item_description' => ['nullable', 'array'],
+            'cost_center_id' => ['nullable', 'array'],
+            'cost_center_id.*' => ['nullable', 'integer', 'exists:cost_centers,id'],
+            'revenue_center_id' => ['nullable', 'array'],
+            'revenue_center_id.*' => ['nullable', 'integer', 'exists:revenue_centers,id'],
+            'branch_id' => ['nullable', 'array'],
+            'branch_id.*' => ['nullable', 'integer', 'exists:stores,id'],
+            'project_code' => ['nullable', 'array'],
+            'product_id' => ['nullable', 'array'],
+            'product_id.*' => ['nullable', 'integer', 'exists:products,id'],
+            'customer_id' => ['nullable', 'array'],
+            'customer_id.*' => ['nullable', 'integer', 'exists:customers,id'],
+            'employee_id' => ['nullable', 'array'],
+            'employee_id.*' => ['nullable', 'integer', 'exists:employees,id'],
+            'currency_id' => ['nullable', 'array'],
+            'currency_id.*' => ['nullable', 'integer', 'exists:currencies,id'],
+            'foreign_debit_amount' => ['nullable', 'array'],
+            'foreign_credit_amount' => ['nullable', 'array'],
+            'exchange_rate' => ['nullable', 'array'],
+        ]);
+
+        $fiscalYear = $this->fiscalYearsForCurrentUser()->firstWhere('id', (int) $request->get('fiscal_year_id'));
+
+        if (!$fiscalYear) {
+            return redirect()->back()->withInput()->withErrors(['fiscal_year_id' => 'سال مالی انتخاب‌شده در دسترس پنل شما نیست.']);
+        }
+
+        $voucher = $service->save($request->all(), Auth::user(), $fiscalYear);
+
+        Alert::success('ثبت شد', 'سند افتتاحیه شماره ' . $voucher->voucher_number . ' به صورت موقت ثبت شد. برای نهایی‌سازی آن را «دائمی» کنید.');
+
+        return redirect()->route('Accounting.vouchers');
     }
 
     public function editVoucher(Voucher $voucher, AccountingPostingService $postingService)
@@ -1562,7 +1628,12 @@ class AccountingController extends Controller
             'exchange_rate' => $item->exchange_rate,
         ])->values()->all();
 
-        return view('Accounting.vouchers.create', array_merge(compact('accounts', 'today', 'voucher', 'voucherRows'), $this->voucherDimensionOptions()));
+        $fiscalYears = $this->fiscalYearsForCurrentUser();
+        $selectedFiscalYear = $fiscalYears->firstWhere('id', (int) $voucher->fiscal_year_id)
+            ?: $fiscalYears->firstWhere('is_default', true)
+            ?: $fiscalYears->first();
+
+        return view('Accounting.vouchers.create', array_merge(compact('accounts', 'today', 'voucher', 'voucherRows', 'fiscalYears', 'selectedFiscalYear'), $this->voucherDimensionOptions()));
     }
 
     public function treasury()
@@ -1611,6 +1682,8 @@ class AccountingController extends Controller
     {
         $request->validate([
             'voucher_date_en' => ['nullable', 'date'],
+            'reference_number' => ['nullable', 'string', 'max:60'],
+            'fiscal_year_id' => ['nullable', 'integer', 'exists:fiscal_years,id'],
             'description' => ['nullable', 'string'],
             'account_id' => ['required', 'array'],
             'account_id.*' => ['nullable', 'integer', 'exists:accounts,id'],
@@ -1660,6 +1733,8 @@ class AccountingController extends Controller
 
         $request->validate([
             'voucher_date_en' => ['nullable', 'date'],
+            'reference_number' => ['nullable', 'string', 'max:60'],
+            'fiscal_year_id' => ['nullable', 'integer', 'exists:fiscal_years,id'],
             'description' => ['nullable', 'string'],
             'account_id' => ['required', 'array'],
             'account_id.*' => ['nullable', 'integer', 'exists:accounts,id'],

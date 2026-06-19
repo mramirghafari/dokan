@@ -36,7 +36,17 @@ class AppServiceProvider extends ServiceProvider
         $this->registerSlowQueryMonitor();
 
         view()->composer('*', function ($view) {
-            $view->with('user', Auth::user());
+            $user = Auth::user();
+
+            if ($user) {
+                $user->loadMissing('roles');
+                $panels = app(\App\Services\PanelMembershipService::class);
+                $view->with('availablePanels', $panels->accessiblePanelsForUser($user));
+                $view->with('activePanel', $panels->activePanel($user));
+                $view->with('userSideLabel', $panels->roleLabelForActivePanel($user));
+            }
+
+            $view->with('user', $user);
         });
     }
 

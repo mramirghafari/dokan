@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Voucher extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable = ['factor_id', 'tenant_id', 'organization_id', 'account_id', 'voucher_type', 'voucher_number', 'voucher_date_fa', 'voucher_date_en', 'amount', 'total_debit', 'total_credit', 'method', 'document_type', 'status', 'is_permanent', 'source_type', 'source_id', 'original_voucher_id', 'reversal_voucher_id', 'merged_into_voucher_id', 'fiscal_year', 'description', 'reversal_reason', 'posted_at', 'approved_by', 'created_by', 'updated_by', 'reversed_at', 'reversed_by', 'merged_at', 'merged_by', 'cancelled_at', 'cancelled_by'];
+    protected $fillable = ['factor_id', 'tenant_id', 'organization_id', 'account_id', 'voucher_type', 'voucher_number', 'reference_number', 'voucher_date_fa', 'voucher_date_en', 'amount', 'total_debit', 'total_credit', 'method', 'document_type', 'status', 'is_permanent', 'source_type', 'source_id', 'original_voucher_id', 'reversal_voucher_id', 'merged_into_voucher_id', 'fiscal_year', 'fiscal_year_id', 'description', 'reversal_reason', 'posted_at', 'approved_by', 'created_by', 'updated_by', 'reversed_at', 'reversed_by', 'merged_at', 'merged_by', 'cancelled_at', 'cancelled_by'];
     protected $casts = [
         'is_permanent' => 'boolean',
         'posted_at' => 'datetime',
@@ -32,6 +32,16 @@ class Voucher extends Model
     public function account()
     {
         return $this->belongsTo(Accounts::class, 'account_id');
+    }
+
+    public function fiscalYear()
+    {
+        return $this->belongsTo(FiscalYear::class, 'fiscal_year_id');
+    }
+
+    public function isOpening(): bool
+    {
+        return $this->document_type === 'period_opening' || (int) $this->voucher_type === 1;
     }
 
     public function originalVoucher()

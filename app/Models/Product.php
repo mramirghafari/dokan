@@ -16,7 +16,14 @@ use Illuminate\Support\Facades\DB;
 class Product extends Model
 {
     use HasFactory, BelongsToTenant, SoftDeletes, HasOrganizationFilter, HasOrganizationScopes;
-    protected $fillable = ['title', 'display_name', 'orderLimit', 'category_id', 'entity', 'brand_id', 'isActive', 'user_id', 'description', 'organization_id', 'tenant_id', 'store_id', 'sku', 'product_type', 'stock_tracking_mode', 'traceability_mode', 'requires_expiry_tracking', 'requires_serial_tracking', 'valuation_method', 'parentCategory_id', 'childCategory_id', 'start_date', 'exp_date', 'pr_unit', 'base_unit_id', 'pr_sub_unit', 'secondary_unit_id', 'pr_weight', 'pr_weight_txt', 'pack_items', 'unit_conversion_factor', 'pr_weight', 'pr_weight_unit', 'pack_weight', 'pack_weight_unit', 'pack_weight_txt', 'price', 'purchase_price', 'cost_price', 'representative_price', 'wholesale_price', 'consumer_price', 'discount', 'tax', 'fee_masraf', 'photo', 'attrs', 'item_sale_status', 'pack_sale_status', 'isFreez', 'isNotify', 'set_price', 'isMaterial', 'depot_id', 'updated_at'];
+    protected $fillable = ['title', 'display_name', 'orderLimit', 'category_id', 'entity', 'brand_id', 'isActive', 'user_id', 'description', 'organization_id', 'tenant_id', 'store_id', 'sku', 'product_type', 'stock_tracking_mode', 'traceability_mode', 'requires_expiry_tracking', 'requires_serial_tracking', 'valuation_method', 'parentCategory_id', 'childCategory_id', 'start_date', 'exp_date', 'pr_unit', 'base_unit_id', 'pr_sub_unit', 'secondary_unit_id', 'pr_weight', 'pr_weight_txt', 'pack_items', 'unit_conversion_factor', 'pr_weight', 'pr_weight_unit', 'pack_weight', 'pack_weight_unit', 'pack_weight_txt', 'price', 'purchase_price', 'cost_price', 'representative_price', 'wholesale_price', 'consumer_price', 'discount', 'max_discount_amount', 'tax', 'fee_masraf', 'photo', 'attrs', 'item_sale_status', 'pack_sale_status', 'order_quantity_mode', 'isFreez', 'isNotify', 'set_price', 'isMaterial', 'depot_id', 'updated_at'];
+
+    public const ORDER_QUANTITY_MODES = [
+        'none' => 'تک‌فروشی (تعداد ثابت ۱)',
+        'main_unit' => 'فقط واحد اصلی',
+        'secondary_unit' => 'فقط واحد فرعی',
+        'both' => 'هر دو واحد',
+    ];
 
     protected $casts = [
         'unit_conversion_factor' => 'decimal:6',
@@ -25,6 +32,7 @@ class Product extends Model
         'representative_price' => 'decimal:2',
         'wholesale_price' => 'decimal:2',
         'consumer_price' => 'decimal:2',
+        'max_discount_amount' => 'decimal:2',
         'requires_expiry_tracking' => 'boolean',
         'requires_serial_tracking' => 'boolean',
     ];
@@ -56,6 +64,66 @@ class Product extends Model
     public function productTypeText(): string
     {
         return self::PRODUCT_TYPE_LABELS[$this->product_type ?: 'goods'] ?? self::PRODUCT_TYPE_LABELS['goods'];
+    }
+
+    public function resolveOrderQuantityMode(): string
+    {
+        $mode = (string) ($this->order_quantity_mode ?? '');
+
+        if ($mode !== '' && isset(self::ORDER_QUANTITY_MODES[$mode])) {
+            return $mode;
+        }
+
+        $pack = (bool) $this->pack_sale_status;
+        $item = (bool) $this->item_sale_status;
+
+        return match (true) {
+            $pack && $item => 'both',
+            $pack => 'secondary_unit',
+            $item => 'main_unit',
+            default => 'none',
+        };
+    }
+
+    /**
+     * @return array{item_sale_status: int, pack_sale_status: int}
+     */
+    public static function saleFlagsForQuantityMode(string $mode): array
+    {
+        return match ($mode) {
+            'none' => ['item_sale_status' => 0, 'pack_sale_status' => 0],
+            'main_unit' => ['item_sale_status' => 1, 'pack_sale_status' => 0],
+            'secondary_unit' => ['item_sale_status' => 0, 'pack_sale_status' => 1],
+            'both' => ['item_sale_status' => 1, 'pack_sale_status' => 1],
+            default => ['item_sale_status' => 1, 'pack_sale_status' => 0],
+        };
+    }
+
+    /**
+     * @return array{pack: int, tedad: int}
+     */
+    public function fixedOrderQuantities(): array
+    {
+        if ($this->usesDurationEncodedQuantity()) {
+            return [
+                'pack' => max(1, (int) $this->pack_items),
+                'tedad' => 1,
+            ];
+        }
+
+        return [
+            'pack' => 0,
+            'tedad' => 1,
+        ];
+    }
+
+    public function usesDurationEncodedQuantity(): bool
+    {
+        $unit = trim((string) $this->pr_unit);
+
+        return ($this->product_type ?? '') === 'service'
+            && in_array($unit, ['ماه', 'month'], true)
+            && (int) ($this->pack_items ?? 0) >= 1;
     }
 
     public function stockTrackingText(): string
@@ -101,6 +169,11 @@ class Product extends Model
     public function priceListItems()
     {
         return $this->hasMany(PriceListItem::class);
+    }
+
+    public function pricePeriods()
+    {
+        return $this->hasMany(ProductPricePeriod::class);
     }
 
     public function organization()

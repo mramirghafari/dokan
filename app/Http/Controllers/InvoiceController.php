@@ -854,14 +854,11 @@ class InvoiceController extends Controller
 
     public function add_factor_visitor(Request $request)
     {
-
-        //dd($request->all());
         $user = \Auth::user();
         $isVisitor = false;
         $isAgent = false;
 
         foreach ($user->roles as $role) {
-            $storesUser = DB::table('role_store')->where('role_id', $role->id)->pluck('store_id');
             if ($role->title == 'visitor') {
                 $isVisitor = true;
             }
@@ -877,6 +874,81 @@ class InvoiceController extends Controller
         $Area = $Customer ? Area::find($Customer->area) : null;
         $Region = $Area ? Region::find($Area->region_id) : null;
 
+        $limitService = app(\App\Services\OrderDiscountLimitService::class);
+        $parsedLines = [];
+        $orderTotalRials = 0;
+
+        foreach ($request->all() as $key => $value) {
+            if ($value === null || $value === '' || (float) $value == 0) {
+                continue;
+            }
+
+            if (str_starts_with($key, 'pack_')) {
+                $pr_id = (int) str_replace('pack_', '', $key);
+                $parsedLines[$pr_id]['pack'] = (int) $value;
+            } elseif (str_starts_with($key, 'item_')) {
+                $pr_id = (int) str_replace('item_', '', $key);
+                $parsedLines[$pr_id]['tedad'] = (int) $value;
+            } elseif (str_starts_with($key, 'price_')) {
+                $pr_id = (int) str_replace('price_', '', $key);
+                $parsedLines[$pr_id]['price'] = (int) str_replace(',', '', (string) $value);
+            } elseif (str_starts_with($key, 'discount_')) {
+                $pr_id = (int) str_replace('discount_', '', $key);
+                $parsedLines[$pr_id]['discount'] = (float) $value;
+            }
+        }
+
+        foreach ($parsedLines as $pr_id => $line) {
+            $pack = (int) ($line['pack'] ?? 0);
+            $tedad = (int) ($line['tedad'] ?? 0);
+
+            if ($pack <= 0 && $tedad <= 0) {
+                unset($parsedLines[$pr_id]);
+                continue;
+            }
+
+            $Product = Product::find($pr_id);
+            if (!$Product) {
+                unset($parsedLines[$pr_id]);
+                continue;
+            }
+
+            if ($Product->resolveOrderQuantityMode() === 'none' && ($pack > 0 || $tedad > 0)) {
+                $fixedQty = $limitService->resolveSubmittedQuantities($Product, $pack, $tedad);
+                $pack = $fixedQty['pack'];
+                $tedad = $fixedQty['tedad'];
+                $parsedLines[$pr_id]['pack'] = $pack;
+                $parsedLines[$pr_id]['tedad'] = $tedad;
+            }
+
+            $unitPrice = (int) ($line['price'] ?? $Product->price);
+            $discountPercent = (float) ($line['discount'] ?? 0);
+            $lineGross = $limitService->lineGrossRials($Product, $pack, $tedad, $unitPrice);
+            $discountAmount = (int) round(($lineGross * $discountPercent) / 100);
+            $lineNet = $lineGross - $discountAmount;
+            $taxAmount = (int) round(($lineNet * (int) $Product->tax) / 100);
+            $orderTotalRials += $lineNet + $taxAmount;
+
+            $validationError = $limitService->validateLine($user, $Product, $Customer, $discountPercent, $lineGross);
+            if ($validationError) {
+                Alert::warning('خطا در ثبت سفارش', $validationError);
+
+                return back()->withInput();
+            }
+        }
+
+        if (empty($parsedLines)) {
+            Alert::warning('خطا در ثبت سفارش', 'برای ثبت فاکتور حداقل باید یک محصول را انتخاب نمایید');
+
+            return back()->withInput();
+        }
+
+        $purchaseError = $limitService->validatePurchaseAmount($Customer, $orderTotalRials);
+        if ($purchaseError) {
+            Alert::warning('خطا در ثبت سفارش', $purchaseError);
+
+            return back()->withInput();
+        }
 
         $LastInvoice = DB::table('pishfactors')->orderBy('id', 'desc')->first();
         if ($LastInvoice) {
@@ -909,35 +981,16 @@ class InvoiceController extends Controller
             'invoiceID' => $LastInvoice + 1
         ]);
 
-        foreach ($_POST as $key => $value) {
-            if ($value != null && $value != "" && $value != 0) {
-                if (str_starts_with($key, 'pack_')) {
-                    $pr_id = str_replace("pack_", "", $key);
-                    $Product = Product::find($pr_id);
-                    PishFactorItems::create([
-                        'pishfactor_id' => $Pishfactor->id,
-                        'pr_id' => $pr_id,
-                        'pack' => $value,
-                        'tedad' => isset($_POST["item_$pr_id"]) ? $_POST["item_$pr_id"] : 0,
-                        'price' => isset($_POST["price_$pr_id"]) ? intval(str_replace(',', '', $_POST["price_$pr_id"])) : $Product->price,
-                        'discount' => isset($_POST["discount_$pr_id"]) ? $_POST["discount_$pr_id"] : $Product->price,
-                    ]);
-                } elseif (str_starts_with($key, 'item_')) {
-                    $pr_id = str_replace("item_", "", $key);
-                    $Product = Product::find($pr_id);
-                    $checkitem = PishFactorItems::where('pr_id', $pr_id)->where('pishfactor_id', $Pishfactor->id)->count();
-                    if ($checkitem == 0) {
-                        PishFactorItems::create([
-                            'pishfactor_id' => $Pishfactor->id,
-                            'pr_id' => $pr_id,
-                            'pack' => isset($_POST["pack_$pr_id"]) ? $_POST["pack_$pr_id"] : 0,
-                            'tedad' => $value,
-                            'price' => isset($_POST["price_$pr_id"]) ? intval(str_replace(',', '', $_POST["price_$pr_id"])) : $Product->price,
-                            'discount' => isset($_POST["discount_$pr_id"]) ? $_POST["discount_$pr_id"] : $Product->price,
-                        ]);
-                    }
-                }
-            }
+        foreach ($parsedLines as $pr_id => $line) {
+            $Product = Product::find($pr_id);
+            PishFactorItems::create([
+                'pishfactor_id' => $Pishfactor->id,
+                'pr_id' => $pr_id,
+                'pack' => (int) ($line['pack'] ?? 0),
+                'tedad' => (int) ($line['tedad'] ?? 0),
+                'price' => (int) ($line['price'] ?? $Product->price),
+                'discount' => (float) ($line['discount'] ?? 0),
+            ]);
         }
 
         $factorItems = PishFactorItems::where('pishfactor_id', $Pishfactor->id)->get();

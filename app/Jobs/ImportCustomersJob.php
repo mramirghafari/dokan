@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Scopes\TenantScope;
 use App\Services\CustomerBulkImportService;
 use App\Services\DataExchangeService;
+use App\Services\SpreadsheetImportReader;
 use App\Services\TenantContextService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -42,78 +43,52 @@ class ImportCustomersJob implements ShouldQueue
     public function handle(
         CustomerBulkImportService $importService,
         DataExchangeService $exchangeService,
-        TenantContextService $tenantContext
+        TenantContextService $tenantContext,
+        SpreadsheetImportReader $spreadsheetReader
     ): void {
         $run = DataExchangeRun::query()->findOrFail($this->exchangeRunId);
         $user = User::query()->findOrFail($this->userId);
         $tenantId = $run->tenant_id ?: $tenantContext->tenantId($user);
 
-        TenantScope::forTenant($tenantId, function () use ($importService, $exchangeService, $run, $user) {
+        TenantScope::forTenant($tenantId, function () use ($importService, $exchangeService, $spreadsheetReader, $run, $user) {
             try {
-                $rows = $this->readRows($this->storagePath);
+                if (!Storage::disk('local')->exists($this->storagePath)) {
+                    throw new \RuntimeException('Import file not found: ' . $this->storagePath);
+                }
+
+                $absolutePath = Storage::disk('local')->path($this->storagePath);
+                $rows = $spreadsheetReader->readAssocRows($absolutePath);
+                $importService->validateImportStructure($rows);
                 $summary = $importService->importRows($rows, $user, array_merge($this->options, [
                     'organization_id' => $run->organization_id,
+                    'exchange_run_id' => $run->id,
                 ]));
+
+                $successRows = (int) $summary['created'] + (int) $summary['updated'];
+                $failedRows = (int) $summary['failed'] + (int) $summary['skipped'];
+
+                if ($successRows === 0 && $failedRows > 0) {
+                    $exchangeService->fail(
+                        $run,
+                        $importService->buildResultMessage($summary, $rows),
+                        $summary
+                    );
+
+                    return;
+                }
 
                 $exchangeService->finish(
                     $run,
                     (int) $summary['total'],
-                    (int) $summary['created'] + (int) $summary['updated'],
-                    (int) $summary['failed'] + (int) $summary['skipped'],
+                    $successRows,
+                    $failedRows,
                     $summary
                 );
             } catch (\Throwable $exception) {
                 $exchangeService->fail($run, $exception->getMessage());
-                throw $exception;
+            } finally {
+                Storage::disk('local')->delete($this->storagePath);
             }
         });
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function readRows(string $storagePath): array
-    {
-        if (!Storage::disk('local')->exists($storagePath)) {
-            throw new \RuntimeException('Import file not found: ' . $storagePath);
-        }
-
-        $absolutePath = Storage::disk('local')->path($storagePath);
-        $extension = strtolower(pathinfo($absolutePath, PATHINFO_EXTENSION));
-
-        if ($extension === 'json') {
-            $decoded = json_decode((string) file_get_contents($absolutePath), true);
-
-            return is_array($decoded['rows'] ?? null) ? $decoded['rows'] : (is_array($decoded) ? $decoded : []);
-        }
-
-        $handle = fopen($absolutePath, 'r');
-
-        if ($handle === false) {
-            throw new \RuntimeException('Unable to read import file.');
-        }
-
-        $header = fgetcsv($handle);
-
-        if (!is_array($header)) {
-            fclose($handle);
-
-            return [];
-        }
-
-        $header = array_map(fn ($column) => trim((string) $column), $header);
-        $rows = [];
-
-        while (($line = fgetcsv($handle)) !== false) {
-            if ($line === [null] || $line === false) {
-                continue;
-            }
-
-            $rows[] = array_combine($header, array_pad($line, count($header), null));
-        }
-
-        fclose($handle);
-
-        return $rows;
     }
 }

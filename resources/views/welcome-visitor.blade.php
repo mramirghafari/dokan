@@ -12,19 +12,12 @@ use Hekmatinasser\Verta\Verta; ?>
     <title>پیشخوان دکان دارمینو</title>
     <meta content="" name="description" />
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet" />
-    <!-- Core CSS -->
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><!-- Icons -->
+<!-- Core CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/apex-charts/apex-charts.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/swiper/swiper.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables.bootstrap5.css" rel="stylesheet" />
@@ -34,10 +27,7 @@ use Hekmatinasser\Verta\Verta; ?>
         rel="stylesheet" />
     <!-- Page CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/pages/cards-advance.css" rel="stylesheet" />
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
@@ -77,13 +67,13 @@ use Hekmatinasser\Verta\Verta; ?>
                             @if (\App\Services\TenantSettings::enabled('feature_route_management'))
                                 <div class="mb-4 col-sm-6 col-12">
                                     <a class="btn btn-primary waves-effect waves-light w-100"
-                                        href="{{ route('tasks.create') }}"><i class="ti ti-plus me-md-2"></i> ثبت مسیر
+                                        href="{{ route('tasks.create') }}"><x-ui.icon name="plus" class="me-md-2" /> ثبت مسیر
                                         جدید</a>
                                 </div>
                             @endif
                             <div class="mb-4 col-sm-6 col-12">
                                 <a class="btn btn-primary waves-effect waves-light w-100"
-                                    href="{{ route('products.index') }}"><i class="ti ti-plus me-md-2"></i> ثبت سفارش
+                                    href="{{ route('products.index') }}"><x-ui.icon name="plus" class="me-md-2" /> ثبت سفارش
                                     جدید</a>
                             </div>
                         </div>
@@ -293,7 +283,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                             <div class="col-12 col-sm-4">
                                                 <div class="d-flex gap-2 align-items-center">
                                                     <div class="badge rounded bg-label-primary p-1">
-                                                        <i class="ti ti-currency-dollar ti-sm"></i>
+                                                        <x-ui.icon name="currency-dollar" class="ti-sm" />
                                                     </div>
                                                     <h6 class="mb-0">فروش امروز</h6>
                                                 </div>
@@ -307,7 +297,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                             <div class="col-12 col-sm-4">
                                                 <div class="d-flex gap-2 align-items-center">
                                                     <div class="badge rounded bg-label-info p-1">
-                                                        <i class="ti ti-chart-pie-2 ti-sm"></i>
+                                                        <x-ui.icon name="chart-pie-2" class="ti-sm" />
                                                     </div>
                                                     <h6 class="mb-0">فروش هفته</h6>
                                                 </div>
@@ -321,7 +311,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                             <div class="col-12 col-sm-4">
                                                 <div class="d-flex gap-2 align-items-center">
                                                     <div class="badge rounded bg-label-danger p-1">
-                                                        <i class="ti ti-brand-paypal ti-sm"></i>
+                                                        <x-ui.icon name="brand-paypal" class="ti-sm" />
                                                     </div>
                                                     <h6 class="mb-0">فروش ماه</h6>
                                                 </div>
@@ -357,7 +347,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                             <ul class="row p-0 m-0">
                                                 <li class="d-flex col-12 gap-3 align-items-center mb-lg-3 pb-1">
                                                     <div class="badge rounded bg-label-success p-1">
-                                                        <i class="ti ti-circle-check ti-sm"></i>
+                                                        <x-ui.icon name="circle-check" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">تاریخ شروع و پایان</h6>
@@ -366,7 +356,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                                 </li>
                                                 <li class="d-flex col-12 gap-3 align-items-center pb-1">
                                                     <div class="badge rounded bg-label-danger p-1">
-                                                        <i class="ti ti-clock ti-sm"></i>
+                                                        <x-ui.icon name="clock" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">تاریخ پایان</h6>
@@ -375,7 +365,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                                 </li>
                                                 <li class="d-flex col-12 gap-3 align-items-center mb-lg-3 pt-2 pb-1">
                                                     <div class="badge rounded bg-label-primary p-1">
-                                                        <i class="ti ti-target ti-sm"></i>
+                                                        <x-ui.icon name="target" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">تعداد فاکتورهای تعیین شده</h6>
@@ -388,7 +378,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                                 </li>
                                                 <li class="d-flex col-12 gap-3 align-items-center mb-lg-3 pt-2 pb-1">
                                                     <div class="badge rounded bg-label-success p-1">
-                                                        <i class="ti ti-star ti-sm"></i>
+                                                        <x-ui.icon name="star" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">تعداد فاکتورهای ثبت شده</h6>
@@ -397,7 +387,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                                 </li>
                                                 <li class="d-flex col-12 col-md-12 gap-3 align-items-center pb-1">
                                                     <div class="badge rounded bg-label-success p-1">
-                                                        <i class="ti ti-moneybag ti-sm"></i>
+                                                        <x-ui.icon name="moneybag" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">مجموع درآمد فاکتورها</h6>
@@ -639,11 +629,13 @@ use Hekmatinasser\Verta\Verta; ?>
     <!-- build:js assets/vendor/js/core.js -->
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <!-- endbuild -->
     <!-- Vendors JS -->

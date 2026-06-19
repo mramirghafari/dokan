@@ -124,6 +124,7 @@ class UserController extends Controller
             'password' => bcrypt($request->password)
         ]);
         $user->roles()->sync($request->role_id);
+        app(\App\Services\PanelMembershipService::class)->syncMembership($user, (int) $tenantId, (int) $organizationId ?: null);
         $scopeService->syncUserScopes($user, $tenantId, $this->scopesFromRequest($request, $organizationId), $currentUser->id);
 
         Log::create([
@@ -251,6 +252,12 @@ class UserController extends Controller
             $user->update([
                 'tenants_id' => $request->tenants_id
             ]);
+            app(\App\Services\PanelMembershipService::class)->syncMembership(
+                $user,
+                (int) $request->tenants_id,
+                is_numeric($organizationId) ? (int) $organizationId : null,
+                (int) $user->isAdmin === 1
+            );
         }
         $user->update([
             'name' => $request->name,

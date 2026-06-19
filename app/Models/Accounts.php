@@ -10,7 +10,7 @@ use App\Traits\SyncsTenantColumns;
 class Accounts extends Model
 {
     use HasFactory, SoftDeletes, SyncsTenantColumns;
-    protected $fillable = ['code', 'name', 'level', 'type', 'treasury_type', 'account_category', 'detail_type', 'is_control', 'is_system', 'is_treasury', 'cost_center_required', 'floating_detail_required', 'nature', 'account_number', 'card_number', 'iban', 'branch', 'bank_name', 'currency_type', 'opening_balance', 'isActive', 'parent_id', 'organization_id', 'tenants_id', 'tenant_id', 'created_by'];
+    protected $fillable = ['code', 'name', 'level', 'type', 'treasury_type', 'account_category', 'asset_class', 'asset_type', 'detail_type', 'is_control', 'is_system', 'is_treasury', 'cost_center_required', 'floating_detail_required', 'nature', 'account_number', 'card_number', 'iban', 'branch', 'bank_name', 'currency_type', 'opening_balance', 'isActive', 'parent_id', 'organization_id', 'tenants_id', 'tenant_id', 'created_by'];
 
     protected $casts = [
         'is_control' => 'boolean',
@@ -39,5 +39,20 @@ class Accounts extends Model
             'terminal' => 'کارتخوان / درگاه',
             default => 'حساب عملیاتی',
         };
+    }
+
+    public function assetClassLabel(): ?string
+    {
+        if (!$this->asset_class || !$this->account_category) {
+            return null;
+        }
+
+        return config("standard_chart_of_accounts.sub_classes.{$this->account_category}.{$this->asset_class}");
+    }
+
+    public function assetTypeLabel(): ?string
+    {
+        // asset_type مستقیماً نام حساب کل استاندارد انتخاب‌شده را نگه می‌دارد.
+        return $this->asset_type ?: null;
     }
 }

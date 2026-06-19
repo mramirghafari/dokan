@@ -81,6 +81,8 @@ class RoleController extends Controller
         $role->update([
             'title' => $request->title,
             'description' => $request->description,
+            'max_discount_percent' => $request->filled('max_discount_percent') ? $request->max_discount_percent : null,
+            'max_discount_amount' => $request->filled('max_discount_amount') ? $request->max_discount_amount : null,
             'tenant_id' => $tenantId,
             'scope_type' => $role->scope_type ?: 'tenant',
             'isActive' => $isActive

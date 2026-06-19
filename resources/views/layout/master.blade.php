@@ -7,19 +7,12 @@
     <title>پیشخوان دکان دارمینو</title>
     <meta content="" name="description"/>
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/>
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet"/>
-    <!-- Core CSS -->
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/><!-- Icons -->
+<!-- Core CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet"/>
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/apex-charts/apex-charts.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/swiper/swiper.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables.bootstrap5.css" rel="stylesheet"/>
@@ -27,10 +20,7 @@
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css" rel="stylesheet"/>
     <!-- Page CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/pages/cards-advance.css" rel="stylesheet"/>
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet"/>
@@ -86,7 +76,7 @@
                                             <div class="col-12 col-sm-4">
                                                 <div class="d-flex gap-2 align-items-center">
                                                     <div class="badge rounded bg-label-primary p-1">
-                                                        <i class="ti ti-currency-dollar ti-sm"></i>
+                                                        <x-ui.icon name="currency-dollar" class="ti-sm" />
                                                     </div>
                                                     <h6 class="mb-0">فروش امروز</h6>
                                                 </div>
@@ -106,7 +96,7 @@
                                             <div class="col-12 col-sm-4">
                                                 <div class="d-flex gap-2 align-items-center">
                                                     <div class="badge rounded bg-label-info p-1">
-                                                        <i class="ti ti-chart-pie-2 ti-sm"></i>
+                                                        <x-ui.icon name="chart-pie-2" class="ti-sm" />
                                                     </div>
                                                     <h6 class="mb-0">فروش هفته</h6>
                                                 </div>
@@ -126,7 +116,7 @@
                                             <div class="col-12 col-sm-4">
                                                 <div class="d-flex gap-2 align-items-center">
                                                     <div class="badge rounded bg-label-danger p-1">
-                                                        <i class="ti ti-brand-paypal ti-sm"></i>
+                                                        <x-ui.icon name="brand-paypal" class="ti-sm" />
                                                     </div>
                                                     <h6 class="mb-0">فروش ماه</h6>
                                                 </div>
@@ -159,7 +149,7 @@
                                     </div>
                                     <div class="dropdown">
                                         <button aria-expanded="false" aria-haspopup="true" class="btn p-0" data-bs-toggle="dropdown" id="supportTrackerMenu" type="button">
-                                            <i class="ti ti-dots-vertical ti-sm text-muted"></i>
+                                            <x-ui.icon name="dots-vertical" class="ti-sm text-muted" />
                                         </button>
                                         <div aria-labelledby="supportTrackerMenu" class="dropdown-menu dropdown-menu-end">
                                             <a class="dropdown-item" href="javascript:void(0);">بر اساس تعداد فروش</a>
@@ -177,7 +167,7 @@
                                             <ul class="p-0 m-0">
                                                 <li class="d-flex gap-3 align-items-center mb-lg-3 pt-2 pb-1">
                                                     <div class="badge rounded bg-label-primary p-1">
-                                                        <i class="ti ti-ticket ti-sm"></i>
+                                                        <x-ui.icon name="ticket" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">مسیرهای فعال</h6>
@@ -186,7 +176,7 @@
                                                 </li>
                                                 <li class="d-flex gap-3 align-items-center mb-lg-3 pb-1">
                                                     <div class="badge rounded bg-label-info p-1">
-                                                        <i class="ti ti-circle-check ti-sm"></i>
+                                                        <x-ui.icon name="circle-check" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">تعداد مشتریان</h6>
@@ -195,7 +185,7 @@
                                                 </li>
                                                 <li class="d-flex gap-3 align-items-center pb-1">
                                                     <div class="badge rounded bg-label-warning p-1">
-                                                        <i class="ti ti-clock ti-sm"></i>
+                                                        <x-ui.icon name="clock" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">فاکتورهای ثبت شده</h6>
@@ -222,7 +212,7 @@
                                     </div>
                                     <div class="dropdown">
                                         <button aria-expanded="false" aria-haspopup="true" class="btn p-0" data-bs-toggle="dropdown" id="salesByCountry" type="button">
-                                            <i class="ti ti-dots-vertical ti-sm text-muted"></i>
+                                            <x-ui.icon name="dots-vertical" class="ti-sm text-muted" />
                                         </button>
                                         <div aria-labelledby="salesByCountry" class="dropdown-menu dropdown-menu-end">
                                             <a class="dropdown-item" href="javascript:void(0);">بر اساس روز</a>
@@ -339,7 +329,7 @@
                                     </div>
                                     <div class="dropdown">
                                         <button aria-expanded="false" aria-haspopup="true" class="btn p-0" data-bs-toggle="dropdown" id="MonthlyCampaign" type="button">
-                                            <i class="ti ti-dots-vertical ti-sm text-muted"></i>
+                                            <x-ui.icon name="dots-vertical" class="ti-sm text-muted" />
                                         </button>
                                         <div aria-labelledby="MonthlyCampaign" class="dropdown-menu dropdown-menu-end">
                                             <a class="dropdown-item" href="javascript:void(0);">بر اساس روز</a>
@@ -352,7 +342,7 @@
                                     <ul class="p-0 m-0">
                                         <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
                                             <div class="badge bg-label-success rounded p-2">
-                                                <i class="ti ti-user ti-sm"></i>
+                                                <x-ui.icon name="user" class="ti-sm" />
                                             </div>
                                             <div class="d-flex justify-content-between w-100 flex-wrap">
                                                 <h6 class="mb-0 ms-3">سیده لیلا محمودی</h6>
@@ -364,7 +354,7 @@
                                         </li>
                                         <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
                                             <div class="badge bg-label-info rounded p-2">
-                                                <i class="ti ti-user ti-sm"></i>
+                                                <x-ui.icon name="user" class="ti-sm" />
                                             </div>
                                             <div class="d-flex justify-content-between w-100 flex-wrap">
                                                 <h6 class="mb-0 ms-3">هادی خاوری</h6>
@@ -376,7 +366,7 @@
                                         </li>
                                         <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
                                             <div class="badge bg-label-success rounded p-2">
-                                                <i class="ti ti-user ti-sm"></i>
+                                                <x-ui.icon name="user" class="ti-sm" />
                                             </div>
                                             <div class="d-flex justify-content-between w-100 flex-wrap">
                                                 <h6 class="mb-0 ms-3">سیده لیلا محمودی</h6>
@@ -388,7 +378,7 @@
                                         </li>
                                         <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
                                             <div class="badge bg-label-info rounded p-2">
-                                                <i class="ti ti-user ti-sm"></i>
+                                                <x-ui.icon name="user" class="ti-sm" />
                                             </div>
                                             <div class="d-flex justify-content-between w-100 flex-wrap">
                                                 <h6 class="mb-0 ms-3">هادی خاوری</h6>
@@ -400,7 +390,7 @@
                                         </li>
                                         <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
                                             <div class="badge bg-label-success rounded p-2">
-                                                <i class="ti ti-user ti-sm"></i>
+                                                <x-ui.icon name="user" class="ti-sm" />
                                             </div>
                                             <div class="d-flex justify-content-between w-100 flex-wrap">
                                                 <h6 class="mb-0 ms-3">سیده لیلا محمودی</h6>
@@ -426,7 +416,7 @@
                                     </div>
                                     <div class="dropdown">
                                         <button aria-expanded="false" aria-haspopup="true" class="btn p-0" data-bs-toggle="dropdown" id="MonthlyCampaign" type="button">
-                                            <i class="ti ti-dots-vertical ti-sm text-muted"></i>
+                                            <x-ui.icon name="dots-vertical" class="ti-sm text-muted" />
                                         </button>
                                         <div aria-labelledby="MonthlyCampaign" class="dropdown-menu dropdown-menu-end">
                                             <a class="dropdown-item" href="javascript:void(0);">بر اساس روز</a>
@@ -439,7 +429,7 @@
                                     <ul class="p-0 m-0">
                                         <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
                                             <div class="badge bg-label-success rounded p-2">
-                                                <i class="ti ti-user ti-sm"></i>
+                                                <x-ui.icon name="user" class="ti-sm" />
                                             </div>
                                             <div class="d-flex justify-content-between w-100 flex-wrap">
                                                 <h6 class="mb-0 ms-3">سیده لیلا محمودی</h6>
@@ -451,7 +441,7 @@
                                         </li>
                                         <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
                                             <div class="badge bg-label-info rounded p-2">
-                                                <i class="ti ti-user ti-sm"></i>
+                                                <x-ui.icon name="user" class="ti-sm" />
                                             </div>
                                             <div class="d-flex justify-content-between w-100 flex-wrap">
                                                 <h6 class="mb-0 ms-3">هادی خاوری</h6>
@@ -463,7 +453,7 @@
                                         </li>
                                         <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
                                             <div class="badge bg-label-success rounded p-2">
-                                                <i class="ti ti-user ti-sm"></i>
+                                                <x-ui.icon name="user" class="ti-sm" />
                                             </div>
                                             <div class="d-flex justify-content-between w-100 flex-wrap">
                                                 <h6 class="mb-0 ms-3">سیده لیلا محمودی</h6>
@@ -475,7 +465,7 @@
                                         </li>
                                         <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
                                             <div class="badge bg-label-info rounded p-2">
-                                                <i class="ti ti-user ti-sm"></i>
+                                                <x-ui.icon name="user" class="ti-sm" />
                                             </div>
                                             <div class="d-flex justify-content-between w-100 flex-wrap">
                                                 <h6 class="mb-0 ms-3">هادی خاوری</h6>
@@ -487,7 +477,7 @@
                                         </li>
                                         <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
                                             <div class="badge bg-label-success rounded p-2">
-                                                <i class="ti ti-user ti-sm"></i>
+                                                <x-ui.icon name="user" class="ti-sm" />
                                             </div>
                                             <div class="d-flex justify-content-between w-100 flex-wrap">
                                                 <h6 class="mb-0 ms-3">سیده لیلا محمودی</h6>
@@ -544,7 +534,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -552,7 +542,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -574,7 +564,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -582,7 +572,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -604,7 +594,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -612,7 +602,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -634,7 +624,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -642,7 +632,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -664,7 +654,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -672,7 +662,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -694,7 +684,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -702,7 +692,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -724,7 +714,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -732,7 +722,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -785,7 +775,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -793,7 +783,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -815,7 +805,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -823,7 +813,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -845,7 +835,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -853,7 +843,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -875,7 +865,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -883,7 +873,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -905,7 +895,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -913,7 +903,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -935,7 +925,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -943,7 +933,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -965,7 +955,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="javascript:;" class="dropdown-item">جزئیات</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">بایگانی</a></li>
@@ -973,7 +963,7 @@
                                                         <li><a href="javascript:;" class="dropdown-item text-danger delete-record">حذف</a></li>
                                                     </ul>
                                                 </div>
-                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>
+                                                <a href="javascript:;" class="btn btn-sm btn-icon item-edit"><x-ui.icon name="pencil" class="text-primary" /></a>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -1001,13 +991,13 @@
 <!-- build:js assets/vendor/js/core.js -->
 <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script><script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
 <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
 <!-- endbuild -->
+@include('partials.ui-icons-runtime')
 <!-- Vendors JS -->
 <script src="{{ asset('assets/') }}/vendor/libs/apex-charts/apexcharts.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/swiper/swiper.js"></script>

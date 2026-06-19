@@ -65,14 +65,14 @@
                                             <form action="{{ route('stocks.restore',$stock->id) }}" method="POST" onsubmit="return confirm('آیا از بازگردانی رکورد مورد نظر اطمینان دارید؟');">
                                                 @csrf
                                                 <button type="submit" style="font-size:20px;border:none;background-color:transparent;float:right">
-                                                    <i class="fa fa-refresh" style="color:#04a9f5;"></i>
+                                                    <x-ui.icon name="fa-refresh" />
                                                 </button>
                                             </form>
                                             <form action="{{ route('stocks.trashed.post',$stock->id) }}" method="POST" onsubmit="return confirm('آیا از حذف رکورد مورد نظر اطمینان دارید؟');">
                                                 @method('delete')
                                                 @csrf
                                                 <button type="submit" style="font-size:20px;border:none;background-color:transparent;float:right">
-                                                    <i class="fa fa-trash" style="color:#dc3545;"></i>
+                                                    <x-ui.icon name="fa-trash" />
                                                 </button>
                                             </form>
                                     </td>

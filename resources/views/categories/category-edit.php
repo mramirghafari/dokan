@@ -7,29 +7,19 @@
     <title>ویرایش دسته بندی - دکان دارمینو</title>
     <meta content="" name="description"/>
     <!-- Favicon -->
-    <link href="../assets/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/>
-    <!-- Icons -->
-    <link href="../assets/vendor/fonts/fontawesome.css" rel="stylesheet"/>
-    <link href="../assets/vendor/fonts/tabler-icons.css" rel="stylesheet"/>
-    <link href="../assets/vendor/fonts/flag-icons.css" rel="stylesheet"/>
-    <!-- Core CSS -->
+    <link href="../assets/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/><!-- Icons -->
+<!-- Core CSS -->
     <link href="../assets/vendor/css/rtl/core.css" rel="stylesheet"/>
     <link href="../assets/vendor/css/rtl/theme-default.css" rel="stylesheet"/>
     <link href="../assets/css/demo.css" rel="stylesheet"/>
-    <!-- Vendors CSS -->
-    <link href="../assets/vendor/libs/node-waves/node-waves.css" rel="stylesheet"/>
-    <link href="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet"/>
-    <link href="../assets/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
+    <!-- Vendors CSS --><link href="../assets/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
     <link href="../assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" rel="stylesheet"/>
     <link href="../assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" rel="stylesheet"/>
     <link href="../assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css" rel="stylesheet"/>
 
     <!-- Page CSS -->
     <link href="../assets/vendor/libs/select2/select2.css" rel="stylesheet"/>
-    <!-- Helpers -->
-    <script src="../assets/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="../assets/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="../assets/css/rtl.css" rel="stylesheet"/>
@@ -214,7 +204,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-inline-block">
-                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>
+                                                    <a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><x-ui.icon name="dots-vertical" class="text-primary" /></a>
                                                     <ul class="dropdown-menu dropdown-menu-end m-0">
                                                         <li><a href="category-edit.php" class="dropdown-item">ویرایش</a></li>
                                                         <li><a href="javascript:;" class="dropdown-item">غیرفعال</a></li>
@@ -251,11 +241,13 @@
 <!-- build:js assets/vendor/js/core.js -->
 <script src="../assets/vendor/libs/jquery/jquery.js"></script>
 <script src="../assets/vendor/libs/popper/popper.js"></script>
-<script src="../assets/vendor/js/bootstrap.js"></script>
-<script src="../assets/vendor/libs/node-waves/node-waves.js"></script>
-<script src="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+<script src="../assets/vendor/js/bootstrap.js">
+</script>
 <script src="../assets/vendor/libs/hammer/hammer.js"></script>
 <script src="../assets/vendor/libs/typeahead-js/typeahead.js"></script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
 <script src="../assets/vendor/js/menu.js"></script>
 <!-- endbuild -->
 <script src="../assets/vendor/libs/jquery-sticky/jquery-sticky.js"></script>

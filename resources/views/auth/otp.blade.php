@@ -7,28 +7,18 @@
     <title>کد پیامکی ورود - دکان دارمینو</title>
     <meta content="" name="description"/>
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/>
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet"/>
-    <!-- Core CSS -->
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/><!-- Icons -->
+<!-- Core CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet"/>
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
     <!-- Vendor -->
     <link href="{{ asset('assets/') }}/vendor/libs/@form-validation/form-validation.css" rel="stylesheet"/>
     <!-- Page CSS -->
     <!-- Page -->
     <link href="{{ asset('assets/') }}/vendor/css/pages/page-auth.css" rel="stylesheet"/>
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet"/>
@@ -116,12 +106,14 @@
 <!-- build:js assets/vendor/js/core.js -->
 <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
 <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/i18n/i18n.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
 <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
 <!-- endbuild -->
 <!-- Vendors JS -->
@@ -133,27 +125,42 @@
 <!-- Page JS -->
 <script src="{{ asset('assets/') }}/js/pages-auth.js"></script>
 <script>
-    const inputs = document.querySelectorAll('.otp-input');
+    (function () {
+        var loadingText = 'در حال بررسی';
+        var form = document.getElementById('otpForm');
+        var submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
-    inputs.forEach((input, index) => {
-        input.addEventListener('input', () => {
-            if (input.value.length === 1 && index < inputs.length - 1) {
-                inputs[index + 1].focus();
+        function setSubmitLoading() {
+            if (!submitBtn || submitBtn.disabled) {
+                return;
             }
+            submitBtn.disabled = true;
+            submitBtn.textContent = loadingText;
+        }
 
-            if(index == inputs.length - 1) {
-                $('.sbt').html('در حال بررسی');
-                $('.sbt').attr('disabled','disabled');
-                $('#otpForm').submit();
-            }
+        if (form) {
+            form.addEventListener('submit', setSubmitLoading);
+        }
+
+        var inputs = document.querySelectorAll('.otp-input');
+        inputs.forEach(function (input, index) {
+            input.addEventListener('input', function () {
+                if (input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+
+                if (index === inputs.length - 1 && input.value.length === 1) {
+                    form.submit();
+                }
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Backspace' && input.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
         });
-
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && input.value === '' && index > 0) {
-                inputs[index - 1].focus();
-            }
-        });
-    });
+    })();
 </script>
 </body>
 

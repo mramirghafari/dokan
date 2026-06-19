@@ -9,29 +9,19 @@
     <title>ورود - دکان دارمینو</title>
     <meta content="" name="description" />
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet" />
-    <!-- Core CSS -->
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><!-- Icons -->
+<!-- Core CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet" />
     <!-- Vendor -->
     <link
         href="{{ asset('assets/') }}/vendor/libs/@form-validation/form-validation.css" rel="stylesheet"/>
     <!-- Page CSS -->
     <!-- Page -->
     <link href="{{ asset('assets/') }}/vendor/css/pages/page-auth.css" rel="stylesheet"/>
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet"/>
@@ -40,10 +30,193 @@
         ul.alert.alert-danger {
             list-style-type: none;
         }
+
+        body.login-page .authentication-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.login-page .authentication-inner {
+            max-width: 29rem;
+            width: 100%;
+        }
+
+        body.login-page .card {
+            border: 1px solid rgba(84, 60, 146, 0.12);
+            border-radius: 1rem;
+            box-shadow: 0 0.75rem 2rem rgba(67, 53, 86, 0.12);
+        }
+
+        body.login-page .card-body {
+            padding: 2rem 1.75rem 1.5rem;
+        }
+
+        body.login-page .login-subtitle {
+            color: #6f6b7d;
+            margin-bottom: 1.4rem;
+            font-size: 0.93rem;
+        }
+
+        body.login-page .login-tabs-wrap {
+            margin-bottom: 1.55rem;
+        }
+
+        body.login-page .login-tabs {
+            border: 0;
+            gap: 0.42rem;
+            margin-bottom: 0;
+            background: linear-gradient(180deg, rgba(84, 60, 146, 0.09) 0%, rgba(84, 60, 146, 0.06) 100%);
+            border: 1px solid rgba(84, 60, 146, 0.14);
+            border-radius: 0.95rem;
+            padding: 0.4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        body.login-page .login-tabs .nav-item {
+            margin: 0;
+            display: block;
+            padding: 0.04rem;
+        }
+
+        body.login-page .login-tabs .nav-link {
+            border: 0;
+            border-radius: 0.72rem;
+            color: #6f6b7d;
+            font-weight: 650;
+            font-size: 0.89rem;
+            line-height: 1.35;
+            padding: 0.7rem 0.95rem;
+            margin: 0;
+            width: 100%;
+            text-align: center;
+            transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        body.login-page .login-tabs .nav-link:hover {
+            color: #4a347f;
+            background-color: rgba(255, 255, 255, 0.55);
+        }
+
+        body.login-page .login-tabs .nav-link.active {
+            background: #ffffff;
+            color: #432e75;
+            box-shadow: 0 0.24rem 0.75rem rgba(84, 60, 146, 0.14);
+            transform: translateY(-1px);
+        }
+
+        body.login-page .login-tabs .nav-link:focus-visible {
+            outline: 2px solid rgba(84, 60, 146, 0.35);
+            outline-offset: 1px;
+            box-shadow: 0 0 0 0.2rem rgba(84, 60, 146, 0.15);
+        }
+
+        body.login-page .login-tab-content {
+            padding-top: 0.6rem;
+        }
+
+        body.login-page .form-label {
+            font-size: 0.88rem;
+            margin-bottom: 0.42rem !important;
+            color: #4b465c;
+        }
+
+        body.login-page .form-control,
+        body.login-page .input-group-text {
+            border-radius: 0.7rem;
+            border-color: rgba(75, 70, 92, 0.24);
+            min-height: 2.9rem;
+        }
+
+        body.login-page .form-control {
+            padding-inline: 0.9rem;
+        }
+
+        body.login-page .input-group-merge .input-group-text {
+            border-right: 0;
+            background: #fff;
+        }
+
+        body.login-page .input-group-merge .form-control:not(:last-child) {
+            border-left: 0;
+        }
+
+        body.login-page .form-control:focus,
+        body.login-page .input-group-text:focus-within,
+        body.login-page .form-check-input:focus,
+        body.login-page .btn:focus-visible,
+        body.login-page .login-helper-link:focus-visible {
+            border-color: #543C92;
+            box-shadow: 0 0 0 0.2rem rgba(84, 60, 146, 0.16);
+            outline: none;
+        }
+
+        body.login-page .form-password-toggle .d-flex {
+            margin-bottom: 0.4rem;
+            align-items: center;
+        }
+
+        body.login-page .login-helper-link {
+            color: #543C92;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: 0.4rem;
+            padding-inline: 0.2rem;
+        }
+
+        body.login-page .login-helper-link:hover {
+            color: #432e75;
+            text-decoration: underline;
+        }
+
+        body.login-page .form-check {
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        body.login-page .form-check-input {
+            margin-top: 0;
+            width: 1rem;
+            height: 1rem;
+            border-color: rgba(75, 70, 92, 0.35);
+        }
+
+        body.login-page .form-check-input:checked {
+            background-color: #543C92;
+            border-color: #543C92;
+        }
+
+        body.login-page .form-check-label {
+            color: #4b465c;
+            font-size: 0.88rem;
+        }
+
+        body.login-page .btn-login-submit {
+            border-radius: 0.75rem;
+            min-height: 2.9rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            box-shadow: 0 0.45rem 1rem rgba(84, 60, 146, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        body.login-page .btn-login-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0.65rem 1.1rem rgba(84, 60, 146, 0.3);
+        }
+
+        body.login-page .btn-login-submit:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 
-<body>
+<body class="login-page">
 <!-- Content -->
 <div class="container-xxl">
     <div class="authentication-wrapper authentication-basic container-p-y">
@@ -54,62 +227,40 @@
                     <!-- Logo -->
                     <div class="app-brand justify-content-center mb-4 mt-2">
                         <a class="app-brand-link gap-2" href="index.html">
-                            <svg width="67" height="71" viewBox="0 0 47 51" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11.8815 14.9595C11.8751 14.0606 11.151 13.3318 10.2545 13.3318C9.35811 13.3318 8.63396 14.0606 8.62758 14.9595V23.4672C8.61801 23.5699 8.60205 23.6694 8.60205 23.7786C8.60205 27.7275 5.5427 30.9315 1.70815 30.9411C1.70177 30.9411 1.68582 30.9411 1.67944 30.9411C1.67306 30.9411 1.66987 30.9443 1.66349 30.9443C1.65392 30.9443 1.64755 30.9443 1.63798 30.9443H1.5965C0.716023 30.97 0.0078125 31.6859 0.0078125 32.5785C0.0078125 33.471 0.716023 34.1869 1.5965 34.2126H1.66349C1.66349 34.2126 1.66349 34.2126 1.67944 34.2126C1.67944 34.2126 1.68264 34.2126 1.68583 34.2126C7.34195 34.2126 11.8879 29.5446 11.8879 23.7786C11.8879 23.7272 11.8879 23.6823 11.8879 23.6309V14.9595H11.8815Z" fill="#543C92"/>
-                                <path d="M4.82349 26.6134C4.82349 27.9521 3.74204 29.0405 2.41175 29.0405C1.08146 29.0405 0 27.9521 0 26.6134C0 25.2746 1.08146 24.1863 2.41175 24.1863C3.74204 24.1863 4.82349 25.2746 4.82349 26.6134Z" fill="#543C92"/>
-                                <path d="M45.4204 3.53346C46.588 3.08078 47.2547 1.96997 46.907 1.04857C46.5593 0.127167 45.3311 -0.258091 44.1571 0.181741L21.2168 8.93344C20.0556 9.39575 19.3952 10.4969 19.7398 11.4151C20.0843 12.3333 21.3093 12.7186 22.4769 12.2884L45.4172 3.53988L45.4204 3.53346Z" fill="#543C92"/>
-                                <path d="M33.8412 12.4617C33.822 12.4617 33.8412 12.4681 33.8093 12.4681H33.7678C32.8235 12.497 32.0643 13.2675 32.0643 14.2242C32.0643 15.1809 32.8235 15.9514 33.7678 15.9803H33.7901C33.7901 15.9803 33.8156 15.9803 33.8284 15.9803C33.8316 15.9803 33.8348 15.9803 33.8412 15.9803C33.8475 15.9803 33.8507 15.9803 33.8539 15.9803C37.9852 15.9868 41.3093 19.4444 41.3093 23.6983C41.3093 27.9521 38.0171 31.4002 33.889 31.4098C33.8794 31.4098 33.8667 31.4098 33.8571 31.4098C33.8507 31.4098 33.8444 31.413 33.838 31.413C33.8284 31.413 33.8188 31.413 33.8093 31.413H33.7646C32.8171 31.4419 32.0547 32.2124 32.0547 33.1723C32.0547 34.1322 32.8171 34.9027 33.7646 34.9316H33.8348C33.8348 34.9316 33.8348 34.9316 33.8507 34.9349H33.8603C39.9503 34.9349 44.844 29.9105 44.844 23.7015C44.844 17.4925 39.9248 12.4681 33.8348 12.4681" fill="#543C92"/>
-                                <path d="M40.0728 37.8274C40.0728 37.8274 40.0728 37.8274 40.06 37.8274H40.0409C39.6326 37.8403 39.3008 38.1742 39.3008 38.5883C39.3008 39.0025 39.6294 39.3363 40.0409 39.3492H40.0505C40.0505 39.3492 40.0632 39.3492 40.0664 39.3492C40.0664 39.3492 40.0664 39.3492 40.0728 39.3492C40.0728 39.3492 40.076 39.3492 40.0792 39.3492C41.872 39.3492 43.314 40.8517 43.314 42.6977C43.314 44.5437 41.8848 46.0398 40.0951 46.043C40.0919 46.043 40.0856 46.043 40.0824 46.043H40.076C40.0728 46.043 40.0664 46.043 40.0632 46.043H40.0441C39.6326 46.0558 39.304 46.3897 39.304 46.8071C39.304 47.2244 39.6357 47.5583 40.0441 47.5712H40.076C40.076 47.5712 40.076 47.5712 40.0824 47.5712C42.7238 47.5712 44.8484 45.3913 44.8484 42.6977C44.8484 40.0041 42.7142 37.8242 40.0728 37.8242V37.8274Z" fill="#543C92"/>
-                                <path d="M38.1591 38.5819C38.1591 38.1614 37.8178 37.821 37.3999 37.821C36.982 37.821 36.6438 38.1614 36.6406 38.5819V46.82C36.647 47.2373 36.982 47.5776 37.3999 47.5776C37.8178 47.5776 38.1527 47.2405 38.1591 46.82V38.5819Z" fill="#543C92"/>
-                                <path d="M25.5079 37.8274C22.8664 37.8274 20.7227 40.0105 20.7227 42.7041C20.7227 42.7554 20.7227 42.7972 20.7227 42.8485C20.7227 42.8582 20.7227 42.8774 20.7227 42.8903V43.0765V46.8263C20.729 47.2436 21.064 47.584 21.4819 47.584C21.8998 47.584 22.2348 47.2469 22.2412 46.8263V46.2677C23.0961 47.0831 24.2414 47.584 25.5047 47.584C28.1461 47.584 30.2899 45.4009 30.2899 42.7073C30.2899 40.0137 28.1461 37.8306 25.5047 37.8306L25.5079 37.8274ZM25.5079 46.0461C23.7118 46.0461 22.2571 44.5469 22.2571 42.7009C22.2571 40.8548 23.7118 39.3556 25.5079 39.3556C27.3039 39.3556 28.7586 40.8548 28.7586 42.7009C28.7586 44.5469 27.3039 46.0461 25.5079 46.0461Z" fill="#543C92"/>
-                                <path d="M1.43127 39.2979C-0.460487 41.2017 -0.479624 44.2709 1.3898 46.1522C2.28304 47.0511 3.44425 47.5102 4.62141 47.5423L4.25773 47.9083C3.96743 48.2101 3.96743 48.6885 4.26411 48.9838C4.5608 49.2792 5.03613 49.2824 5.33281 48.9902L7.93915 46.3705L8.06995 46.2357C8.06995 46.2357 8.09228 46.2164 8.09866 46.2068C8.13694 46.1715 8.16247 46.1426 8.20075 46.104C10.0925 44.2002 10.1116 41.131 8.24222 39.2497C6.3728 37.3684 3.32621 37.3877 1.43127 39.2915V39.2979ZM2.51592 40.3894C3.81431 39.0828 5.89428 39.0603 7.16395 40.3349C8.43363 41.6126 8.40811 43.7058 7.10972 45.0125C5.81134 46.3191 3.73136 46.3416 2.46169 45.0671C1.19201 43.7925 1.21753 41.6961 2.51592 40.3894Z" fill="#543C92"/>
-                                <path d="M35.4983 38.5819C35.4983 38.1614 35.157 37.821 34.7391 37.821C34.3211 37.821 33.983 38.1614 33.9798 38.5819V42.5565C33.9766 42.6046 33.967 42.6528 33.967 42.7009C33.967 44.547 32.5378 46.043 30.7482 46.0462C30.745 46.0462 30.7386 46.0462 30.7354 46.0462H30.729C30.7258 46.0462 30.7195 46.0462 30.7163 46.0462H30.6971C30.2856 46.0591 29.957 46.393 29.957 46.8103C29.957 47.2277 30.2888 47.5616 30.6971 47.5744H30.729C30.729 47.5744 30.729 47.5744 30.7354 47.5744C33.3769 47.5744 35.5015 45.3945 35.5015 42.7009C35.5015 42.6753 35.5015 42.656 35.5015 42.6335V38.5819H35.4983Z" fill="#543C92"/>
-                                <path d="M19.5803 38.5819C19.5803 38.1614 19.239 37.821 18.8211 37.821C18.4032 37.821 18.065 38.1614 18.0618 38.5819V42.5565C18.0586 42.6046 18.0491 42.6528 18.0491 42.7009C18.0491 44.547 16.6199 46.043 14.8302 46.0462C14.827 46.0462 14.8206 46.0462 14.8175 46.0462H14.8111C14.8079 46.0462 14.8015 46.0462 14.7983 46.0462H14.7792C14.3676 46.0591 14.0391 46.393 14.0391 46.8103C14.0391 47.2277 14.3708 47.5616 14.7792 47.5744H14.8111C14.8111 47.5744 14.8111 47.5744 14.8175 47.5744C17.4589 47.5744 19.5835 45.3945 19.5835 42.7009C19.5835 42.6753 19.5835 42.656 19.5835 42.6335V38.5819H19.5803Z" fill="#543C92"/>
-                                <path d="M14.6311 38.5819C14.6311 38.1614 14.2898 37.821 13.8719 37.821C13.454 37.821 13.1158 38.1614 13.1126 38.5819V42.5565C13.1094 42.6046 13.0999 42.6528 13.0999 42.7009C13.0999 44.547 11.6707 46.043 9.881 46.0462C9.87781 46.0462 9.87143 46.0462 9.86824 46.0462H9.86186C9.85867 46.0462 9.85229 46.0462 9.8491 46.0462H9.82996C9.41843 46.0591 9.08984 46.393 9.08984 46.8103C9.08984 47.2277 9.42162 47.5616 9.82996 47.5744H9.86186C9.86186 47.5744 9.86186 47.5744 9.86824 47.5744C12.5097 47.5744 14.6343 45.3945 14.6343 42.7009C14.6343 42.6753 14.6343 42.656 14.6343 42.6335V38.5819H14.6311Z" fill="#543C92"/>
-                                <path d="M15.2626 50.9999C15.9427 50.9999 16.494 50.4451 16.494 49.7607C16.494 49.0763 15.9427 48.5215 15.2626 48.5215C14.5826 48.5215 14.0312 49.0763 14.0312 49.7607C14.0312 50.4451 14.5826 50.9999 15.2626 50.9999Z" fill="#543C92"/>
-                                <path d="M18.3408 50.9999C19.0208 50.9999 19.5722 50.4451 19.5722 49.7607C19.5722 49.0763 19.0208 48.5215 18.3408 48.5215C17.6607 48.5215 17.1094 49.0763 17.1094 49.7607C17.1094 50.4451 17.6607 50.9999 18.3408 50.9999Z" fill="#543C92"/>
-                                <path d="M11.2236 37.8564C11.9037 37.8564 12.455 37.3016 12.455 36.6172C12.455 35.9327 11.9037 35.3779 11.2236 35.3779C10.5435 35.3779 9.99219 35.9327 9.99219 36.6172C9.99219 37.3016 10.5435 37.8564 11.2236 37.8564Z" fill="#543C92"/>
-                                <path d="M21.3201 13.1648C21.3041 13.1648 21.3201 13.1712 21.2914 13.1712H21.2531C20.3694 13.2001 19.658 13.9193 19.658 14.8182C19.658 15.7171 20.3694 16.4363 21.2531 16.4619H21.2754C21.2754 16.4619 21.3009 16.4619 21.3105 16.4619C21.3137 16.4619 21.3169 16.4619 21.3201 16.4619C21.3264 16.4619 21.3296 16.4619 21.3328 16.4619C25.2025 16.4684 28.3161 19.7077 28.3161 23.6919C28.3161 27.676 25.2312 30.9058 21.3647 30.9154C21.3584 30.9154 21.3424 30.9154 21.336 30.9154C21.3296 30.9154 21.3264 30.9186 21.3201 30.9186C21.3105 30.9186 21.3009 30.9186 21.2914 30.9186H21.2499C20.363 30.9443 19.6484 31.6699 19.6484 32.5688C19.6484 33.4677 20.363 34.1901 21.2499 34.2158H21.3169C21.3169 34.2158 21.3169 34.2158 21.3328 34.219C21.3328 34.219 21.336 34.219 21.3392 34.219C27.0432 34.219 31.6306 29.5092 31.6306 23.6951C31.6306 17.8809 27.024 13.1712 21.3169 13.1712L21.3201 13.1648Z" fill="#F9BA16"/>
-                                <path d="M17.1896 14.9723C17.1832 14.0638 16.4527 13.3318 15.5499 13.3318C14.6471 13.3318 13.9165 14.067 13.9102 14.9723V32.3987H13.9133C13.9261 33.3008 14.6535 34.0328 15.5531 34.0328C16.4527 34.0328 17.18 33.304 17.1928 32.3987H17.196V14.9723H17.1896Z" fill="#F9BA16"/>
-                            </svg>
-
+                            <svg width="337" height="190" viewBox="0 0 337 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M231.981 71.3007C231.961 68.3733 229.767 66 227.05 66C224.334 66 222.14 68.3733 222.12 71.3007V99.0068C222.091 99.3413 222.043 99.6654 222.043 100.021C222.043 112.881 212.772 123.315 201.153 123.346C201.133 123.346 201.085 123.346 201.066 123.346C201.046 123.346 201.037 123.357 201.017 123.357C200.988 123.357 200.969 123.357 200.94 123.357H200.814C198.146 123.44 196 125.772 196 128.678C196 131.585 198.146 133.916 200.814 134H201.017C201.017 134 201.017 134 201.066 134C201.066 134 201.075 134 201.085 134C218.224 134 232 118.798 232 100.021C232 99.8536 232 99.7072 232 99.5399V71.3007H231.981Z" fill="#543C92"/>
+                                <path d="M210.352 107.987C210.352 112.18 207.105 115.589 203.11 115.589C199.115 115.589 195.868 112.18 195.868 107.987C195.868 103.794 199.115 100.385 203.11 100.385C207.105 100.385 210.352 103.794 210.352 107.987Z" fill="#543C92"/>
+                                <path d="M332.259 35.6981C335.766 34.2802 337.768 30.801 336.724 27.9151C335.679 25.0291 331.991 23.8225 328.466 25.2001L259.579 52.6115C256.092 54.0595 254.109 57.5085 255.144 60.3844C256.178 63.2603 259.857 64.467 263.363 63.1196L332.25 35.7182L332.259 35.6981Z" fill="#543C92"/>
+                                <path d="M297.487 63.6624C297.429 63.6624 297.487 63.6825 297.391 63.6825H297.266C294.431 63.773 292.151 66.1863 292.151 69.1828C292.151 72.1794 294.431 74.5928 297.266 74.6833H297.333C297.333 74.6833 297.41 74.6833 297.448 74.6833C297.458 74.6833 297.468 74.6833 297.487 74.6833C297.506 74.6833 297.516 74.6833 297.525 74.6833C309.931 74.7034 319.913 85.5332 319.913 98.8568C319.913 112.18 310.026 122.98 297.63 123.01C297.602 123.01 297.563 123.01 297.535 123.01C297.516 123.01 297.496 123.02 297.477 123.02C297.448 123.02 297.42 123.02 297.391 123.02H297.257C294.412 123.111 292.122 125.524 292.122 128.531C292.122 131.537 294.412 133.951 297.257 134.041H297.468C297.468 134.041 297.468 134.041 297.516 134.051H297.544C315.832 134.051 330.527 118.314 330.527 98.8668C330.527 79.4194 315.755 63.6825 297.468 63.6825" fill="#543C92"/>
+                                <path d="M259.889 65.8646C259.841 65.8646 259.889 65.8848 259.803 65.8848H259.688C257.034 65.9753 254.898 68.2277 254.898 71.0433C254.898 73.8588 257.034 76.1113 259.688 76.1917H259.755C259.755 76.1917 259.832 76.1917 259.86 76.1917C259.87 76.1917 259.88 76.1917 259.889 76.1917C259.908 76.1917 259.918 76.1917 259.927 76.1917C271.548 76.2118 280.897 86.3578 280.897 98.8368C280.897 111.316 271.634 121.432 260.023 121.462C260.004 121.462 259.956 121.462 259.937 121.462C259.918 121.462 259.908 121.472 259.889 121.472C259.86 121.472 259.832 121.472 259.803 121.472H259.678C257.015 121.552 254.869 123.825 254.869 126.64C254.869 129.456 257.015 131.718 259.678 131.799H259.88C259.88 131.799 259.88 131.799 259.927 131.809C259.927 131.809 259.937 131.809 259.947 131.809C277.075 131.809 290.85 117.057 290.85 98.8468C290.85 80.6362 277.017 65.8848 259.88 65.8848L259.889 65.8646Z" fill="#F9BA16"/>
+                                <path d="M247.483 71.526C247.463 68.6803 245.27 66.3877 242.559 66.3877C239.848 66.3877 237.654 68.6904 237.635 71.526V126.108H237.644C237.683 128.933 239.867 131.226 242.568 131.226C245.27 131.226 247.454 128.943 247.492 126.108H247.502V71.526H247.483Z" fill="#F9BA16"/>
+                                <path d="M13.4886 132C11.7873 132 10.5316 131.149 9.72152 129.448C9.47848 128.962 9.35696 128.476 9.35696 127.99V69.1747C9.35696 67.4734 10.1266 66.2582 11.6658 65.5291C12.1519 65.2861 12.6785 65.1646 13.2456 65.1646H48.243C49.3772 65.1646 50.2278 65.5291 50.7949 66.2582C51.362 66.9063 51.6456 67.6759 51.6456 68.5671C51.6456 69.4582 51.362 70.2684 50.7949 70.9975C50.2278 71.6456 49.3772 71.9696 48.243 71.9696H17.4987V94.2076H46.6633C47.8785 94.2076 48.7696 94.5722 49.3367 95.3013C49.9038 95.9494 50.1873 96.719 50.1873 97.6101C50.1873 98.4203 49.8633 99.1899 49.2152 99.919C48.6481 100.648 47.7975 101.013 46.6633 101.013H17.4987V125.195H49.4582C50.5924 125.195 51.443 125.559 52.0101 126.289C52.6582 126.937 52.9823 127.706 52.9823 128.597C52.9823 129.489 52.6987 130.299 52.1316 131.028C51.5646 131.676 50.6734 132 49.4582 132H13.4886ZM141.155 102.714V128.111C141.155 129.975 140.264 131.19 138.482 131.757C137.995 131.919 137.347 132 136.537 132C135.808 132 134.998 131.676 134.107 131.028C133.216 130.38 132.77 129.408 132.77 128.111V69.1747C132.77 68.1215 133.054 67.2709 133.621 66.6228C134.674 65.6506 135.808 65.1646 137.023 65.1646H153.793C164.406 65.1646 171.94 67.676 176.395 72.6987C179.069 75.6962 180.406 79.4228 180.406 83.8785C180.406 88.3342 179.069 92.1013 176.395 95.1797C172.102 100.203 164.446 102.714 153.428 102.714H141.155ZM155.008 96.1519C160.193 96.1519 164.082 95.3013 166.674 93.6C169.995 91.4937 171.656 88.2532 171.656 83.8785C171.656 79.5848 169.995 76.4253 166.674 74.4C163.92 72.6177 160.071 71.7266 155.13 71.7266H141.155V96.1519H155.008Z" fill="#543C92"/>
+                                <path d="M68.1382 69.1747C68.1382 68.1215 68.4218 67.2709 68.9888 66.6228C70.042 65.6506 71.1357 65.1646 72.2699 65.1646H92.442C103.136 65.1646 110.305 68.081 113.951 73.9139C115.409 76.1013 116.138 79.0177 116.138 82.6633C116.138 86.3089 114.923 89.3873 112.493 91.8987C110.143 94.4101 106.781 96.1519 102.407 97.1241V97.3671C106.7 98.0152 109.738 99.5949 111.52 102.106C112.898 104.294 113.789 107.089 114.194 110.491C115.085 118.025 115.652 123.818 115.895 127.868C115.895 129.246 115.45 130.299 114.558 131.028C113.748 131.676 112.817 132 111.764 132C110.71 132 109.738 131.716 108.847 131.149C107.956 130.501 107.47 129.529 107.389 128.233C106.984 124.425 106.66 121.104 106.417 118.268C106.174 115.352 105.89 112.881 105.566 110.856C105.242 108.83 104.796 107.21 104.229 105.995C103.743 104.699 103.014 103.686 102.042 102.957C100.179 101.661 96.8977 101.013 92.199 101.013H76.4015V128.111C76.4015 129.975 75.5509 131.19 73.8496 131.757C73.2825 131.919 72.5939 132 71.7838 132C71.0547 132 70.2445 131.676 69.3534 131.028C68.5433 130.38 68.1382 129.408 68.1382 128.111V69.1747ZM88.6749 94.4506C96.6142 94.4506 101.88 93.1949 104.472 90.6835C106.417 88.9013 107.389 86.3494 107.389 83.0278C107.389 78.2481 105.647 75.0481 102.164 73.4278C99.7331 72.2937 96.2496 71.7266 91.7129 71.7266H76.4015V94.4506H88.6749Z" fill="#F9BA16"/>
+                                </svg>
+                                
                         </a>
                     </div>
                     <!-- /Logo -->
-                    <h4 class="mb-1 pt-2">دکان دارمینو</h4>
-                    <p class="mb-4">ورود به حساب کاربری</p>
+                    <h4 class="mb-1 pt-2">سامانه یکپارچه دکان ERP</h4>
+                    <p class="login-subtitle">ورود به حساب کاربری</p>
                     @include('errors.errors')
                     @if (session('error'))
                         <p class="alert alert-danger m-0">{{ session('error') }}</p> @endif
-                    <div class="nav-align-top
-        mb-4">
-    <ul class="nav nav-tabs px-0 mx-0" role="tablist">
+                    <div class="nav-align-top mb-4 login-tabs-wrap">
+    <ul class="nav nav-tabs px-0 mx-0 login-tabs" role="tablist">
         <li class="nav-item">
-            <button aria-controls="navs-top-home" aria-selected="true" class="nav-link active"
-                data-bs-target="#navs-top-home" data-bs-toggle="tab" role="tab" type="button">ورود با شماره
-                موبایل</button>
-        </li>
-        <li class="nav-item">
-            <button aria-controls="navs-top-profile" aria-selected="false" class="nav-link"
-                data-bs-target="#navs-top-profile" data-bs-toggle="tab" role="tab" type="button">ورود با رمز
+            <button aria-controls="navs-top-password" aria-selected="true" class="nav-link active" id="tab-password-login"
+                data-bs-target="#navs-top-password" data-bs-toggle="tab" role="tab" type="button">ورود با رمز
                 عبور</button>
         </li>
+        <li class="nav-item">
+            <button aria-controls="navs-top-mobile" aria-selected="false" class="nav-link" id="tab-mobile-login"
+                data-bs-target="#navs-top-mobile" data-bs-toggle="tab" role="tab" type="button">ورود با شماره
+                موبایل</button>
+        </li>
     </ul>
-    <div class="tab-content px-0">
-        <div class="tab-pane fade show active" id="navs-top-home" role="tabpanel">
-            <form action="{{ route('sendSmsLogin') }}" method="POST">
-                @csrf
-                <div class="mb-3">
-                    <label class="form-label" for="mobile">شماره موبایل</label>
-                    <input autofocus class="form-control" type="text" name="mobile" id="mobile" required=""
-                        placeholder="09xx1234567" style="direction: ltr;">
-                </div>
-                <div class="mb-3">
-                    <button class="btn btn-primary d-grid w-100" type="submit">ارسال پیامک</button>
-                </div>
-            </form>
-        </div>
-        <div class="tab-pane fade" id="navs-top-profile" role="tabpanel">
+    <div class="tab-content px-0 login-tab-content">
+        <div class="tab-pane fade show active" id="navs-top-password" role="tabpanel" aria-labelledby="tab-password-login">
             <form action="{{ route('login') }}" method="POST">
                 @csrf
                 <div class="mb-3">
@@ -120,26 +271,39 @@
                 <div class="mb-3 form-password-toggle">
                     <div class="d-flex justify-content-between">
                         <label class="form-label" for="password">رمز عبور</label>
-                        <a href="auth-forgot-password-basic.html">
+                        <a class="login-helper-link" href="auth-forgot-password-basic.html">
                             <small>فراموش کرده‌اید؟</small>
                         </a>
                     </div>
                     <div class="input-group input-group-merge">
                         <input class="form-control" type="password" required="" name="password" id="password"
-                            placeholder="">
+                            autocomplete="current-password" placeholder="">
                         <span class="input-group-text cursor-pointer">
-                            <i class="ti ti-eye-off"></i>
+                            <x-ui.icon name="eye-off" />
                         </span>
                     </div>
                 </div>
                 <div class="mb-3">
                     <div class="form-check">
-                        <input class="form-check-input" id="remember-me" type="checkbox" />
-                        <label class="form-check-label" for="remember-me"> مرا به خاطر بسپار</label>
+                        <input class="form-check-input" id="remember-me" name="remember" value="1" type="checkbox" />
+                        <label class="form-check-label" for="remember-me">مرا به خاطر بسپار</label>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <button class="btn btn-primary d-grid w-100" type="submit">ورود به سیستم</button>
+                    <button class="btn btn-primary d-grid w-100 btn-login-submit" type="submit">ورود به سیستم</button>
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane fade" id="navs-top-mobile" role="tabpanel" aria-labelledby="tab-mobile-login">
+            <form action="{{ route('sendSmsLogin') }}" method="POST">
+                @csrf
+                <div class="mb-3">
+                    <label class="form-label" for="mobile">شماره موبایل</label>
+                    <input class="form-control" type="text" name="mobile" id="mobile" required=""
+                        placeholder="09xx1234567" style="direction: ltr;">
+                </div>
+                <div class="mb-3">
+                    <button class="btn btn-primary d-grid w-100 btn-login-submit" type="submit">ارسال پیامک</button>
                 </div>
             </form>
         </div>
@@ -158,12 +322,14 @@
     <!-- build:js assets/vendor/js/core.js -->
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/i18n/i18n.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <!-- endbuild -->
     <!-- Vendors JS -->
@@ -174,6 +340,22 @@
     <script src="{{ asset('assets/') }}/js/main.js"></script>
     <!-- Page JS -->
     <script src="{{ asset('assets/') }}/js/pages-auth.js"></script>
+    <script>
+        (function () {
+            var loadingText = 'در حال بررسی';
+
+            document.querySelectorAll('.login-tab-content form').forEach(function (form) {
+                form.addEventListener('submit', function () {
+                    var btn = form.querySelector('button[type="submit"]');
+                    if (!btn || btn.disabled) {
+                        return;
+                    }
+                    btn.disabled = true;
+                    btn.textContent = loadingText;
+                });
+            });
+        })();
+    </script>
     </body>
 
 </html>

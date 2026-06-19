@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Notifs;
 use App\Models\SmsVerification;
 use App\Models\User;
+use App\Services\PanelMembershipService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,10 @@ use Kavenegar;
 
 class SMSController extends Controller
 {
+    public function __construct(private PanelMembershipService $panels)
+    {
+    }
+
     public function index(Request $request)
     {
 
@@ -35,14 +40,16 @@ class SMSController extends Controller
         $mobile = $request->mobile;
         $random_code = rand(1111, 9999);
         try {
-            $user = User::where('mobile', $mobile)->first();
+            $accessiblePanels = $this->panels->accessiblePanelsForMobile($mobile);
+
+            if ($accessiblePanels->isEmpty()) {
+                return redirect()->back()->with('error', 'کاربری با این شماره وجود ندارد یا دسترسی فعالی ندارد.');
+            }
+
+            $user = User::query()->find($accessiblePanels->first()['user_id']);
 
             if (!$user) {
                 return redirect()->back()->with('error', 'کاربری با این شماره وجود ندارد.');
-            }
-
-            if ($message = $user->loginBlockMessage()) {
-                return redirect()->back()->with('error', $message);
             }
 
             $sms_before = SmsVerification::where('contact_number', $mobile)->where('status', 0)->first();
@@ -118,20 +125,13 @@ class SMSController extends Controller
             $sms_before = SmsVerification::where('contact_number', $mobile)->where('status', 0)->update(['status' => 1]);
             Auth::login($User);
 
-            //$token = $User->createToken('auth_token')->plainTextToken;
-            // $User->api_token = $token;
-            //$User->update();
-
-            // dd($User);
-
             $Notif = new Notifs();
             $Notif->user_id = auth()->user()->id;
             $Notif->title = "ورود موفقیت آمیز";
             $Notif->content = "گزارش ورود شما با موفقیت ثبت شد.";
             $Notif->save();
 
-
-            return redirect(route('index'));
+            return $this->panels->redirectAfterLogin($User);
         }
     }
 }

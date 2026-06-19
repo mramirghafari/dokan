@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>راهنمای کامل راه‌اندازی و آموزش پنل — دکان دارمینو</title>
+    <link rel="stylesheet" href="docs-fonts.css">
+    <style>
+        :root {
+            --ink: #18212f;
+            --muted: #667085;
+            --line: #d9e2ec;
+            --paper: #ffffff;
+            --bg: #f5f7fb;
+            --brand: #0f766e;
+            --brand-soft: #e0f2f1;
+            --warn: #b45309;
+            --warn-soft: #fff7ed;
+            --ok: #15803d;
+            --ok-soft: #ecfdf3;
+            --role: #1d4ed8;
+            --role-soft: #eff6ff;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Yekan Bakh VF", Tahoma, Arial, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.9; }
+        .shell { max-width: 1240px; margin: 0 auto; padding: 32px 18px 64px; }
+        header {
+            background: linear-gradient(135deg, #e6fffa 0%, #f8fafc 55%, #eef2ff 100%);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 26px;
+            margin-bottom: 18px;
+        }
+        h1, h2, h3, h4 { margin: 0 0 12px; line-height: 1.5; }
+        h1 { font-size: 28px; }
+        h2 { font-size: 22px; border-right: 4px solid var(--brand); padding-right: 10px; }
+        h3 { font-size: 18px; color: #0f4c5c; }
+        p { margin: 0 0 12px; }
+        code {
+            direction: ltr;
+            display: inline-block;
+            background: #eef2f7;
+            color: #0f172a;
+            border-radius: 6px;
+            padding: 1px 6px;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+        }
+        .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+        .pill {
+            border-radius: 999px;
+            padding: 5px 12px;
+            font-size: 13px;
+            background: var(--brand-soft);
+            color: #115e59;
+            border: 1px solid #99f6e4;
+        }
+        .pill.warn { background: var(--warn-soft); color: var(--warn); border-color: #fed7aa; }
+        .pill.role { background: var(--role-soft); color: var(--role); border-color: #bfdbfe; }
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+            margin: 18px 0;
+        }
+        .nav-grid a {
+            text-decoration: none;
+            color: var(--ink);
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .nav-grid a:hover { border-color: var(--brand); color: var(--brand); }
+        .section {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 18px;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+        .card { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: #fff; }
+        .step {
+            display: grid;
+            grid-template-columns: 34px 1fr;
+            gap: 12px;
+            padding: 14px 0;
+            border-top: 1px solid var(--line);
+        }
+        .step:first-child { border-top: 0; }
+        .num {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--brand); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; flex-shrink: 0;
+        }
+        .ok { border: 1px solid #bbf7d0; background: var(--ok-soft); border-radius: 10px; padding: 14px; margin-top: 12px; }
+        .warn-box { border: 1px solid #fed7aa; background: var(--warn-soft); border-radius: 10px; padding: 14px; margin-top: 12px; }
+        .example { border: 1px solid #c7d2fe; background: #eef2ff; border-radius: 10px; padding: 14px; margin-top: 12px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; background: #fff; font-size: 14px; }
+        th, td { border: 1px solid var(--line); padding: 9px; text-align: right; vertical-align: top; }
+        th { background: #f8fafc; }
+        ul { margin: 8px 0 0; padding-right: 22px; }
+        .muted { color: var(--muted); font-size: 14px; }
+        .checklist { list-style: none; padding: 0; margin: 0; }
+        .checklist li { padding: 8px 0; border-bottom: 1px dashed var(--line); }
+        .checklist li::before { content: "☐ "; color: var(--brand); font-weight: 700; }
+        .flow {
+            background: #f8fafc;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 16px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            direction: ltr;
+            text-align: left;
+        }
+        .video-scene {
+            border-right: 3px solid var(--role);
+            padding: 12px 16px;
+            margin: 12px 0;
+            background: var(--role-soft);
+            border-radius: 0 8px 8px 0;
+        }
+        .toc-sticky { font-size: 13px; }
+        a { color: #0f766e; }
+    </style>
+</head>
+<body>
+<main class="shell">
+    <header>
+        <h1>راهنمای کامل راه‌اندازی پنل از صفر تا بهره‌برداری</h1>
+        <p>این سند مخصوص <strong>تحویل پنل به مشتری</strong>، <strong>آموزش تیم داخلی</strong> و <strong>onboarding نقش‌به‌نقش</strong> است. برای جزئیات فنی هر ماژول به <a href="erp-user-guide.html">راهنمای مرحله‌به‌مرحله ERP</a> مراجعه کنید؛ این فایل روی «از کجا شروع کنیم و هر منو برای چیست» تمرکز دارد.</p>
+        <div class="meta">
+            <span class="pill">آخرین بروزرسانی: 2026-06-11</span>
+            <span class="pill">مخاطب: مدیر کل، مدیر پنل، حسابدار، انباردار، فروش</span>
+            <span class="pill warn">قبل از آموزش تیم: چک‌لیست فاز ۰ را کامل کنید</span>
+        </div>
+    </header>
+
+    <nav class="nav-grid" aria-label="فهرست اصلی">
+        <a href="#phase0">فاز ۰: تحویل پنل</a>
+        <a href="#decisions">تصمیم‌های اولیه</a>
+        <a href="#roadmap">ترتیب راه‌اندازی</a>
+        <a href="#roles">نقش‌ها و کاربران</a>
+        <a href="#menus">فهرست منوها</a>
+        <a href="#accountant">مسیر حسابدار</a>
+        <a href="#scenarios">سناریوهای نمونه</a>
+        <a href="#video">آموزش ویدیویی</a>
+    </nav>
+
+    <!-- PHASE 0 -->
+    <section class="section" id="phase0">
+        <h2>فاز ۰ — چک‌لیست تحویل پنل به مشتری</h2>
+        <p>وقتی پنل جدید می‌سازید یا به شرکت تحویل می‌دهید، این موارد باید <strong>قبل از آموزش کاربران</strong> انجام شود.</p>
+
+        <div class="step"><div class="num">۱</div><div>
+            <h3>ساخت پنل و کاربر مدیر کل</h3>
+            <p>مسیر (فقط مدیر سیستم): <code>اطلاعات پایه / پنل‌ها</code></p>
+            <ul>
+                <li>نام پنل، نام حقوقی شرکت، نوع اشتراک (دموی ۳ روزه یا دائمی)</li>
+                <li>کاربر مدیر کل: نام، نام کاربری، موبایل، رمز</li>
+            </ul>
+            <div class="ok">خروجی: مدیر پنل بتواند وارد شود و منوی «اطلاعات پایه» و «کاربران» را ببیند.</div>
+        </div></div>
+
+        <div class="step"><div class="num">۲</div><div>
+            <h3>فعال‌سازی قابلیت‌های پنل</h3>
+            <p>مسیر: <code>اطلاعات پایه / تنظیمات پنل</code></p>
+            <ul class="checklist">
+                <li>مدیریت انبار — برای پخش و فروش کالا و تولید</li>
+                <li>منطقه‌بندی مشتریان — اگر فروش منطقه‌ای است</li>
+                <li>مسیر فروش و ویزیت — اگر بازاریاب میدانی دارید</li>
+                <li>شعب و واحدهای پخش — اگر چند شعبه دارید</li>
+                <li>چند سطح قیمت — اگر نماینده/عمده/خرده دارید</li>
+                <li>پخش و تحویل کالا — اگر لجستیک دارید</li>
+            </ul>
+        </div></div>
+
+        <div class="step"><div class="num">۳</div><div>
+            <h3>تعریف سناریوی فروش</h3>
+            <p>مسیر: <code>اطلاعات پایه / سناریوی فروش</code> — مهم‌ترین تصمیم قبل از فاکتور و CRM.</p>
+            <table>
+                <thead><tr><th>سوال</th><th>گزینه</th><th>اثر</th></tr></thead>
+                <tbody>
+                    <tr><td>فروش از کجا شروع شود؟</td><td>سرنخ / فرصت / پیش‌فاکتور / فاکتور</td><td>مسیر CRM و فروش</td></tr>
+                    <tr><td>چه کسی فاکتور بزند؟</td><td>بازاریاب / پشتیبان / مدیر</td><td>دسترسی ثبت سفارش</td></tr>
+                    <tr><td>تایید فاکتور</td><td>خودکار / سرپرست / مدیر</td><td>وضعیت pending یا approved</td></tr>
+                    <tr><td>کنترل موجودی</td><td>فعال / غیرفعال</td><td>رزرو انبار هنگام فاکتور</td></tr>
+                    <tr><td>مشتری چگونه ثبت شود؟</td><td>مستقیم / منطقه‌مسیر / نماینده</td><td>فیلدهای اجباری مشتری</td></tr>
+                </tbody>
+            </table>
+        </div></div>
+
+        <div class="step"><div class="num">۴</div><div>
+            <h3>قالب فاکتور (فاکتورساز)</h3>
+            <p>مسیر: <code>اطلاعات پایه / تنظیمات فاکتور</code></p>
+            <table>
+                <thead><tr><th>نوع کسب‌وکار</th><th>پروفایل پیشنهادی</th></tr></thead>
+                <tbody>
+                    <tr><td>پخش و فروش کالا</td><td>پخش و فروش کالا — کارتن / جزء / کل + وزن (کیلو)</td></tr>
+                    <tr><td>خدمات آموزشی</td><td>خدمات آموزشی — دوره / سرفصل / نفر</td></tr>
+                    <tr><td>اشتراک / SaaS</td><td>اشتراکی — پلن / ماه / کاربر</td></tr>
+                </tbody>
+            </table>
+            <p class="muted">مثال‌های پخش کالا: مرغ و گوشت، میوه، دارو، لبنیات، مواد غذایی بسته‌بندی. همه در یک پروفایل هستند؛ کالای وزنی همان قالب را با ستون وزن پر می‌کند.</p>
+            <p>در همان فرم فاکتورساز، بخش <strong>برچسب ستون‌های واحد</strong> را پر کنید: نام <em>واحد فرعی</em> (کارتن، جعبه، پک، تن ...)، <em>واحد اصلی</em> (عدد، بطری، قرص ...)، <em>ستون وزن</em> (گرم، کیلو، میلی‌گرم، سوت ...) و <em>فی واحد</em> (فی هر بطری، فی هر کیلو ...). پیشنهادهای آماده در فیلدها هست؛ متن دلخواه هم قابل ثبت است.</p>
+        </div></div>
+
+        <div class="step"><div class="num">۵</div><div>
+            <h3>اطلاعات پایه حداقلی</h3>
+            <ul class="checklist">
+                <li>واحد پخش (شعبه) — حداقل یک شعبه</li>
+                <li>انبار — حداقل یک انبار و اتصال به شعبه</li>
+                <li>دسته‌بندی و برند — برای گزارش‌گیری</li>
+                <li>واحد اندازه‌گیری — عدد، کارتن، کیلو، خدمت</li>
+                <li>حساب‌ها و پایانه — برای حسابدار</li>
+                <li>قالب فاکتور — رسمی/غیررسمی + انبار مرتبط</li>
+            </ul>
+        </div></div>
+
+        <div class="step"><div class="num">۶</div><div>
+            <h3>کاربران و نقش‌ها</h3>
+            <p>مسیر: <code>کاربران / نقش‌ها</code> سپس <code>کاربران سامانه</code></p>
+            <div class="warn-box">هر کاربر فقط یک نقش اصلی عملیاتی داشته باشد؛ مدیر کل را برای همه نگذارید.</div>
+        </div></div>
+    </section>
+
+    <!-- DECISIONS -->
+    <section class="section" id="decisions">
+        <h2>تصمیم‌های اولیه — مشتریان بر چه اساسی باشند؟</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>مدل ۱: فروش مستقیم (بدون منطقه)</h3>
+                <p>مناسب: فروشگاه اینترنتی، خدمات آموزشی، SaaS، فروش تلفنی.</p>
+                <ul>
+                    <li>در تنظیمات: منطقه و مسیر = خیر یا اختیاری</li>
+                    <li>مشتری: نام، تلفن، آدرس کافی است</li>
+                    <li>فاکتور: بدون ویزیتور اجباری</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>مدل ۲: پخش منطقه‌ای</h3>
+                <p>مناسب: توزیع مواد غذایی، پخش سراسری، مرغ و گوشت، میوه و دارو.</p>
+                <ul>
+                    <li>شهر → منطقه → مسیر → بازاریاب</li>
+                    <li>هر مشتری به یک مسیر وصل است</li>
+                    <li>مسیر روزانه برای ویزیتور تعریف می‌شود</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>مدل ۳: نمایندگی / شعبه</h3>
+                <p>مناسب: شبکه نمایندگان، چند شعبه مستقل.</p>
+                <ul>
+                    <li>هر شعبه scope جدا: انبار، مشتری، فاکتور</li>
+                    <li>کاربران با محدوده اختصاصی شعبه</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="flow">ترتیب پیشنهادی اطلاعات جغرافیایی (مدل پخش):
+شهرها  →  مناطق  →  مسیرها  →  ثبت بازاریاب  →  تخصیص مسیر به بازاریاب  →  ثبت مشتری در مسیر</div>
+    </section>
+
+    <!-- ROADMAP -->
+    <section class="section" id="roadmap">
+        <h2>ترتیب راه‌اندازی — از صفر تا اولین فاکتور</h2>
+        <table>
+            <thead>
+                <tr><th>فاز</th><th>کار</th><th>مسیر منو</th><th>مسئول</th><th>پیش‌نیاز فاکتور</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>۱</td><td>تنظیمات پنل + سناریوی فروش</td><td>اطلاعات پایه / تنظیمات پنل، سناریوی فروش</td><td>مدیر کل</td><td>—</td></tr>
+                <tr><td>۲</td><td>شعبه، انبار، واحد، دسته، برند</td><td>اطلاعات پایه</td><td>مدیر پنل</td><td>—</td></tr>
+                <tr><td>۳</td><td>شهر، منطقه، مسیر (در صورت نیاز)</td><td>اطلاعات پایه</td><td>مدیر فروش</td><td>مشتری منطقه‌ای</td></tr>
+                <tr><td>۴</td><td>حساب‌ها، صندوق، بانک، پایانه</td><td>اطلاعات پایه / حساب‌ها</td><td>حسابدار</td><td>تسویه و سند</td></tr>
+                <tr><td>۵</td><td>قالب فاکتور</td><td>اطلاعات پایه / تنظیمات فاکتور</td><td>مدیر پنل</td><td>چاپ فاکتور</td></tr>
+                <tr><td>۶</td><td>ثبت محصول + قیمت</td><td>محصولات</td><td>مدیر محصول / انبار</td><td>بله ✓</td></tr>
+                <tr><td>۷</td><td>موجودی اول دوره (در صورت انبار)</td><td>تولید / ورودی انبار یا رسید انبار</td><td>انباردار</td><td>کنترل موجودی</td></tr>
+                <tr><td>۸</td><td>ثبت مشتری</td><td>مشتریان / ثبت مشتری</td><td>فروش / CRM</td><td>بله ✓</td></tr>
+                <tr><td>۹</td><td>تعریف نقش‌ها و کاربران</td><td>کاربران</td><td>مدیر کل</td><td>دسترسی</td></tr>
+                <tr><td>۱۰</td><td>اولین پیش‌فاکتور / فاکتور</td><td>فروش / ثبت پیش‌فاکتور</td><td>بازاریاب / فروش</td><td>همه بالا</td></tr>
+                <tr><td>۱۱</td><td>تایید، خروج انبار، تسویه</td><td>فروش، انبار، مالی</td><td>سرپرست، انبار، حسابدار</td><td>فاکتور تاییدشده</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ROLES -->
+    <section class="section" id="roles">
+        <h2>نقش‌ها — از مدیر کل تا حسابدار</h2>
+        <table>
+            <thead>
+                <tr><th>نقش</th><th>وظیفه اصلی</th><th>منوهای کلیدی</th><th>نباید دسترسی داشته باشد به</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="pill role">مدیر کل پنل (God)</span></td>
+                    <td>تنظیمات، کاربران، سناریوی فروش، همه گزارش‌ها</td>
+                    <td>اطلاعات پایه (کامل)، کاربران، تنظیمات، BI</td>
+                    <td>— (اما برای کار روزمره استفاده نشود)</td>
+                </tr>
+                <tr>
+                    <td><span class="pill role">مدیر پنل / مدیر فروش</span></td>
+                    <td>تایید فاکتور، تارگت، گزارش فروش، مشتریان</td>
+                    <td>فروش، مشتریان، تارگت، CRM</td>
+                    <td>حذف سند حسابداری قطعی (ترجیحاً)</td>
+                </tr>
+                <tr>
+                    <td><span class="pill role">سرپرست فروش (Leader)</span></td>
+                    <td>تایید سفارشات تیم، پیگیری فاکتور</td>
+                    <td>فروش / سفارشات در انتظار، مسیرها</td>
+                    <td>تنظیمات پنل</td>
+                </tr>
+                <tr>
+                    <td><span class="pill role">بازاریاب (Visitor)</span></td>
+                    <td>ویزیت، ثبت مشتری، ثبت سفارش</td>
+                    <td>مسیرهای من، سفارش‌ها، کاتالوگ</td>
+                    <td>حسابداری، تنظیمات</td>
+                </tr>
+                <tr>
+                    <td><span class="pill role">مسئول انبار (Store)</span></td>
+                    <td>رسید، خروج، موجودی، انبارگردانی</td>
+                    <td>انبار و تامین، تولید</td>
+                    <td>قیمت خرید، پرداخت به تأمین‌کننده</td>
+                </tr>
+                <tr>
+                    <td><span class="pill role">مسئول خرید</span></td>
+                    <td>استعلام، سفارش خرید، پیگیری رسید</td>
+                    <td>انبار و تامین / خرید</td>
+                    <td>تایید نهایی پرداخت (جدا)</td>
+                </tr>
+                <tr>
+                    <td><span class="pill role">حسابدار</span></td>
+                    <td>سند، خزانه، تسویه فاکتور، گزارش مالی</td>
+                    <td>مالی و حسابداری (کامل)</td>
+                    <td>حذف فاکتور تاییدشده بدون گردش</td>
+                </tr>
+                <tr>
+                    <td><span class="pill role">راننده / پخش</span></td>
+                    <td>تحویل بار، ثبت تحویل</td>
+                    <td>باربری و توزیع</td>
+                    <td>ثبت فاکتور، سند حسابداری</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>مراحل ساخت یک کاربر جدید</h3>
+        <div class="step"><div class="num">۱</div><div>
+            <p><code>کاربران / نقش‌ها</code> — نقش مناسب را انتخاب یا بسازید و permissionها را تیک بزنید.</p>
+        </div></div>
+        <div class="step"><div class="num">۲</div><div>
+            <p><code>کاربران / کاربران سامانه / ایجاد</code> — نام، نام کاربری، موبایل، شعبه، نقش.</p>
+        </div></div>
+        <div class="step"><div class="num">۳</div><div>
+            <p>بخش <strong>محدوده اختصاصی</strong>: انبار / منطقه / مسیر — فقط اگر کاربر باید محدود باشد.</p>
+        </div></div>
+        <div class="step"><div class="num">۴</div><div>
+            <p>با همان کاربر logout/login کنید و منوها را چک کنید.</p>
+        </div></div>
+    </section>
+
+    <!-- MENUS -->
+    <section class="section" id="menus">
+        <h2>فهرست کامل منوها — آموزش تک‌به‌تک</h2>
+        <p class="muted">منوهایی که در تنظیمات پنل غیرفعال باشند نمایش داده نمی‌شوند.</p>
+
+        <h3>۱. دکان (داشبورد)</h3>
+        <p>صفحه اصلی پس از ورود. خلاصه وضعیت روز. <strong>کاربر:</strong> همه.</p>
+
+        <h3>۲. کاتالوگ محصولات</h3>
+        <p>مشاهده محصولات برای ثبت سفارش سریع. <strong>کاربر:</strong> بازاریاب، فروش.</p>
+
+        <h3>۳. اطلاعات پایه</h3>
+        <table>
+            <thead><tr><th>زیرمنو</th><th>کاربرد</th><th>چه زمانی</th><th>نکته آموزشی</th></tr></thead>
+            <tbody>
+                <tr><td>پنل‌ها</td><td>ساخت/مدیریت tenant</td><td>فقط مدیر سیستم</td><td>قبل از تحویل به مشتری</td></tr>
+                <tr><td>لیست انبارها</td><td>تعریف انبار فیزیکی</td><td>فاز ۲</td><td>نوع انبار و شعبه مرتبط را پر کنید</td></tr>
+                <tr><td>قفسه و مکان انبار</td><td>ردیابی محل کالا</td><td>اختیاری</td><td>برای انبار بزرگ</td></tr>
+                <tr><td>واحدهای پخش</td><td>شعبه / سازمان</td><td>فاز ۲</td><td>پایه scope همه ماژول‌ها</td></tr>
+                <tr><td>دسته‌بندی‌ها</td><td>گروه محصول</td><td>قبل از محصول</td><td>سلسله‌مراتب درست</td></tr>
+                <tr><td>برندها</td><td>برند کالا</td><td>قبل از محصول</td><td>—</td></tr>
+                <tr><td>شهرها</td><td>جغرافیا</td><td>مدل منطقه‌ای</td><td>—</td></tr>
+                <tr><td>مناطق</td><td>تقسیم شهر</td><td>بعد از شهر</td><td>—</td></tr>
+                <tr><td>مسیرها</td><td>مسیر ویزیت بازاریاب</td><td>بعد از منطقه</td><td>هر مسیر یک بازاریاب</td></tr>
+                <tr><td>تنظیمات فاکتور</td><td>قالب چاپ + پروفایل خط</td><td>فاز ۵</td><td>کالا / آموزشی / اشتراک</td></tr>
+                <tr><td>تنظیمات پنل</td><td>فعال/غیرفعال ماژول</td><td>فاز ۱</td><td>اولین کار مدیر</td></tr>
+                <tr><td>سناریوی فروش</td><td>قوانین فاکتور و تایید</td><td>فاز ۱</td><td>قبل از هر فاکتور</td></tr>
+                <tr><td>اعلانات و پیامک</td><td>SMS پنل</td><td>اختیاری</td><td>مدیر سیستم</td></tr>
+                <tr><td>حساب‌ها</td><td>دفتر حساب‌ها</td><td>فاز ۴</td><td>پیش‌نیاز حسابدار</td></tr>
+                <tr><td>پایانه‌ها / درگاه‌ها</td><td>کارتخوان، درگاه</td><td>فاز ۴</td><td>اتصال به حساب بانکی</td></tr>
+            </tbody>
+        </table>
+
+        <h3>۴. کاربران</h3>
+        <table>
+            <thead><tr><th>زیرمنو</th><th>کاربرد</th></tr></thead>
+            <tbody>
+                <tr><td>کاربران سامانه</td><td>ایجاد و ویرایش کاربر، scope، شعبه</td></tr>
+                <tr><td>نقش‌ها</td><td>مجموعه permission برای هر شغل</td></tr>
+                <tr><td>سطوح دسترسی</td><td>تعریف permission تکی (پیشرفته)</td></tr>
+            </tbody>
+        </table>
+
+        <h3>۵. مسیرها</h3>
+        <table>
+            <thead><tr><th>زیرمنو</th><th>کاربرد</th><th>کاربر</th></tr></thead>
+            <tbody>
+                <tr><td>ثبت مسیر برای بازاریاب</td><td>برنامه ویزیت روزانه</td><td>سرپرست</td></tr>
+                <tr><td>مسیرهای فعال</td><td>مسیرهای جاری</td><td>سرپرست</td></tr>
+                <tr><td>مرور مسیرها</td><td>تاریخچه</td><td>مدیر فروش</td></tr>
+                <tr><td>مسیرهای من</td><td>ویزیت امروز</td><td>بازاریاب</td></tr>
+            </tbody>
+        </table>
+
+        <h3>۶. محصولات</h3>
+        <table>
+            <thead><tr><th>زیرمنو</th><th>کاربرد</th><th>فیلدهای مهم</th></tr></thead>
+            <tbody>
+                <tr><td>ثبت محصول جدید</td><td>تعریف کالا/خدمت</td><td>نوع محصول، واحد اصلی/فرعی، قیمت، انبار، مالیات</td></tr>
+                <tr><td>محصولات</td><td>لیست و ویرایش</td><td>SKU، موجودی، فعال/غیرفعال</td></tr>
+                <tr><td>قیمت روز</td><td>بروزرسانی سریع قیمت</td><td>چند سطح قیمت</td></tr>
+                <tr><td>لیست مواد اولیه</td><td>BOM / تولید</td><td>فقط تولیدی</td></tr>
+            </tbody>
+        </table>
+        <div class="example">
+            <strong>آموزشی:</strong> نوع محصول = خدمت، کنترل موجودی = غیرفعال، واحد = نفر یا دوره.<br>
+            <strong>اشتراک:</strong> نوع = خدمت، در فاکتور pack=ماه، tedad=کاربر.<br>
+            <strong>پخش:</strong> واحد اصلی عدد، فرعی کارتن، ضریب تبدیل ۱۲.
+        </div>
+
+        <h3>۷. تارگت‌های فروش و BI</h3>
+        <p>تارگت فروش، پورسانت، داشبورد مدیریتی، BI، Executive، CFO — برای مدیر فروش و مالی بعد از راه‌اندازی عملیاتی.</p>
+
+        <h3>۸. مشتریان و CRM</h3>
+        <table>
+            <thead><tr><th>زیرمنو</th><th>کاربرد</th></tr></thead>
+            <tbody>
+                <tr><td>ثبت مشتری</td><td>ایجاد مشتری جدید — پیش‌نیاز فاکتور</td></tr>
+                <tr><td>جستجوی مشتری</td><td>یافتن سریع</td></tr>
+                <tr><td>لیست / مشتریان فعال</td><td>مدیریت پایگاه</td></tr>
+                <tr><td>داشبورد CRM</td><td>خلاصه فعالیت فروش</td></tr>
+                <tr><td>کارتابل CRM</td><td>تسک و mention</td></tr>
+                <tr><td>سرنخ‌ها / فرصت / کاریز</td><td>فروش مرحله‌ای</td></tr>
+                <tr><td>کمپین CRM</td><td>پیام‌رسانی (SMS اختیاری)</td></tr>
+                <tr><td>پورتال مشتری</td><td>دسترسی خود مشتری</td></tr>
+            </tbody>
+        </table>
+
+        <h3>۹. تولید</h3>
+        <p>درخواست تولید، ورودی انبار، فرمول ساخت، کاردکس — برای کارخانه و تولید داخلی.</p>
+
+        <h3>۱۰. انبار و تامین</h3>
+        <table>
+            <thead><tr><th>زیرمنو</th><th>کاربرد</th><th>حسابدار</th></tr></thead>
+            <tbody>
+                <tr><td>استعلام بها / سفارش خرید</td><td>چرخه خرید</td><td>بعد از تایید → سند</td></tr>
+                <tr><td>رسید انبار</td><td>ورود کالا + موجودی اول دوره</td><td>سند موجودی</td></tr>
+                <tr><td>موجودی لحظه‌ای</td><td>کنترل مانده</td><td>مغایرت‌گیری</td></tr>
+                <tr><td>رزرو موجودی</td><td>رزرو فاکتور</td><td>—</td></tr>
+                <tr><td>گزارش ریالی انبار</td><td>ارزش موجودی</td><td>بله ✓</td></tr>
+                <tr><td>انبارگردانی</td><td>تعدیل مغایرت</td><td>سند اصلاحی</td></tr>
+                <tr><td>خروج انبار / حواله</td><td>تحویل فاکتور</td><td>بعد از تایید فروش</td></tr>
+            </tbody>
+        </table>
+
+        <h3>۱۱. فروش</h3>
+        <table>
+            <thead><tr><th>زیرمنو</th><th>کاربرد</th><th>وضعیت</th></tr></thead>
+            <tbody>
+                <tr><td>ثبت پیش‌فاکتور جدید</td><td>سفارش / فاکتور</td><td>pending یا approved</td></tr>
+                <tr><td>سفارشات در انتظار</td><td>صف تایید سرپرست</td><td>status=0</td></tr>
+                <tr><td>فاکتورهای تایید شده</td><td>آماده انبار و مالی</td><td>status=1</td></tr>
+                <tr><td>فاکتورهای تکمیل شده</td><td>تحویل و تسویه شده</td><td>status=4</td></tr>
+                <tr><td>گزارش‌گیری فروش</td><td>تحلیل مدیر</td><td>—</td></tr>
+            </tbody>
+        </table>
+
+        <h3>۱۲. باربری و توزیع</h3>
+        <p>تعریف بار، مرور توزیع، تخصیص به راننده — بعد از خروج انبار.</p>
+
+        <h3>۱۳. مالی و حسابداری</h3>
+        <p>جزئیات در بخش <a href="#accountant">مسیر حسابدار</a>.</p>
+    </section>
+
+    <!-- ACCOUNTANT -->
+    <section class="section" id="accountant">
+        <h2>مسیر کامل حسابدار — از صفر تا پایان ماه</h2>
+
+        <div class="warn-box">
+            <strong>قانون طلایی:</strong> حسابدار بدون «مشتری + محصول + فاکتور تاییدشده + حساب‌های مالی» نمی‌تواند سند معنادار بزند. اول زیرساخت، بعد عملیات روزانه.
+        </div>
+
+        <h3>پیش‌نیازهای حسابدار (قبل از روز اول)</h3>
+        <table>
+            <thead><tr><th>#</th><th>آیتم</th><th>مسیر</th><th>چک</th></tr></thead>
+            <tbody>
+                <tr><td>۱</td><td>سال مالی باز</td><td>تنظیمات پنل / حسابداری</td><td>☐</td></tr>
+                <tr><td>۲</td><td>چارت حساب‌ها</td><td>اطلاعات پایه / حساب‌ها</td><td>☐</td></tr>
+                <tr><td>۳</td><td>صندوق و بانک</td><td>حساب‌ها + پایانه‌ها</td><td>☐</td></tr>
+                <tr><td>۴</td><td>نرخ مالیات</td><td>محصولات / تنظیمات</td><td>☐</td></tr>
+                <tr><td>۵</td><td>قالب فاکتور رسمی</td><td>تنظیمات فاکتور</td><td>☐</td></tr>
+                <tr><td>۶</td><td>موجودی اول دوره</td><td>رسید انبار نوع «اول دوره»</td><td>☐</td></tr>
+                <tr><td>۷</td><td>مانده اولیه اشخاص</td><td>ثبت مشتری + مانده افتتاحیه</td><td>☐</td></tr>
+                <tr><td>۸</td><td>کاربر حسابدار + نقش</td><td>کاربران سامانه</td><td>☐</td></tr>
+            </tbody>
+        </table>
+
+        <h3>جریان روزانه حسابدار</h3>
+        <div class="flow">صبح:
+  1) مالی / صندوق → مانده نقد و بانک
+  2) مالی / گزارش چک‌ها → سررسید امروز
+  3) فروش / فاکتورهای تایید شده → فاکتورهای دیروز بدون تسویه
+
+ظهر:
+  4) انبار / رسیدهای جدید → تطبیق با فاکتور خرید
+  5) مالی / اسناد حسابداری → ثبت یا تایید سندهای موقت
+  6) مالی / دریافت و پرداخت → واریز مشتری، پرداخت تأمین‌کننده
+
+عصر:
+  7) مالی / مرور فروش → تطبیق فروش با صندوق
+  8) مالی / مغایرت بانکی → تطبیق صورتحساب بانک
+  9) دفتر کل → کنترل تراز آزمایشی</div>
+
+        <h3>تکلیف حسابدار در هر مرحله فروش</h3>
+        <table>
+            <thead><tr><th>مرحله</th><th>کار حسابدار</th><th>منو</th><th>خروجی</th></tr></thead>
+            <tbody>
+                <tr><td>ثبت پیش‌فاکتور</td><td>معمولاً کاری ندارد</td><td>—</td><td>—</td></tr>
+                <tr><td>تایید فاکتور</td><td>بررسی اعتبار مشتری (در صورت فعال بودن)</td><td>فروش</td><td>فاکتور approved</td></tr>
+                <tr><td>خروج انبار</td><td>تطبیق مقدار فاکتور با حواله</td><td>انبار</td><td>movement ثبت شده</td></tr>
+                <tr><td>تحویل به مشتری</td><td>ثبت امانی / مطالبات</td><td>فروش</td><td>وضعیت تحویل</td></tr>
+                <tr><td>دریافت وجه</td><td>ثبت دریافت نقد/چک/کارت</td><td>مالی / دریافت و پرداخت</td><td>سند دریافت</td></tr>
+                <tr><td>صدور سند فروش</td><td>سند خودکار یا دستی فروش</td><td>اسناد حسابداری</td><td>سند ثبت شده</td></tr>
+                <tr><td>پایان ماه</td><td>تراز، بستن موقت، گزارش</td><td>دفاتر، صورت‌های مالی</td><td>گزارش مدیریت</td></tr>
+            </tbody>
+        </table>
+
+        <h3>منوی مالی — آموزش تک‌به‌تک برای حسابدار</h3>
+        <table>
+            <thead><tr><th>منو</th><th>کی استفاده شود</th><th>نکته</th></tr></thead>
+            <tbody>
+                <tr><td>صندوق</td><td>هر روز</td><td>مانده واقعی صندوق</td></tr>
+                <tr><td>مرور حساب‌ها</td><td>روزانه / هفتگی</td><td>گردش هر حساب</td></tr>
+                <tr><td>اسناد حسابداری</td><td>همیشه</td><td>سند دستی و خودکار</td></tr>
+                <tr><td>الگوهای سند</td><td>عملیات تکراری</td><td>حقوق، اجاره، …</td></tr>
+                <tr><td>دفاتر و تراز آزمایشی</td><td>هفتگی</td><td>کنترل تراز</td></tr>
+                <tr><td>صورت‌های مالی</td><td>پایان دوره</td><td>سود و زیان، ترازنامه</td></tr>
+                <tr><td>دریافت و پرداخت</td><td>هر تراکنش</td><td>مشتری و تأمین‌کننده</td></tr>
+                <tr><td>گزارش چک‌ها / راس‌گیری</td><td>هفتگی</td><td>سررسید</td></tr>
+                <tr><td>مغایرت بانکی</td><td>ماهانه</td><td>تطبیق بانک</td></tr>
+                <tr><td>پیش‌بینی نقدینگی</td><td>مدیریتی</td><td>برنامه‌ریزی</td></tr>
+                <tr><td>مرور فروش</td><td>روزانه</td><td>تطبیق با فاکتور</td></tr>
+                <tr><td>سامانه مودیان</td><td>فاکتور رسمی</td><td>ارسال مالیاتی</td></tr>
+                <tr><td>حقوق و دستمزد</td><td>ماهانه</td><td>سند خودکار</td></tr>
+                <tr><td>اموال شرکت</td><td>دارایی ثابت</td><td>استهلاک</td></tr>
+            </tbody>
+        </table>
+
+        <h3>اولین هفته حسابدار — برنامه آموزش عملی</h3>
+        <div class="grid">
+            <div class="card"><h4>روز ۱</h4><ul><li>ورود و آشنایی منو مالی</li><li>بررسی حساب‌ها و صندوق</li><li>یک رسید اول دوره نمونه</li></ul></div>
+            <div class="card"><h4>روز ۲</h4><ul><li>ثبت یک مشتری با مانده افتتاحیه</li><li>ثبت یک فاکتور تست</li><li>مشاهده سند خودکار</li></ul></div>
+            <div class="card"><h4>روز ۳</h4><ul><li>دریافت نقدی از مشتری</li><li>تسویه فاکتور</li><li>مرور فروش</li></ul></div>
+            <div class="card"><h4>روز ۴</h4><ul><li>خرید + رسید انبار</li><li>سند خرید</li><li>گردش تأمین‌کننده</li></ul></div>
+            <div class="card"><h4>روز ۵</h4><ul><li>تراز آزمایشی</li><li>مغایرت‌های رایج</li><li>چک‌لیست پایان هفته</li></ul></div>
+        </div>
+    </section>
+
+    <!-- SCENARIOS -->
+    <section class="section" id="scenarios">
+        <h2>سناریوهای نمونه — سه نوع پنل</h2>
+
+        <h3>الف) پنل پخش کالا</h3>
+        <ol>
+            <li>تنظیمات: انبار ✓ منطقه ✓ مسیر ✓ پخش ✓</li>
+            <li>شهر → منطقه → مسیر → بازاریاب</li>
+            <li>انبار مرکزی + قالب فاکتور «پخش و فروش کالا»</li>
+            <li>محصول با کارتن/جزء، موجودی اول دوره</li>
+            <li>مشتری per مسیر، ویزیت روزانه</li>
+            <li>فاکتور → تایید سرپرست → خروج انبار → پخش</li>
+            <li>حسابدار: تسویه و سند فروش</li>
+        </ol>
+
+        <h3>ب) پنل آموزشی</h3>
+        <ol>
+            <li>تنظیمات: منطقه ✗ (یا اختیاری)، انبار ✗ یا غیرفعال</li>
+            <li>محصول نوع «خدمت» — دوره، سرفصل، قیمت نفر</li>
+            <li>قالب فاکتور «خدمات آموزشی»</li>
+            <li>مشتری مستقیم، CRM برای پیگیری</li>
+            <li>فاکتور بدون خروج انبار</li>
+            <li>حسابدار: درآمد دوره + پیش‌دریافت + اقساط</li>
+            <li>import اکسل ۲۰۰۰ دانشجو از CRM</li>
+        </ol>
+
+        <h3>ج) پنل اشتراکی</h3>
+        <ol>
+            <li>محصول = پلن ماهانه</li>
+            <li>قالب فاکتور «اشتراکی» — pack=ماه، tedad=کاربر</li>
+            <li>فاکتور دوره‌ای + تمدید</li>
+            <li>حسابدار: شناسایی درآمد دوره‌ای</li>
+        </ol>
+    </section>
+
+    <!-- VIDEO -->
+    <section class="section" id="video">
+        <h2>آموزش تصویری / ویدیویی — راهنمای تولید</h2>
+        <p>من نمی‌توانم مستقیماً ویدیو ضبط کنم، اما می‌توانید با اسکریپت زیر خودتان یا با ابزارهای <strong>Loom</strong>، <strong>OBS</strong>، <strong>Scribe</strong> یا <strong>راهنمای تعاملی داخل پنل</strong> سری آموزشی بسازید.</p>
+
+        <h3>پیشنهاد ساختار سری ویدیو (۱۸ قسمت)</h3>
+        <table>
+            <thead><tr><th>قسمت</th><th>عنوان</th><th>مدت</th><th>مخاطب</th></tr></thead>
+            <tbody>
+                <tr><td>۰۱</td><td>ورود و معرفی داشبورد</td><td>۵ دقیقه</td><td>همه</td></tr>
+                <tr><td>۰۲</td><td>تنظیمات پنل — فعال کردن ماژول‌ها</td><td>۱۰ دقیقه</td><td>مدیر</td></tr>
+                <tr><td>۰۳</td><td>سناریوی فروش</td><td>۱۵ دقیقه</td><td>مدیر</td></tr>
+                <tr><td>۰۴</td><td>شعبه، انبار، واحد</td><td>۱۲ دقیقه</td><td>مدیر</td></tr>
+                <tr><td>۰۵</td><td>شهر، منطقه، مسیر</td><td>۱۰ دقیقه</td><td>فروش</td></tr>
+                <tr><td>۰۶</td><td>ثبت محصول کامل</td><td>۱۵ دقیقه</td><td>انبار/فروش</td></tr>
+                <tr><td>۰۷</td><td>قالب فاکتور و پروفایل‌ها</td><td>۸ دقیقه</td><td>مدیر</td></tr>
+                <tr><td>۰۸</td><td>ثبت مشتری</td><td>۸ دقیقه</td><td>فروش</td></tr>
+                <tr><td>۰۹</td><td>نقش‌ها و کاربران</td><td>۱۲ دقیقه</td><td>مدیر</td></tr>
+                <tr><td>۱۰</td><td>ثبت اولین فاکتور</td><td>۱۵ دقیقه</td><td>فروش</td></tr>
+                <tr><td>۱۱</td><td>تایید فاکتور و خروج انبار</td><td>۱۲ دقیقه</td><td>سرپرست/انبار</td></tr>
+                <tr><td>۱۲</td><td>حساب‌ها و صندوق (پیش‌نیاز)</td><td>۱۵ دقیقه</td><td>حسابدار</td></tr>
+                <tr><td>۱۳</td><td>رسید انبار و موجودی اول دوره</td><td>۱۲ دقیقه</td><td>حسابدار/انبار</td></tr>
+                <tr><td>۱۴</td><td>دریافت از مشتری و تسویه</td><td>۱۰ دقیقه</td><td>حسابدار</td></tr>
+                <tr><td>۱۵</td><td>اسناد حسابداری</td><td>۱۵ دقیقه</td><td>حسابدار</td></tr>
+                <tr><td>۱۶</td><td>تراز و گزارش پایان ماه</td><td>۱۲ دقیقه</td><td>حسابدار</td></tr>
+                <tr><td>۱۷</td><td>مسیر بازاریاب میدانی</td><td>۱۰ دقیقه</td><td>ویزیتور</td></tr>
+                <tr><td>۱۸</td><td>سناریوی پنل آموزشی</td><td>۲۰ دقیقه</td><td>مدیر پروژه</td></tr>
+            </tbody>
+        </table>
+
+        <h3>نمونه اسکریپت قسمت ۱۲ — حساب‌ها (برای ضبط)</h3>
+        <div class="video-scene">
+            <strong>صحنه ۱ (۳۰ ثانیه):</strong> «سلام. من [نام] هستم. امروز پیش‌نیازهای حسابداری را قبل از اولین فاکتور تنظیم می‌کنیم.»
+        </div>
+        <div class="video-scene">
+            <strong>صحنه ۲ (۲ دقیقه):</strong> بروید <code>اطلاعات پایه / حساب‌ها</code>. حساب‌های کلیدی: صندوق، بانک، فروش، مطالبات، موجودی کالا. هر کدام را با کد و نام فارسی نشان دهید.
+        </div>
+        <div class="video-scene">
+            <strong>صحنه ۳ (۲ دقیقه):</strong> <code>پایانه‌ها</code> — کارتخوان را به حساب بانکی وصل کنید. توضیح دهید بدون این اتصال، تسویه کارتخوان در گزارش جدا نمی‌افتد.
+        </div>
+        <div class="video-scene">
+            <strong>صحنه ۴ (۲ دقیقه):</strong> یک رسید «موجودی اول دوره» نمونه بزنید و بگویید حسابدار باید مبلغ ریالی را با تراز اولیه تطبیق دهد.
+        </div>
+        <div class="video-scene">
+            <strong>صحنه ۵ (۱ دقیقه):</strong> جمع‌بندی چک‌لیست ۸ مورد پیش‌نیاز — لینک PDF همین راهنما را در توضیحات ویدیو بگذارید.
+        </div>
+
+        <h3>ابزارهای پیشنهادی ضبط</h3>
+        <ul>
+            <li><strong>OBS Studio</strong> — رایگان، ضبط صفحه با کیفیت بالا</li>
+            <li><strong>Loom</strong> — سریع برای آموزش‌های کوتاه هر منو</li>
+            <li><strong>Scribe / Tango</strong> — تبدیل کلیک‌های واقعی به PDF/HTML آموزشی</li>
+            <li><strong>زیرنویس فارسی</strong> — در YouTube یا فایل داخلی شرکت</li>
+        </ul>
+        <div class="ok">اگر بخواهید، در مرحله بعد می‌توان برای هر منو یک صفحه «راهنمای داخل برنامه» (آیکن ? کنار عنوان) یا فایل Scribe جدا تولید کرد.</div>
+    </section>
+
+    <section class="section">
+        <h2>پیوند با سایر اسناد</h2>
+        <ul>
+            <li><a href="erp-user-guide.html">راهنمای مرحله‌به‌مرحله ERP</a> — جزئیات فنی هر ماژول</li>
+            <li><a href="erp-roadmap-checklist.html">چک‌لیست تکمیل ERP</a> — معیار آمادگی فنی</li>
+            <li><a href="erp-completion-roadmap.html">نقشه راه تکمیل</a> — برنامه توسعه</li>
+        </ul>
+        <p class="muted print-note">این راهنما باید بعد از هر تغییر منو یا نقش بروزرسانی شود. پیشنهاد: نسخه PDF برای تحویل مشتری + ویدیوهای ۵–۱۵ دقیقه‌ای برای هر نقش.</p>
+    </section>
+</main>
+</body>
+</html>

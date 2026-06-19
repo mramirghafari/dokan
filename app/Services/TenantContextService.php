@@ -23,6 +23,10 @@ class TenantContextService
 
     public function tenantId($user = null): ?int
     {
+        if (session()->has(PanelMembershipService::SESSION_TENANT_KEY)) {
+            return (int) session(PanelMembershipService::SESSION_TENANT_KEY) ?: null;
+        }
+
         $user = $user ?: auth()->user();
 
         if (!$user) {
@@ -34,6 +38,10 @@ class TenantContextService
 
     public function organizationId($user = null): ?int
     {
+        if (session()->has(PanelMembershipService::SESSION_ORGANIZATION_KEY)) {
+            return (int) session(PanelMembershipService::SESSION_ORGANIZATION_KEY) ?: null;
+        }
+
         $user = $user ?: auth()->user();
 
         if (!$user || empty($user->organization_id)) {

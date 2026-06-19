@@ -117,8 +117,13 @@ if (document.getElementById('layout-menu')) {
 
                 function recursive(item) {
                     if (item.className.includes("menu-item")) {
-                        if(isHorizontalLayout) item.className = item.className + " active open";
-                        else item.className = item.className + " open";
+                        if (isHorizontalLayout) {
+                            item.className = item.className + " active open";
+                        } else if (item.querySelector(':scope > .menu-link.menu-toggle')) {
+                            if (!item.className.includes('active')) {
+                                item.className = item.className + ' active';
+                            }
+                        }
                         recursive(item.parentElement);
                     } else if (item.className.includes("menu-inner")) {
                         return "-1";
@@ -133,6 +138,38 @@ if (document.getElementById('layout-menu')) {
 
         // Change parameter to true if you want scroll animation
         _scrollToActive();
+
+        function closeOpenSubmenusKeepActive() {
+            if (isHorizontalLayout) {
+                return;
+            }
+
+            const layoutMenu = document.getElementById('layout-menu');
+
+            if (!layoutMenu) {
+                return;
+            }
+
+            layoutMenu.querySelectorAll('.menu-item.open').forEach(function (item) {
+                item.classList.remove('open');
+            });
+
+            layoutMenu.querySelectorAll('.menu-sub .menu-item.active').forEach(function (activeChild) {
+                let node = activeChild.parentElement;
+
+                while (node && node !== layoutMenu) {
+                    if (node.classList.contains('menu-item') && node.querySelector(':scope > .menu-link.menu-toggle')) {
+                        node.classList.add('active');
+                        node.classList.remove('open');
+                    }
+
+                    node = node.parentElement;
+                }
+            });
+        }
+
+        closeOpenSubmenusKeepActive();
+        window.addEventListener('load', closeOpenSubmenusKeepActive);
         window.Helpers.mainMenu = menu;
     });
 
@@ -616,7 +653,7 @@ if (typeof $ !== 'undefined') {
                                 notFound:
                                     '<div class="not-found px-3 py-2">' +
                                     '<h6 class="suggestions-header text-primary mb-2">صفحات</h6>' +
-                                    '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> نتیجه ای یافت نشد</p>' +
+                                    '<p class="py-2 mb-0">' + (window.uiIcon ? window.uiIcon('alert-circle', 'ti-xs me-2') : '') + ' نتیجه ای یافت نشد</p>' +
                                     '</div>'
                             }
                         },
@@ -656,7 +693,7 @@ if (typeof $ !== 'undefined') {
                                 notFound:
                                     '<div class="not-found px-3 py-2">' +
                                     '<h6 class="suggestions-header text-primary mb-2">فایل‌ها</h6>' +
-                                    '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> نتیجه‌ای یافت نشد</p>' +
+                                    '<p class="py-2 mb-0">' + (window.uiIcon ? window.uiIcon('alert-circle', 'ti-xs me-2') : '') + ' نتیجه‌ای یافت نشد</p>' +
                                     '</div>'
                             }
                         },
@@ -693,7 +730,7 @@ if (typeof $ !== 'undefined') {
                                 notFound:
                                     '<div class="not-found px-3 py-2">' +
                                     '<h6 class="suggestions-header text-primary mb-2">اعضا</h6>' +
-                                    '<p class="py-2 mb-0"><i class="ti ti-alert-circle ti-xs me-2"></i> نتیجه‌ای یافت نشد</p>' +
+                                    '<p class="py-2 mb-0">' + (window.uiIcon ? window.uiIcon('alert-circle', 'ti-xs me-2') : '') + ' نتیجه‌ای یافت نشد</p>' +
                                     '</div>'
                             }
                         }
@@ -729,9 +766,12 @@ if (typeof $ !== 'undefined') {
                 });
             });
 
-            // Init PerfectScrollbar in search result
+            // Init PerfectScrollbar in search result (optional — template search UI not used in this project)
             var psSearch;
             $('.navbar-search-suggestion').each(function () {
+                if (typeof PerfectScrollbar === 'undefined') {
+                    return;
+                }
                 psSearch = new PerfectScrollbar($(this)[0], {
                     wheelPropagation: false,
                     suppressScrollX: true
@@ -739,7 +779,9 @@ if (typeof $ !== 'undefined') {
             });
 
             searchInput.on('keyup', function () {
-                psSearch.update();
+                if (psSearch) {
+                    psSearch.update();
+                }
             });
         }
     });

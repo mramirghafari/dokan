@@ -7,21 +7,13 @@
     <meta content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
         name="viewport" />
     <title>اسناد حسابداری - دکان دارمینو</title>
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" /><link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-    <script src="{{ asset('assets/') }}/js/config.js"></script>
+    <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet" /><link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" /><script src="{{ asset('assets/') }}/js/config.js"></script>
 </head>
 
 <body>
-    @include('sweetalert::alert')
+    @include('partials.panel-toasts')
     @php
         $dimensionText = function ($item) {
             $parts = [];
@@ -30,14 +22,6 @@
                 $parts[] = 'مرکز هزینه: ' . trim(($item->costCenter->code ?: '') . ' ' . $item->costCenter->name);
             }
 
-                                            <form id="merge-vouchers-form" action="{{ route('Accounting.vouchers.merge') }}" method="POST" class="d-flex flex-wrap gap-2">
-                                                @csrf
-                                                <input type="hidden" name="voucher_date_en" value="{{ now()->toDateString() }}">
-                                                <input type="hidden" name="description" value="ادغام اسناد موقت انتخاب شده">
-                                                <button type="submit" class="btn btn-outline-warning">
-                                                    <i class="ti ti-git-merge me-1"></i> ادغام انتخابی
-                                                </button>
-                                            </form>
             if ($item->branch) {
                 $parts[] = 'شعبه: ' . $item->branch->title;
             }
@@ -76,16 +60,19 @@
                 @include('sections/header')
                 <div class="content-wrapper">
                     <div class="container-xxl flex-grow-1 container-p-y">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+                        <div id="tour-vouchers-page-header" class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
                             <h4 class="mb-0"><span class="text-muted fw-light">مالی و حسابداری /</span> اسناد حسابداری
                             </h4>
-                            <div class="d-flex flex-wrap gap-2">
+                            <div id="tour-vouchers-header-actions" class="d-flex flex-wrap gap-2">
                                 <a class="btn btn-outline-secondary"
                                     href="{{ route('Accounting.analyticDimensions') }}">
-                                    <i class="ti ti-chart-dots me-1"></i> گزارش تفصیل شناور
+                                    <x-ui.icon name="chart-dots" class="me-1" /> گزارش تفصیل شناور
                                 </a>
-                                <a class="btn btn-primary" href="{{ route('Accounting.vouchers.create') }}">
-                                    <i class="ti ti-plus me-1"></i> ثبت سند جدید
+                                <a class="btn btn-outline-primary" href="{{ route('Accounting.vouchers.opening') }}">
+                                    <x-ui.icon name="plus" class="me-1" /> سند افتتاحیه
+                                </a>
+                                <a id="tour-vouchers-create-btn" class="btn btn-primary" href="{{ route('Accounting.vouchers.create') }}">
+                                    <x-ui.icon name="plus" class="me-1" /> ثبت سند جدید
                                 </a>
                             </div>
                         </div>
@@ -98,7 +85,23 @@
                             </div>
                         @endif
 
-                        <div class="card">
+                        <div id="tour-vouchers-merge-bar" class="card mb-3">
+                            <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
+                                <div class="text-muted small mb-0">
+                                    سندهای <strong>موقت</strong> را تیک بزنید و در یک سند واحد ادغام کنید (حداقل ۲ سند).
+                                </div>
+                                <form id="merge-vouchers-form" action="{{ route('Accounting.vouchers.merge') }}" method="POST" class="d-flex flex-wrap gap-2 mb-0">
+                                    @csrf
+                                    <input type="hidden" name="voucher_date_en" value="{{ now()->toDateString() }}">
+                                    <input type="hidden" name="description" value="ادغام اسناد موقت انتخاب شده">
+                                    <button type="submit" class="btn btn-outline-warning">
+                                        <x-ui.icon name="git-merge" class="me-1" /> ادغام انتخابی
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div id="tour-vouchers-table" class="card">
                             <div class="card-datatable table-responsive py-0">
                                 <table class="table table-hover align-middle">
                                     <thead>
@@ -127,7 +130,17 @@
                                                         <span class="text-muted">-</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $voucher->voucher_number }}</td>
+                                                <td>
+                                                    {{ $voucher->voucher_number }}
+                                                    @if ($voucher->document_type === 'period_opening')
+                                                        <span class="badge bg-label-primary d-block mt-1">افتتاحیه</span>
+                                                    @elseif ($voucher->document_type === 'period_closing')
+                                                        <span class="badge bg-label-dark d-block mt-1">اختتامیه</span>
+                                                    @endif
+                                                    @if ($voucher->reference_number)
+                                                        <div class="small text-muted mt-1">عطف: {{ $voucher->reference_number }}</div>
+                                                    @endif
+                                                </td>
                                                 <td>{{ $voucher->voucher_date_fa ?: optional($voucher->voucher_date_en)->format('Y-m-d') }}
                                                 </td>
                                                 <td>{{ $voucher->description }}</td>
@@ -191,6 +204,9 @@
                                                         @if (in_array($voucher->document_type, ['manual', 'manual_copy', 'manual_template'], true))
                                                             <a class="btn btn-sm btn-outline-info"
                                                                 href="{{ route('Accounting.vouchers.edit', $voucher) }}">ویرایش</a>
+                                                        @elseif ($voucher->document_type === 'period_opening')
+                                                            <a class="btn btn-sm btn-outline-info"
+                                                                href="{{ route('Accounting.vouchers.opening', ['fiscal_year_id' => $voucher->fiscal_year_id]) }}">ویرایش افتتاحیه</a>
                                                         @endif
                                                         <form
                                                             action="{{ route('Accounting.vouchers.permanent', $voucher) }}"
@@ -226,6 +242,7 @@
                                             </tr>
                                             @if ($voucher->items->isNotEmpty())
                                                 <tr>
+                                                    <td></td>
                                                     <td></td>
                                                     <td colspan="7">
                                                         <div class="table-responsive">
@@ -270,7 +287,7 @@
                                             @endif
                                         @empty
                                             <tr>
-                                                <td colspan="8" class="text-center text-muted py-4">هنوز سند
+                                                <td colspan="9" class="text-center text-muted py-4">هنوز سند
                                                     حسابداری
                                                     ثبت نشده است.</td>
                                             </tr>
@@ -295,10 +312,12 @@
 
     <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-    <script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
     <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
     <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
     <script src="{{ asset('assets/') }}/js/main.js"></script>
     <script>

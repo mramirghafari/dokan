@@ -26,6 +26,8 @@ class Customers extends Model
         'channel',
         'sales_channel_id',
         'customer_code',
+        'max_purchase_amount',
+        'max_discount_amount',
         'status',
         'customer_status_id',
         'area',
@@ -42,6 +44,11 @@ class Customers extends Model
         'organization_id',
         'tenant_id',
         'updated_at'
+    ];
+
+    protected $casts = [
+        'max_purchase_amount' => 'decimal:2',
+        'max_discount_amount' => 'decimal:2',
     ];
 
     public function leader()
@@ -117,6 +124,16 @@ class Customers extends Model
     public function activeOrdersSum()
     {
         return $this->activeOrders()->sum('fullPrice');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function latestPishfactor()
+    {
+        return $this->hasOne(Pishfactor::class, 'customer_id', 'id')->latestOfMany();
     }
 
     /** 🔹 تعیین رهبر بر اساس Area → یا Region */

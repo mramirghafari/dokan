@@ -41,7 +41,7 @@
                                     @endif
                                 </h4>
                             </div>
-                            <span class="badge bg-label-{{ $card['status'] === 'fresh' ? 'success' : 'warning' }}"><i class="ti {{ $card['icon'] }}"></i></span>
+                            <span class="badge bg-label-{{ $card['status'] === 'fresh' ? 'success' : 'warning' }}"><x-ui.icon :name="$card['icon']" /></span>
                         </div>
                         @if(!is_null($card['delta_percent']))
                             <small class="{{ $card['delta_percent'] >= 0 ? 'delta-up' : 'delta-down' }}">

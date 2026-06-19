@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\UnitController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,7 +22,9 @@ Auth::routes();
 
 //logout
 Route::get('/logout', function () {
+    app(\App\Services\PanelMembershipService::class)->clearActivePanel();
     \Auth::logout();
+
     return redirect()->route('login');
 });
 
@@ -35,7 +39,10 @@ Route::match(['GET', 'POST'], '/portal/customer/{token}/payments/{payment}/verif
 Route::post('/crm/integrations/voip/{connection}/webhook', "CrmIntegrationController@voipWebhook")->name('crm.integrations.voip.webhook');
 Route::get('/bi/shared-report/{token}', "BiDashboardController@sharedReport")->name('bi.report-builder.shared');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'panel.active'])->group(function () {
+    Route::get('/panel/select', [\App\Http\Controllers\Auth\PanelSelectionController::class, 'show'])->name('panel.select');
+    Route::post('/panel/select', [\App\Http\Controllers\Auth\PanelSelectionController::class, 'store'])->name('panel.switch');
+
     //index
     Route::get('/', "HomeController@index")->name('index');
     Route::get('/dashboard/org-data/{id}', "HomeController@getOrgData")->name('getOrgData');
@@ -66,6 +73,8 @@ Route::middleware(['auth'])->group(function () {
     //Brands
     Route::resource('brands', BrandController::class)->except('create', 'show', 'destroy');
     //Units
+    Route::get('units/product', [UnitController::class, 'index'])->defaults('usage_scope', 'product')->name('units.product.index');
+    Route::get('units/shipping', [UnitController::class, 'index'])->defaults('usage_scope', 'shipping')->name('units.shipping.index');
     Route::resource('units', UnitController::class)->except('create', 'show', 'destroy');
     Route::get('/units/getParent/{id}', "UnitController@parents")->name('units.parent');
     //Organizations
@@ -94,6 +103,11 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('categories', CategoryController::class)->except('create', 'show', 'destroy');
     //Products
     Route::get('products/datatable', "ProductController@datatable")->name('products.datatable');
+    Route::post('products/list-columns', "ProductController@saveListColumns")->name('products.list-columns.save');
+    Route::get('products/data-import', "ProductDataImportController@index")->name('products.data-import.index');
+    Route::get('products/data-import/template', "ProductDataImportController@template")->name('products.data-import.template');
+    Route::post('products/data-import', "ProductDataImportController@import")->name('products.data-import.import');
+    Route::get('products/data-import/status/{run}', "ProductDataImportController@importStatus")->name('products.data-import.status');
     Route::resource('products', ProductController::class)->except('show');
     Route::get('products/trashed', "ProductController@trashGet")->name('products.trashed.get');
     Route::delete('/products/trashed/{product}', "ProductController@trashPost")->name('products.trashed.post');
@@ -110,6 +124,11 @@ Route::middleware(['auth'])->group(function () {
 
     //Customers
     Route::get('customers/datatable', "CustomersController@datatable")->name('customers.datatable');
+    Route::post('customers/list-columns', "CustomersController@saveListColumns")->name('customers.list-columns.save');
+    Route::get('customers/data-import', "CustomerDataImportController@index")->name('customers.data-import.index');
+    Route::get('customers/data-import/template', "CustomerDataImportController@template")->name('customers.data-import.template');
+    Route::post('customers/data-import', "CustomerDataImportController@import")->name('customers.data-import.import');
+    Route::get('customers/data-import/status/{run}', "CustomerDataImportController@importStatus")->name('customers.data-import.status');
     Route::get('customers/{customer}/360', "CustomersController@profile360")->name('customers.360');
     Route::resource('customers', CustomersController::class);
     Route::any('customers_search', "CustomersController@search")->name('customers.search');
@@ -282,11 +301,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/freight/update_by_driver/{Factor}', "DriverController@update_by_driver")->name('update_by_driver');
 
     //Accounts & Accounting
+    Route::post('Account/import-standard', "AccountController@importStandard")->name('Account.importStandard');
     Route::resource('Account', AccountController::class)->except('show');
     Route::resource('Terminals', TerminalController::class)->except('show');
     Route::resource('Accounting', AccountingController::class)->except('show');
     Route::get('Accounting/vouchers', "AccountingController@vouchers")->name('Accounting.vouchers');
     Route::get('Accounting/vouchers/create', "AccountingController@createVoucher")->name('Accounting.vouchers.create');
+    Route::get('Accounting/vouchers/opening', "AccountingController@createOpeningVoucher")->name('Accounting.vouchers.opening');
+    Route::post('Accounting/vouchers/opening', "AccountingController@storeOpeningVoucher")->name('Accounting.vouchers.opening.store');
     Route::get('Accounting/voucher-templates', "AccountingController@voucherTemplates")->name('Accounting.voucherTemplates');
     Route::post('Accounting/voucher-templates/{voucherTemplate}/draft', "AccountingController@createVoucherFromTemplate")->name('Accounting.voucherTemplates.draft');
     Route::get('Accounting/vouchers/{voucher}/edit', "AccountingController@editVoucher")->name('Accounting.vouchers.edit');
@@ -523,7 +545,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings', "SettingController@index")->name('settings.index');
     Route::get('/settings/sales-scenario', "SettingController@salesScenario")->name('settings.salesScenario');
     Route::get('/settings/notifications', "SettingController@notifications")->name('settings.notifications');
+    Route::get('/settings/dashboard-widgets', "SettingController@dashboardWidgets")->name('settings.dashboardWidgets');
     Route::post('/settings', "SettingController@update")->name('settings.update');
+    Route::get('/setup-guide', "SetupGuideController@index")->name('setup-guide.index');
+
+    Route::post('/panel/onboarding/welcome', "PanelOnboardingController@dismissWelcome")->name('panel.onboarding.welcome');
+    Route::post('/panel/onboarding/tour', "PanelOnboardingController@completeTour")->name('panel.onboarding.tour');
+    Route::post('/panel/onboarding/complete', "PanelOnboardingController@completeSetup")->name('panel.onboarding.complete');
 
     //WAREHOUSE REPORTSS
     Route::get('/reports/warehouse', "ReportController@warehouse")->name('warehouse.index');

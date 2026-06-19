@@ -7,29 +7,19 @@
     <title>ویرایش فاکتورهای سامانه - دکان دارمینو</title>
     <meta content="" name="description"/>
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/>
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet"/>
-    <!-- Core CSS -->
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/><!-- Icons -->
+<!-- Core CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet"/>
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables.bootstrap5.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css" rel="stylesheet"/>
 
     <!-- Page CSS -->
     <link href="{{ asset('assets/') }}/vendor/libs/select2/select2.css" rel="stylesheet"/>
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet"/>
@@ -76,12 +66,18 @@
                                         </div>
                                         <div class="mb-3 col-12 col-md-3">
                                             <label class="form-label" for="pr_type">نوع محصولات فاکتور</label>
-                                            <select class="select2 form-select" data-allow-clear="true" id="pr_type" name="pr_type">
-                                                <option value="">انتخاب کنید</option>
-                                                <option value="1"  @if($factorMaker->pr_type == 1) selected @endif>محصولات یخچالی</option>
-                                                <option value="0"  @if($factorMaker->pr_type == 0) selected @endif>محصولات غیریخچالی</option>
+                                            @php($currentProductType = app(\App\Services\InvoiceLayoutService::class)->normalizeProductType($factorMaker->pr_type === null ? null : (string) $factorMaker->pr_type))
+                                            <select class="select2 form-select" data-allow-clear="true" id="pr_type" name="pr_type" data-profile-link="business_profile">
+                                                @foreach ($productTypes as $type)
+                                                    <option value="{{ $type['key'] }}" data-profile="{{ $type['profile'] }}"
+                                                        @if($currentProductType === $type['key']) selected @endif>{{ $type['label'] }}</option>
+                                                @endforeach
                                             </select>
+                                            <small class="text-muted d-block mt-1" id="pr_type_help">
+                                                {{ collect($productTypes)->firstWhere('key', $currentProductType)['description'] ?? '' }}
+                                            </small>
                                         </div>
+                                        @include('FactorManager.partials.business_profile_fields')
                                         <div class="mb-3 col-12 col-md-3">
                                             <label class="form-label" for="currency_type">واحد پولی فاکتور</label>
                                             <select class="select2 form-select" data-allow-clear="true" id="currency_type" name="currency_type">
@@ -337,66 +333,7 @@
                                             @endif
 
                                         </tr>
-                                        <tr class="x_border td-left-border">
-                                            <th class="text-center">ردیف</th>
-                                            @if($factorMaker->column_pr_code == 1)
-                                            <th class="text-center">کد کالا</th>
-                                            @endif
-                                            <th class="kalaname" width="250">نام کالا</th>
-                                            @if($factorMaker->column_moadian == 1)
-                                            <th class="text-center moadian">شناسه مودیان</th>
-                                            @endif
-                                            @if($factorMaker->column_sub_unit == 1)
-                                            <th class="text-center boxcol">کارتن</th>
-                                            @endif
-                                            <th class="text-center">جزء</th>
-                                            @if($factorMaker->column_sub_unit == 1)
-                                            <th class="text-center">کل</th>
-                                            @endif
-                                            <th class="text-center">فی واحد</th>
-                                            <th class="text-center">مبلغ ناخالص</th>
-                                            @if($factorMaker->column_discount == 1)
-                                            <th class="dis_col text-center">درصد تخفیف</th>
-                                            <th class="text-center">مبلغ تخفیف</th>
-                                            <th class="text-center">مبلغ پس از تخفیف</th>
-                                            @endif
-                                            @if($factorMaker->column_tax == 1)
-                                            <th class="text-center">مالیات</th>
-                                            @endif
-                                            <th class="text-center">مبلغ خالص</th>
-                                        </tr>
-                                        </thead>
-
-                                        <tbody>
-                                        <tr class="item_1 x_border  td-left-border" data-item="1">
-                                            <td class="text-center">1</td>
-                                            @if($factorMaker->column_pr_code == 1)
-                                            <td class="text-center">---</td>
-                                            @endif
-                                            <td>---</td>
-                                            @if($factorMaker->column_moadian == 1)
-                                            <td class="text-center">---</td>
-                                            @endif
-                                            @if($factorMaker->column_sub_unit == 1)
-                                            <td class="text-center">---</td>
-                                            @endif
-                                            <td class="text-center">---</td>
-                                            @if($factorMaker->column_sub_unit == 1)
-                                            <td class="text-center">---</td>
-                                            @endif
-                                            <td class="text-center">---</td>
-                                            <td class="fee_price text-center">---</td>
-                                            @if($factorMaker->column_discount == 1)
-                                            <td class="discount_changer text-center">--- </td>
-                                            <td class="discount_price text-center">---</td>
-                                            <td class="pat text-center"></td>
-                                            @endif
-                                            @if($factorMaker->column_tax == 1)
-                                            <td class="tax text-center" data-tax="1">---</td>
-                                            @endif
-                                            <td class="price_with_tax text-center">---</td>
-                                        </tr>
-                                        </tbody>
+                                        @include('FactorManager.partials.layout_preview', ['factorMaker' => $factorMaker])
                                         <tfoot>
                                         <tr>
                                             <th colspan="@if($factorMaker->column_sub_unit == 1) 4 @else 3 @endif">جمع کل</th>
@@ -512,11 +449,13 @@
 <!-- build:js assets/vendor/js/core.js -->
 <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
 <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
 <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
 <!-- endbuild -->
 <script src="{{ asset('assets/') }}/vendor/libs/jquery-sticky/jquery-sticky.js"></script>
@@ -596,6 +535,8 @@
 
     });
 
+    @php $savedLayoutLabels = $factorMaker->line_layout['labels'] ?? []; @endphp
+    @include('FactorManager.partials.layout_preview_script')
 </script>
 </body>
 

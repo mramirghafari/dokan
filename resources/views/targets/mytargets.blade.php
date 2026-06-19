@@ -10,19 +10,12 @@ use Hekmatinasser\Verta\Verta; ?>
     <title>تارگت پلن من -  دکان دارمینو</title>
     <meta content="" name="description"/>
     <!-- Favicon -->
-    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/>
-    <!-- Icons -->
-    <link href="{{ asset('assets/') }}/vendor/fonts/fontawesome.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/tabler-icons.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/fonts/flag-icons.css" rel="stylesheet"/>
-    <!-- Core CSS -->
+    <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon"/><!-- Icons -->
+<!-- Core CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/css/rtl/theme-default.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/css/demo.css" rel="stylesheet"/>
-    <!-- Vendors CSS -->
-    <link href="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet"/>
-    <link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
+    <!-- Vendors CSS --><link href="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/apex-charts/apex-charts.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/swiper/swiper.css" rel="stylesheet"/>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-bs5/datatables.bootstrap5.css" rel="stylesheet"/>
@@ -30,10 +23,7 @@ use Hekmatinasser\Verta\Verta; ?>
     <link href="{{ asset('assets/') }}/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css" rel="stylesheet"/>
     <!-- Page CSS -->
     <link href="{{ asset('assets/') }}/vendor/css/pages/cards-advance.css" rel="stylesheet"/>
-    <!-- Helpers -->
-    <script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
-
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <!-- Helpers --><!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <!-- Better experience of RTL -->
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet"/>
@@ -74,7 +64,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                             <ul class="row p-0 m-0">
                                                                                                 <li class="d-flex col-12 col-md-6 gap-3 align-items-center mb-lg-3 pb-1">
                                                     <div class="badge rounded bg-label-success p-1">
-                                                        <i class="ti ti-circle-check ti-sm"></i>
+                                                        <x-ui.icon name="circle-check" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">تاریخ شروع</h6>
@@ -83,7 +73,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                                 </li>
                                                 <li class="d-flex col-12 col-md-6 gap-3 align-items-center pb-1">
                                                     <div class="badge rounded bg-label-danger p-1">
-                                                        <i class="ti ti-clock ti-sm"></i>
+                                                        <x-ui.icon name="clock" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">تاریخ پایان</h6>
@@ -92,7 +82,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                                 </li>
                                                 <li class="d-flex col-12 col-md-6 gap-3 align-items-center mb-lg-3 pt-2 pb-1">
                                                     <div class="badge rounded bg-label-primary p-1">
-                                                        <i class="ti ti-target ti-sm"></i>
+                                                        <x-ui.icon name="target" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">تعداد فاکتورهای تعیین شده</h6>
@@ -105,7 +95,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                                 </li>
                                                 <li class="d-flex col-12 col-md-6 gap-3 align-items-center mb-lg-3 pt-2 pb-1">
                                                     <div class="badge rounded bg-label-success p-1">
-                                                        <i class="ti ti-star ti-sm"></i>
+                                                        <x-ui.icon name="star" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">تعداد فاکتورهای ثبت شده</h6>
@@ -114,7 +104,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                                 </li>
                                                 <li class="d-flex col-12 col-md-12 gap-3 align-items-center pb-1">
                                                     <div class="badge rounded bg-label-success p-1">
-                                                        <i class="ti ti-moneybag ti-sm"></i>
+                                                        <x-ui.icon name="moneybag" class="ti-sm" />
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">مجموع درآمد فاکتورها</h6>
@@ -151,7 +141,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                         <ul class="p-0 m-0">
                                             <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
                                                 <div class="badge bg-label-primary rounded p-2">
-                                                    <i class="ti ti-user ti-sm"></i>
+                                                    <x-ui.icon name="user" class="ti-sm" />
                                                 </div>
                                                 <div class="d-flex justify-content-between w-100 flex-wrap">
                                                     <h6 class="mb-0 ms-3">{{ $visitor['name'] }}</h6>
@@ -206,11 +196,13 @@ use Hekmatinasser\Verta\Verta; ?>
 <!-- build:js assets/vendor/js/core.js -->
 <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
-<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/node-waves/node-waves.js"></script>
-<script src="{{ asset('assets/') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/bootstrap.js">
+</script>
 <script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/typeahead-js/typeahead.js"></script>
+<script src="{{ asset('assets/') }}/vendor/libs/hammer/hammer.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
+
 <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
 <!-- endbuild -->
 <!-- Vendors JS -->
