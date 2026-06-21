@@ -27,9 +27,34 @@
         ul.alert.alert-danger {
             list-style-type: none;
         }
+
+        body.otp-page .authentication-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.otp-page .authentication-inner {
+            max-width: 29rem;
+            width: 100%;
+        }
+
+        body.otp-page .card {
+            border: 1px solid rgba(84, 60, 146, 0.12);
+            border-radius: 1rem;
+            box-shadow: 0 0.75rem 2rem rgba(67, 53, 86, 0.12);
+        }
+
+        body.otp-page .card-body {
+            padding: 2rem 1.75rem 1.5rem;
+        }
+
         div#otp {
             max-width: 400px;
+            margin-inline: auto;
         }
+
         input.otp-input {
             width: 60px;
             height: 50px;
@@ -39,10 +64,65 @@
             text-align: center;
             font-size: 20px;
         }
+
+        @media (max-width: 767px) {
+            body.otp-page .authentication-inner {
+                max-width: 100%;
+            }
+
+            body.otp-page .authentication-inner.py-4 {
+                padding-top: 1rem !important;
+                padding-bottom: 1rem !important;
+            }
+
+            body.otp-page .container-xxl {
+                padding-inline: 0.75rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body.otp-page .authentication-wrapper.container-p-y {
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+            }
+
+            body.otp-page .card-body {
+                padding: 1rem !important;
+            }
+
+            body.otp-page .app-brand {
+                margin-bottom: 0.75rem !important;
+                margin-top: 0 !important;
+            }
+
+            body.otp-page .app-brand svg {
+                max-width: 72px;
+                width: 100%;
+                height: auto;
+            }
+
+            body.otp-page h4 {
+                font-size: 1.05rem;
+                padding-top: 0.25rem !important;
+                margin-bottom: 0.35rem !important;
+            }
+
+            body.otp-page .otp-subtitle {
+                margin-bottom: 1rem !important;
+                font-size: 0.88rem;
+            }
+
+            input.otp-input {
+                width: 52px;
+                height: 44px;
+                margin: 3px;
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 
-<body>
+<body class="otp-page">
 <!-- Content -->
 <div class="container-xxl">
     <div class="authentication-wrapper authentication-basic container-p-y">
@@ -76,7 +156,7 @@
                     </div>
                     <!-- /Logo -->
                     <h4 class="mb-1 pt-2">دکان دارمینو</h4>
-                    <p class="mb-4">کد ارسال شده به شماره {{ session('mobile') }} را وارد کنید:</p>
+                    <p class="mb-4 otp-subtitle">کد ارسال شده به شماره {{ session('mobile') }} را وارد کنید:</p>
                     @include('errors.errors')
                     @if(session('error'))
                         <p class="alert alert-danger m-0">{{ session('error') }}</p>

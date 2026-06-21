@@ -213,6 +213,79 @@
         body.login-page .btn-login-submit:active {
             transform: translateY(0);
         }
+
+        @media (max-width: 767px) {
+            body.login-page .authentication-inner {
+                max-width: 100%;
+            }
+
+            body.login-page .authentication-inner.py-4 {
+                padding-top: 1rem !important;
+                padding-bottom: 1rem !important;
+            }
+
+            body.login-page .container-xxl {
+                padding-inline: 0.75rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body.login-page .authentication-wrapper.container-p-y {
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+            }
+
+            body.login-page .card-body {
+                padding: 1rem !important;
+            }
+
+            body.login-page .app-brand {
+                margin-bottom: 0.75rem !important;
+                margin-top: 0 !important;
+            }
+
+            body.login-page .app-brand svg {
+                max-width: 140px;
+                width: 100%;
+                height: auto;
+            }
+
+            body.login-page h4 {
+                font-size: 1.05rem;
+                padding-top: 0.25rem !important;
+                margin-bottom: 0.35rem !important;
+            }
+
+            body.login-page .login-subtitle {
+                margin-bottom: 0.85rem;
+                font-size: 0.85rem;
+            }
+
+            body.login-page .login-tabs-wrap {
+                margin-bottom: 1rem;
+            }
+
+            body.login-page .login-tabs {
+                padding: 0.3rem;
+                gap: 0.25rem;
+            }
+
+            body.login-page .login-tabs .nav-link {
+                font-size: 0.8125rem;
+                padding: 0.45rem 0.35rem;
+                line-height: 1.25;
+            }
+
+            body.login-page .login-tab-content {
+                padding-top: 0.35rem;
+            }
+
+            body.login-page .form-control,
+            body.login-page .input-group-text,
+            body.login-page .btn-login-submit {
+                min-height: 2.6rem;
+            }
+        }
     </style>
 </head>
 
