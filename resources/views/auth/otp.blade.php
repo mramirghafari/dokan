@@ -85,10 +85,10 @@
                         @csrf
                         <div class="mb-3">
                             <div id="otp" class="inputs d-flex flex-row-reverse justify-content-center mt-2">
-                                <input type="text" maxlength="1" class="otp-input" name="otp[]" autofocus>
-                                <input type="text" maxlength="1" class="otp-input" name="otp[]" >
-                                <input type="text" maxlength="1" class="otp-input" name="otp[]" >
-                                <input type="text" maxlength="1" class="otp-input" name="otp[]" >
+                                <input type="text" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]*" autofocus>
+                                <input type="text" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]*">
+                                <input type="text" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]*">
+                                <input type="text" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]*">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -126,9 +126,11 @@
 <script src="{{ asset('assets/') }}/js/pages-auth.js"></script>
 <script>
     (function () {
-        var loadingText = 'در حال بررسی';
+        var loadingText = 'در حال بررسی...';
+        var otpLength = 4;
         var form = document.getElementById('otpForm');
         var submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+        var isSubmitting = false;
 
         function setSubmitLoading() {
             if (!submitBtn || submitBtn.disabled) {
@@ -138,26 +140,65 @@
             submitBtn.textContent = loadingText;
         }
 
+        function getOtpValue() {
+            var inputs = document.querySelectorAll('.otp-input');
+            var code = '';
+            inputs.forEach(function (input) {
+                code += input.value;
+            });
+            return code;
+        }
+
+        function tryAutoSubmit() {
+            if (!form || isSubmitting) {
+                return;
+            }
+            if (getOtpValue().length === otpLength) {
+                isSubmitting = true;
+                setSubmitLoading();
+                form.submit();
+            }
+        }
+
         if (form) {
-            form.addEventListener('submit', setSubmitLoading);
+            form.addEventListener('submit', function () {
+                isSubmitting = true;
+                setSubmitLoading();
+            });
         }
 
         var inputs = document.querySelectorAll('.otp-input');
         inputs.forEach(function (input, index) {
             input.addEventListener('input', function () {
-                if (input.value.length === 1 && index < inputs.length - 1) {
+                var digit = input.value.replace(/\D/g, '').slice(0, 1);
+                input.value = digit;
+
+                if (digit.length === 1 && index < inputs.length - 1) {
                     inputs[index + 1].focus();
                 }
 
-                if (index === inputs.length - 1 && input.value.length === 1) {
-                    form.submit();
-                }
+                tryAutoSubmit();
             });
 
             input.addEventListener('keydown', function (e) {
                 if (e.key === 'Backspace' && input.value === '' && index > 0) {
                     inputs[index - 1].focus();
                 }
+            });
+
+            input.addEventListener('paste', function (e) {
+                e.preventDefault();
+                var pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, otpLength);
+                pasted.split('').forEach(function (char, i) {
+                    if (inputs[i]) {
+                        inputs[i].value = char;
+                    }
+                });
+                if (pasted.length > 0) {
+                    var focusIndex = Math.min(pasted.length, inputs.length - 1);
+                    inputs[focusIndex].focus();
+                }
+                tryAutoSubmit();
             });
         });
     })();

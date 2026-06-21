@@ -300,7 +300,8 @@
                 <div class="mb-3">
                     <label class="form-label" for="mobile">شماره موبایل</label>
                     <input class="form-control" type="text" name="mobile" id="mobile" required=""
-                        placeholder="09xx1234567" style="direction: ltr;">
+                        inputmode="numeric" pattern="[0-9]*" maxlength="11"
+                        placeholder="09xx1234567" style="direction: ltr;" autocomplete="tel">
                 </div>
                 <div class="mb-3">
                     <button class="btn btn-primary d-grid w-100 btn-login-submit" type="submit">ارسال پیامک</button>
@@ -342,7 +343,7 @@
     <script src="{{ asset('assets/') }}/js/pages-auth.js"></script>
     <script>
         (function () {
-            var loadingText = 'در حال بررسی';
+            var loadingText = 'در حال بررسی...';
 
             document.querySelectorAll('.login-tab-content form').forEach(function (form) {
                 form.addEventListener('submit', function () {
@@ -354,6 +355,34 @@
                     btn.textContent = loadingText;
                 });
             });
+
+            var mobileInput = document.getElementById('mobile');
+            if (mobileInput) {
+                mobileInput.addEventListener('input', function () {
+                    var val = this.value.replace(/\D/g, '');
+
+                    if (val.length > 0 && val.charAt(0) !== '0') {
+                        val = '0' + val;
+                    }
+                    if (val.length > 1 && val.charAt(1) !== '9') {
+                        val = '09' + val.slice(2);
+                    }
+
+                    val = val.slice(0, 11);
+                    this.value = val;
+
+                    if (val.length === 11) {
+                        this.blur();
+                    }
+                });
+
+                mobileInput.addEventListener('paste', function (e) {
+                    e.preventDefault();
+                    var pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+                    mobileInput.value = pasted;
+                    mobileInput.dispatchEvent(new Event('input'));
+                });
+            }
         })();
     </script>
     </body>
