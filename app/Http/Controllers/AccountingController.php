@@ -64,6 +64,7 @@ use App\Services\TreasuryChequeBookService;
 use App\Services\TreasuryCashForecastService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -1526,6 +1527,24 @@ class AccountingController extends Controller
         return redirect()->route('Accounting.payroll');
     }
 
+    public function payrollPayslip(PayrollRun $payrollRun)
+    {
+        $this->authorizePayrollRunTenant($payrollRun);
+
+        $payrollRun->load(['items.employee', 'items.contract', 'items.components']);
+
+        return view('Accounting.payroll.payslip', compact('payrollRun'));
+    }
+
+    public function payrollReport(PayrollRun $payrollRun)
+    {
+        $this->authorizePayrollRunTenant($payrollRun);
+
+        $payrollRun->load(['items.employee', 'items.contract', 'accountingVoucher']);
+
+        return view('Accounting.payroll.report', compact('payrollRun'));
+    }
+
     public function createVoucher()
     {
         $accounts = $this->accountingAccounts();
@@ -2686,7 +2705,24 @@ class AccountingController extends Controller
 
     private function payrollEmployees()
     {
-        return collect();
+        $user = Auth::user();
+        $query = Employee::query()
+            ->where('isActive', 1)
+            ->when(Schema::hasColumn('employees', 'employment_status'), function ($query) {
+                $query->where(function ($sub) {
+                    $sub->whereNull('employment_status')->orWhere('employment_status', '<>', 'terminated');
+                });
+            })
+            ->orderBy('name');
+
+        if ((int) $user->isGod !== 1) {
+            $tenantId = $this->currentTenantId($user);
+            $query->where(function ($query) use ($tenantId) {
+                $query->where('tenant_id', $tenantId)->orWhereNull('tenant_id');
+            });
+        }
+
+        return $query->get();
     }
 
     private function nextExpenseNumber(?int $tenantId): string

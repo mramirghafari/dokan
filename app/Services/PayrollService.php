@@ -302,9 +302,19 @@ class PayrollService
             $benefitAmount = $this->providedMoney($benefits, $index, $fixedBenefits + $overtimeAmount + $bonusAmount + $missionAmount);
             $insuranceSubjectAmount = round($baseSalary + $benefitAmount, 2);
             $taxableAmount = round(max(0, $baseSalary + $benefitAmount - $this->money($contract?->tax_exemption_amount)), 2);
-            $employeeInsurance = $this->providedMoney($employeeInsurances, $index, round($insuranceSubjectAmount * $this->rate($contract?->employee_insurance_rate) / 100, 2));
-            $employerInsurance = $this->providedMoney($employerInsurances, $index, round($insuranceSubjectAmount * $this->rate($contract?->employer_insurance_rate) / 100, 2));
-            $taxAmount = $this->providedMoney($taxes, $index, round($taxableAmount * $this->rate($contract?->tax_rate) / 100, 2));
+            $empInsRate = $this->rate($contract?->employee_insurance_rate);
+            $emplrInsRate = $this->rate($contract?->employer_insurance_rate);
+            // Default to statutory rates when contract doesn't specify (7% employee, 26% employer incl. unemployment)
+            $defaultEmpIns = $empInsRate > 0 ? $empInsRate : 7.0;
+            $defaultEmplrIns = $emplrInsRate > 0 ? $emplrInsRate : 26.0;
+            $employeeInsurance = $this->providedMoney($employeeInsurances, $index, round($insuranceSubjectAmount * $defaultEmpIns / 100, 2));
+            $employerInsurance = $this->providedMoney($employerInsurances, $index, round($insuranceSubjectAmount * $defaultEmplrIns / 100, 2));
+            // Use progressive tax when contract tax_rate = 0 (system-calculated mandatory brackets)
+            $contractTaxRate = $this->rate($contract?->tax_rate);
+            $defaultTax = $contractTaxRate > 0
+                ? round($taxableAmount * $contractTaxRate / 100, 2)
+                : self::calculateProgressiveTax($taxableAmount);
+            $taxAmount = $this->providedMoney($taxes, $index, $defaultTax);
             $otherDeduction = $this->money($otherDeductions[$index] ?? 0);
             $loanDeduction = $this->money($loanDeductions[$index] ?? 0);
             $advanceDeduction = $this->money($advanceDeductions[$index] ?? 0);
@@ -465,6 +475,56 @@ class PayrollService
         }
 
         return 0;
+    }
+
+    /**
+     * Iranian progressive payroll tax (مالیات حقوق) — 1404/1405 brackets.
+     * Input and output are in Rials (ریال).
+     * Brackets are based on monthly taxable income (درآمد مشمول مالیات ماهانه).
+     *
+     * Up to  12,000,000 T  (120,000,000 R): 0%
+     * 12,000,001–20,000,000 T: 10%
+     * 20,000,001–40,000,000 T: 15%
+     * 40,000,001–80,000,000 T: 20%
+     * Above  80,000,000 T      : 25%
+     *
+     * Note: we work in Toman internally (divide Rials by 10).
+     */
+    public static function calculateProgressiveTax(float $taxableAmountRials): float
+    {
+        if ($taxableAmountRials <= 0) {
+            return 0;
+        }
+
+        $toman = $taxableAmountRials / 10;
+
+        $brackets = [
+            [120_000_000, 0.00],
+            [200_000_000, 0.10],
+            [400_000_000, 0.15],
+            [800_000_000, 0.20],
+            [PHP_FLOAT_MAX, 0.25],
+        ];
+
+        $tax = 0.0;
+        $prev = 0.0;
+
+        foreach ($brackets as [$ceiling, $rate]) {
+            if ($toman <= $prev) {
+                break;
+            }
+
+            $taxable = min($toman, $ceiling) - $prev;
+
+            if ($taxable <= 0) {
+                break;
+            }
+
+            $tax += $taxable * $rate;
+            $prev = $ceiling;
+        }
+
+        return round($tax * 10, 2);
     }
 
     private function overtimeAmount(?PayrollContract $contract, float $overtimeHours): float

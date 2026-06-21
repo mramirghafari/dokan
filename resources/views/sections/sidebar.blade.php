@@ -1245,6 +1245,26 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
             </li>
             @endif
 
+            @can('employees')
+                <li class="menu-item {{ Request::routeIs(['employees.index', 'employees.edit', 'Accounting.payroll', 'Accounting.payroll.payslip', 'Accounting.payroll.report']) ? 'active' : '' }}"
+                    data-menu-key="hr_payroll">
+                    <a class="menu-link menu-toggle" href="javascript:void(0);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <div>منابع انسانی</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item {{ Request::routeIs(['employees.index', 'employees.edit']) ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('employees.index') }}">تعریف پرسنل و کارگزینی</a>
+                        </li>
+                        <li class="menu-item {{ Request::routeIs(['Accounting.payroll']) ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('Accounting.payroll') }}">حقوق و دستمزد</a>
+                        </li>
+                    </ul>
+                </li>
+            @endcan
+
             @can('formulation')
                 <li class="menu-item " data-menu-key="formulation">
                     <a class="menu-link menu-toggle" href="javascript:void(0);">

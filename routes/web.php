@@ -360,6 +360,8 @@ Route::middleware(['auth', 'panel.active'])->group(function () {
     Route::post('Accounting/payroll', "AccountingController@storePayrollRun")->name('Accounting.payroll.store');
     Route::post('Accounting/payroll/{payrollRun}/payments', "AccountingController@payPayrollRun")->name('Accounting.payroll.payments.store');
     Route::post('Accounting/payroll/{payrollRun}/cancel', "AccountingController@cancelPayrollRun")->name('Accounting.payroll.cancel');
+    Route::get('Accounting/payroll/{payrollRun}/payslip', "AccountingController@payrollPayslip")->name('Accounting.payroll.payslip');
+    Route::get('Accounting/payroll/{payrollRun}/report', "AccountingController@payrollReport")->name('Accounting.payroll.report');
     Route::get('contracting/projects', "ContractingController@index")->name('contracting.projects');
     Route::post('contracting/projects', "ContractingController@storeProject")->name('contracting.projects.store');
     Route::post('contracting/projects/{project}/progress-statements', "ContractingController@storeProgressStatement")->name('contracting.progressStatements.store');

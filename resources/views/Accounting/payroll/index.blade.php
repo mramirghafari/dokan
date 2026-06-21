@@ -432,18 +432,26 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    @if ($run->status !== 'canceled' && $remaining <= 0)
-                                                        <span class="badge bg-label-success">تکمیل</span>
-                                                    @endif
-                                                    @if ($run->status !== 'canceled' && $paid <= 0)
-                                                        <form method="POST"
-                                                            action="{{ route('Accounting.payroll.cancel', $run) }}"
-                                                            onsubmit="return confirm('لیست حقوق ابطال شود؟')">
-                                                            @csrf
-                                                            <button class="btn btn-sm btn-outline-danger"
-                                                                type="submit">ابطال</button>
-                                                        </form>
-                                                    @endif
+                                                    <div class="d-flex flex-column gap-1">
+                                                        <a class="btn btn-sm btn-outline-secondary"
+                                                            href="{{ route('Accounting.payroll.payslip', $run) }}"
+                                                            target="_blank">فیش حقوقی</a>
+                                                        <a class="btn btn-sm btn-outline-info"
+                                                            href="{{ route('Accounting.payroll.report', $run) }}"
+                                                            target="_blank">گزارش لیست</a>
+                                                        @if ($run->status !== 'canceled' && $remaining <= 0)
+                                                            <span class="badge bg-label-success">تکمیل</span>
+                                                        @endif
+                                                        @if ($run->status !== 'canceled' && $paid <= 0)
+                                                            <form method="POST"
+                                                                action="{{ route('Accounting.payroll.cancel', $run) }}"
+                                                                onsubmit="return confirm('لیست حقوق ابطال شود؟')">
+                                                                @csrf
+                                                                <button class="btn btn-sm btn-outline-danger"
+                                                                    type="submit">ابطال</button>
+                                                            </form>
+                                                        @endif
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <tr>
