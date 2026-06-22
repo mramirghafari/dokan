@@ -65,7 +65,7 @@
                                             <div class="d-flex align-items-center my-2">
                                                 <h3 class="mb-0 me-2">{{ number_format($customersWithPurchaseCount) }}</h3>
                                             </div>
-                                            <p class="mb-0">مشتریان با سابقه خرید</p>
+                                            <p class="mb-0">مشتریان با وضعیت فعال</p>
                                         </div>
                                         <div class="avatar"> <span class="avatar-initial rounded bg-label-success"> <x-ui.icon name="user-check" class="ti-sm" /> </span> </div>
                                     </div>
@@ -151,7 +151,7 @@
                                             <label for="status">وضعیت مشتریان:</label>
                                             <select class="select2 form-select" id="status" name="status">
                                                 <option value="2" {{ (int) ($status ?? 2) === 2 ? 'selected' : '' }}>همه مشتریان</option>
-                                                <option value="1" {{ (int) ($status ?? 2) === 1 ? 'selected' : '' }}>مشتریان با سابقه خرید</option>
+                                                <option value="1" {{ (int) ($status ?? 2) === 1 ? 'selected' : '' }}>مشتریان فعال</option>
                                             </select>
                                         </div>
 

@@ -210,9 +210,7 @@ class CustomerListSummaryService
         $metrics = [
             'total_customers' => (clone $baseQuery)->count('customers.id'),
             'customers_with_purchase' => (clone $baseQuery)
-                ->whereHas('pishfactors', function (Builder $query) {
-                    $query->whereIn('status', [1, 4]);
-                })
+                ->where('customers.status', 1)
                 ->count('customers.id'),
             'restricted_customers' => 0,
             'banned_customers' => (clone $baseQuery)->where('customers.status', 0)->count('customers.id'),

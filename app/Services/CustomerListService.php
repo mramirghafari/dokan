@@ -112,16 +112,7 @@ class CustomerListService
         }
 
         if ((int) $request->input('status') === 1) {
-            $visitorId = $request->filled('visitor_id') && (int) $request->visitor_id !== 0
-                ? (int) $request->visitor_id
-                : null;
-
-            $query->whereHas('pishfactors', function (Builder $inner) use ($visitorId) {
-                $inner->whereIn('status', [1, 4]);
-                if ($visitorId) {
-                    $inner->where('visitor_id', $visitorId);
-                }
-            });
+            $query->where($table . '.status', 1);
         }
 
         return $query;

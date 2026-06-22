@@ -535,6 +535,13 @@ class CustomersController extends Controller
         return back();
     }
 
+    public function activeCustomers(Request $request)
+    {
+        $request->merge(['status' => 1]);
+
+        return $this->index($request);
+    }
+
     public function createdByMe()
     {
 
