@@ -1136,7 +1136,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
         @endif
 
         @can('Accounting')
-            <li class="menu-item accounting {{ Request::routeIs(['Accounting.index', 'Accounting.AccountingReviews', 'Accounting.vouchers', 'Accounting.vouchers.create', 'Accounting.vouchers.edit', 'Accounting.vouchers.opening', 'Accounting.voucherTemplates', 'Accounting.legalLedgers', 'Accounting.detailedLedgers', 'Accounting.analyticDimensions', 'Accounting.currencyBalances', 'Accounting.financialStatements', 'Accounting.revenueCenters', 'Accounting.incomes', 'Accounting.fiscalClosing', 'Accounting.expenses', 'Accounting.payroll', 'contracting.projects', 'taxpayer.index', 'Accounting.treasury', 'Accounting.treasury.create', 'Accounting.treasury.transfer.create', 'Accounting.treasury.cheques', 'Accounting.treasury.cheques.aging', 'Accounting.treasury.chequeBooks', 'Accounting.treasury.bankReconciliation', 'Accounting.treasury.liquidity', 'Accounting.treasury.cashForecast', 'Accounting.treasury.pettyCash', 'Accounting.payed', 'Accounting.unpayed', 'Accounting.cashpay', 'Accounting.checkpay', 'Accounting.unknown']) ? 'active' : '' }}"
+            <li class="menu-item accounting {{ Request::routeIs(['Accounting.index', 'Accounting.AccountingReviews', 'Accounting.vouchers', 'Accounting.vouchers.create', 'Accounting.vouchers.edit', 'Accounting.vouchers.opening', 'Accounting.voucherTemplates', 'Accounting.legalLedgers', 'Accounting.detailedLedgers', 'Accounting.analyticDimensions', 'Accounting.currencyBalances', 'Accounting.financialStatements', 'Accounting.revenueCenters', 'Accounting.incomes', 'Accounting.fiscalClosing', 'Accounting.expenses', 'Accounting.payroll', 'employees.index', 'employees.edit', 'contracting.projects', 'taxpayer.index', 'Accounting.treasury', 'Accounting.treasury.create', 'Accounting.treasury.transfer.create', 'Accounting.treasury.cheques', 'Accounting.treasury.cheques.aging', 'Accounting.treasury.chequeBooks', 'Accounting.treasury.bankReconciliation', 'Accounting.treasury.liquidity', 'Accounting.treasury.cashForecast', 'Accounting.treasury.pettyCash', 'Accounting.payed', 'Accounting.unpayed', 'Accounting.cashpay', 'Accounting.checkpay', 'Accounting.unknown']) ? 'active' : '' }}"
                 data-menu-key="accounting">
                 <a class="menu-link menu-toggle" href="javascript:void(0)">
                     <svg width="21" height="17" viewBox="0 0 21 17" fill="none"
@@ -1189,6 +1189,12 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                     </li>
                     <li class="menu-item {{ Request::routeIs(['Accounting.fiscalClosing']) ? 'active' : '' }}">
                         <a class="menu-link" href="{{ route('Accounting.fiscalClosing') }}">بستن دوره مالی</a>
+                    </li>
+                    <li class="menu-item {{ Request::routeIs(['employees.index', 'employees.edit']) ? 'active' : '' }}">
+                        <a class="menu-link" href="{{ route('employees.index') }}">تعریف پرسنل</a>
+                    </li>
+                    <li class="menu-item {{ Request::routeIs(['employees.index', 'employees.edit']) ? 'active' : '' }}">
+                        <a class="menu-link" href="{{ route('employees.index') }}">احکام پرسنلی</a>
                     </li>
                     <li class="menu-item {{ Request::routeIs(['Accounting.payroll']) ? 'active' : '' }}">
                         <a class="menu-link" href="{{ route('Accounting.payroll') }}">حقوق و دستمزد</a>
@@ -1244,26 +1250,6 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                 </ul>
             </li>
             @endif
-
-            @can('employees')
-                <li class="menu-item {{ Request::routeIs(['employees.index', 'employees.edit', 'Accounting.payroll', 'Accounting.payroll.payslip', 'Accounting.payroll.report']) ? 'active' : '' }}"
-                    data-menu-key="hr_payroll">
-                    <a class="menu-link menu-toggle" href="javascript:void(0);">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <div>منابع انسانی</div>
-                    </a>
-                    <ul class="menu-sub">
-                        <li class="menu-item {{ Request::routeIs(['employees.index', 'employees.edit']) ? 'active' : '' }}">
-                            <a class="menu-link" href="{{ route('employees.index') }}">تعریف پرسنل و کارگزینی</a>
-                        </li>
-                        <li class="menu-item {{ Request::routeIs(['Accounting.payroll']) ? 'active' : '' }}">
-                            <a class="menu-link" href="{{ route('Accounting.payroll') }}">حقوق و دستمزد</a>
-                        </li>
-                    </ul>
-                </li>
-            @endcan
 
             @can('formulation')
                 <li class="menu-item " data-menu-key="formulation">
