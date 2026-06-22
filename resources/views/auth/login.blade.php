@@ -374,8 +374,9 @@
                     <div class="input-group input-group-merge">
                         <input class="form-control" type="password" required="" name="password" id="password"
                             autocomplete="current-password" placeholder="">
-                        <span class="input-group-text cursor-pointer">
-                            <x-ui.icon name="eye-off" />
+                        <span class="input-group-text cursor-pointer" id="togglePassword" style="cursor:pointer">
+                            <x-ui.icon name="eye-off" id="icon-eye-off" />
+                            <x-ui.icon name="eye" id="icon-eye" style="display:none" />
                         </span>
                     </div>
                 </div>
@@ -543,6 +544,27 @@
 
                 mobileInput.addEventListener('compositionend', function () {
                     mobileInput.value = sanitizeMobileValue(mobileInput.value);
+                });
+            }
+        })();
+    </script>
+    <script>
+        (function () {
+            var toggleBtn = document.getElementById('togglePassword');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function () {
+                    var input = document.getElementById('password');
+                    var iconOff = document.getElementById('icon-eye-off');
+                    var iconOn = document.getElementById('icon-eye');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        if (iconOff) iconOff.style.display = 'none';
+                        if (iconOn) iconOn.style.display = '';
+                    } else {
+                        input.type = 'password';
+                        if (iconOff) iconOff.style.display = '';
+                        if (iconOn) iconOn.style.display = 'none';
+                    }
                 });
             }
         })();
