@@ -165,10 +165,10 @@
                         @csrf
                         <div class="mb-3">
                             <div id="otp" class="inputs d-flex flex-row-reverse justify-content-center mt-2">
-                                <input type="text" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]*" autofocus>
-                                <input type="text" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]*">
-                                <input type="text" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]*">
-                                <input type="text" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]*">
+                                <input type="tel" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]" autofocus>
+                                <input type="tel" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]">
+                                <input type="tel" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]">
+                                <input type="tel" maxlength="1" class="otp-input" name="otp[]" inputmode="numeric" pattern="[0-9]">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -212,6 +212,32 @@
         var submitBtn = form ? form.querySelector('button[type="submit"]') : null;
         var isSubmitting = false;
 
+        function toAsciiDigit(ch) {
+            if (!ch) {
+                return '';
+            }
+            var code = ch.charCodeAt(0);
+            if (code >= 0x06F0 && code <= 0x06F9) {
+                return String(code - 0x06F0);
+            }
+            if (code >= 0x0660 && code <= 0x0669) {
+                return String(code - 0x0660);
+            }
+            if (code >= 0x30 && code <= 0x39) {
+                return ch;
+            }
+            return '';
+        }
+
+        function sanitizeOtpDigit(raw) {
+            var digit = toAsciiDigit(String(raw || '').charAt(0));
+            return digit.replace(/\D/g, '').slice(0, 1);
+        }
+
+        function isAllowedOtpChar(ch) {
+            return !!sanitizeOtpDigit(ch);
+        }
+
         function setSubmitLoading() {
             if (!submitBtn || submitBtn.disabled) {
                 return;
@@ -249,8 +275,32 @@
 
         var inputs = document.querySelectorAll('.otp-input');
         inputs.forEach(function (input, index) {
+            input.addEventListener('beforeinput', function (e) {
+                if (e.inputType === 'insertText' || e.inputType === 'insertFromPaste' || e.inputType === 'insertCompositionText') {
+                    if (e.data && !isAllowedOtpChar(e.data)) {
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.ctrlKey || e.metaKey || e.altKey) {
+                    return;
+                }
+                var allowedKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight'];
+                if (allowedKeys.indexOf(e.key) !== -1) {
+                    if (e.key === 'Backspace' && input.value === '' && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                    return;
+                }
+                if (e.key.length === 1 && !isAllowedOtpChar(e.key)) {
+                    e.preventDefault();
+                }
+            });
+
             input.addEventListener('input', function () {
-                var digit = input.value.replace(/\D/g, '').slice(0, 1);
+                var digit = sanitizeOtpDigit(input.value);
                 input.value = digit;
 
                 if (digit.length === 1 && index < inputs.length - 1) {
@@ -260,18 +310,12 @@
                 tryAutoSubmit();
             });
 
-            input.addEventListener('keydown', function (e) {
-                if (e.key === 'Backspace' && input.value === '' && index > 0) {
-                    inputs[index - 1].focus();
-                }
-            });
-
             input.addEventListener('paste', function (e) {
                 e.preventDefault();
                 var pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, otpLength);
                 pasted.split('').forEach(function (char, i) {
                     if (inputs[i]) {
-                        inputs[i].value = char;
+                        inputs[i].value = sanitizeOtpDigit(char);
                     }
                 });
                 if (pasted.length > 0) {
@@ -279,6 +323,10 @@
                     inputs[focusIndex].focus();
                 }
                 tryAutoSubmit();
+            });
+
+            input.addEventListener('compositionend', function () {
+                input.value = sanitizeOtpDigit(input.value);
             });
         });
     })();

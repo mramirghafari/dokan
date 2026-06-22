@@ -231,59 +231,84 @@
 
         @media (max-width: 576px) {
             body.login-page .authentication-wrapper.container-p-y {
-                padding-top: 0.75rem !important;
-                padding-bottom: 0.75rem !important;
+                padding-top: 0.5rem !important;
+                padding-bottom: 0.5rem !important;
             }
 
             body.login-page .card-body {
-                padding: 1rem !important;
+                padding: 0.85rem !important;
             }
 
             body.login-page .app-brand {
-                margin-bottom: 0.75rem !important;
+                margin-bottom: 0.35rem !important;
                 margin-top: 0 !important;
             }
 
+            body.login-page .app-brand-link {
+                display: block;
+                line-height: 0;
+            }
+
             body.login-page .app-brand svg {
-                max-width: 140px;
-                width: 100%;
-                height: auto;
+                max-width: 100px !important;
+                width: 100% !important;
+                height: auto !important;
             }
 
             body.login-page h4 {
-                font-size: 1.05rem;
-                padding-top: 0.25rem !important;
-                margin-bottom: 0.35rem !important;
+                font-size: 1rem;
+                padding-top: 0.15rem !important;
+                margin-bottom: 0.25rem !important;
             }
 
             body.login-page .login-subtitle {
-                margin-bottom: 0.85rem;
-                font-size: 0.85rem;
+                margin-bottom: 0.65rem;
+                font-size: 0.82rem;
             }
 
             body.login-page .login-tabs-wrap {
-                margin-bottom: 1rem;
+                margin-bottom: 0.85rem;
             }
 
             body.login-page .login-tabs {
-                padding: 0.3rem;
-                gap: 0.25rem;
+                display: flex !important;
+                padding: 0.25rem;
+                gap: 0.2rem;
+            }
+
+            body.login-page .login-tabs .nav-item {
+                flex: 1 1 0;
+                min-width: 0;
             }
 
             body.login-page .login-tabs .nav-link {
-                font-size: 0.8125rem;
-                padding: 0.45rem 0.35rem;
-                line-height: 1.25;
+                font-size: 12px !important;
+                padding: 0.35rem 0.25rem !important;
+                line-height: 1.2 !important;
+                white-space: nowrap !important;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             body.login-page .login-tab-content {
-                padding-top: 0.35rem;
+                padding-top: 0.3rem;
             }
 
             body.login-page .form-control,
             body.login-page .input-group-text,
             body.login-page .btn-login-submit {
-                min-height: 2.6rem;
+                min-height: 2.5rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body.login-page .app-brand svg {
+                max-width: 80px !important;
+            }
+
+            body.login-page .login-tabs .nav-link {
+                font-size: 11px !important;
+                padding: 0.32rem 0.2rem !important;
             }
         }
     </style>
@@ -323,13 +348,11 @@
     <ul class="nav nav-tabs px-0 mx-0 login-tabs" role="tablist">
         <li class="nav-item">
             <button aria-controls="navs-top-password" aria-selected="true" class="nav-link active" id="tab-password-login"
-                data-bs-target="#navs-top-password" data-bs-toggle="tab" role="tab" type="button">ورود با رمز
-                عبور</button>
+                data-bs-target="#navs-top-password" data-bs-toggle="tab" role="tab" type="button">ورود با رمز عبور</button>
         </li>
         <li class="nav-item">
             <button aria-controls="navs-top-mobile" aria-selected="false" class="nav-link" id="tab-mobile-login"
-                data-bs-target="#navs-top-mobile" data-bs-toggle="tab" role="tab" type="button">ورود با شماره
-                موبایل</button>
+                data-bs-target="#navs-top-mobile" data-bs-toggle="tab" role="tab" type="button">ورود با شماره موبایل</button>
         </li>
     </ul>
     <div class="tab-content px-0 login-tab-content">
@@ -368,12 +391,12 @@
             </form>
         </div>
         <div class="tab-pane fade" id="navs-top-mobile" role="tabpanel" aria-labelledby="tab-mobile-login">
-            <form action="{{ route('sendSmsLogin') }}" method="POST">
+            <form action="{{ route('sendSmsLogin') }}" method="POST" id="mobile-login-form">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label" for="mobile">شماره موبایل</label>
-                    <input class="form-control" type="text" name="mobile" id="mobile" required=""
-                        inputmode="numeric" pattern="[0-9]*" maxlength="11"
+                    <input class="form-control" type="tel" name="mobile" id="mobile" required=""
+                        inputmode="numeric" pattern="09[0-9]{9}" maxlength="11"
                         placeholder="09xx1234567" style="direction: ltr;" autocomplete="tel">
                 </div>
                 <div class="mb-3">
@@ -417,13 +440,63 @@
     <script>
         (function () {
             var loadingText = 'در حال بررسی...';
+            var mobilePattern = /^09[0-9]{9}$/;
+
+            function toAsciiDigits(str) {
+                var out = '';
+                for (var i = 0; i < str.length; i++) {
+                    var code = str.charCodeAt(i);
+                    if (code >= 0x06F0 && code <= 0x06F9) {
+                        out += String(code - 0x06F0);
+                    } else if (code >= 0x0660 && code <= 0x0669) {
+                        out += String(code - 0x0660);
+                    } else if (code >= 0x30 && code <= 0x39) {
+                        out += str.charAt(i);
+                    }
+                }
+                return out;
+            }
+
+            function sanitizeMobileValue(raw) {
+                var val = toAsciiDigits(String(raw || '')).replace(/\D/g, '');
+
+                if (val.length > 0 && val.charAt(0) !== '0') {
+                    val = '0' + val;
+                }
+                if (val.length > 1 && val.charAt(1) !== '9') {
+                    val = '09' + val.slice(2);
+                }
+
+                return val.slice(0, 11);
+            }
+
+            function isAllowedMobileChar(ch) {
+                if (!ch) {
+                    return true;
+                }
+                return /^[0-9۰-۹٠-٩]$/.test(ch);
+            }
 
             document.querySelectorAll('.login-tab-content form').forEach(function (form) {
-                form.addEventListener('submit', function () {
+                form.addEventListener('submit', function (e) {
                     var btn = form.querySelector('button[type="submit"]');
                     if (!btn || btn.disabled) {
                         return;
                     }
+
+                    if (form.id === 'mobile-login-form') {
+                        var mobileInput = document.getElementById('mobile');
+                        var mobileVal = mobileInput ? sanitizeMobileValue(mobileInput.value) : '';
+                        if (mobileInput) {
+                            mobileInput.value = mobileVal;
+                        }
+                        if (!mobilePattern.test(mobileVal)) {
+                            e.preventDefault();
+                            mobileInput && mobileInput.focus();
+                            return;
+                        }
+                    }
+
                     btn.disabled = true;
                     btn.textContent = loadingText;
                 });
@@ -431,17 +504,29 @@
 
             var mobileInput = document.getElementById('mobile');
             if (mobileInput) {
+                mobileInput.addEventListener('beforeinput', function (e) {
+                    if (e.inputType === 'insertText' || e.inputType === 'insertFromPaste' || e.inputType === 'insertCompositionText') {
+                        if (e.data && !isAllowedMobileChar(e.data)) {
+                            e.preventDefault();
+                        }
+                    }
+                });
+
+                mobileInput.addEventListener('keydown', function (e) {
+                    if (e.ctrlKey || e.metaKey || e.altKey) {
+                        return;
+                    }
+                    var allowedKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+                    if (allowedKeys.indexOf(e.key) !== -1) {
+                        return;
+                    }
+                    if (e.key.length === 1 && !isAllowedMobileChar(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+
                 mobileInput.addEventListener('input', function () {
-                    var val = this.value.replace(/\D/g, '');
-
-                    if (val.length > 0 && val.charAt(0) !== '0') {
-                        val = '0' + val;
-                    }
-                    if (val.length > 1 && val.charAt(1) !== '9') {
-                        val = '09' + val.slice(2);
-                    }
-
-                    val = val.slice(0, 11);
+                    var val = sanitizeMobileValue(this.value);
                     this.value = val;
 
                     if (val.length === 11) {
@@ -451,9 +536,13 @@
 
                 mobileInput.addEventListener('paste', function (e) {
                     e.preventDefault();
-                    var pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
-                    mobileInput.value = pasted;
+                    var pasted = (e.clipboardData || window.clipboardData).getData('text');
+                    mobileInput.value = sanitizeMobileValue(pasted);
                     mobileInput.dispatchEvent(new Event('input'));
+                });
+
+                mobileInput.addEventListener('compositionend', function () {
+                    mobileInput.value = sanitizeMobileValue(mobileInput.value);
                 });
             }
         })();
