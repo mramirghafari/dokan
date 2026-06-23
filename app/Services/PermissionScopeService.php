@@ -45,7 +45,20 @@ class PermissionScopeService
         $tenantId = $this->tenantIdForUser($user);
 
         return $query->where(function ($query) use ($tenantId) {
-            $query->whereNull('tenant_id');
+            // Show global roles only when no tenant-specific role with the same
+            // title exists for this tenant (prevents duplicate display names).
+            $query->where(function ($globalQ) use ($tenantId) {
+                $globalQ->whereNull('tenant_id');
+
+                if ($tenantId) {
+                    $globalQ->whereNotExists(function ($sub) use ($tenantId) {
+                        $sub->from('roles as r_dup')
+                            ->whereColumn('r_dup.title', 'roles.title')
+                            ->where('r_dup.tenant_id', $tenantId)
+                            ->whereNull('r_dup.deleted_at');
+                    });
+                }
+            });
 
             if ($tenantId) {
                 $query->orWhere('tenant_id', $tenantId);
