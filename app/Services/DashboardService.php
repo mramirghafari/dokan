@@ -404,7 +404,7 @@ class DashboardService
         $receivable = 0;
         $payable    = 0;
 
-        if (Schema::hasTable('vouchers') && \App\Services\TenantSettings::enabled('feature_double_entry_accounting')) {
+        if (Schema::hasTable('vouchers') && Schema::hasColumn('vouchers', 'type') && \App\Services\TenantSettings::enabled('feature_double_entry_accounting')) {
             $receivable = DB::table('vouchers')
                 ->where('organization_id', $orgId)
                 ->where('type', 'receivable')
