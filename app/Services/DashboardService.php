@@ -431,6 +431,176 @@ class DashboardService
         ];
     }
 
+    /**
+     * آخرین مشتریان ثبت‌شده با اطلاعات بازاریاب و کال‌سنتر
+     */
+    public function getRecentCustomers(User $user, int $limit = 10): array
+    {
+        $orgId = $this->resolveOrgId($user);
+
+        $customers = Customers::where('organization_id', $orgId)
+            ->orderByDesc('id')
+            ->take($limit)
+            ->get();
+
+        $addedByIds = $customers->pluck('added_by')->filter()->unique();
+        $visitorIds  = $customers->pluck('visitor_id')->filter()->unique();
+        $mergedIds   = $addedByIds->merge($visitorIds)->unique();
+
+        $userNames = User::whereIn('id', $mergedIds)
+            ->pluck('name', 'id');
+
+        $factorCounts = Pishfactor::whereIn('customer_id', $customers->pluck('id'))
+            ->whereIn('status', [1, 4])
+            ->select('customer_id', DB::raw('COUNT(*) as cnt'))
+            ->groupBy('customer_id')
+            ->pluck('cnt', 'customer_id');
+
+        $balances = [];
+        if (Schema::hasTable('customer_accounts')) {
+            $balances = DB::table('customer_accounts')
+                ->whereIn('customer_id', $customers->pluck('id'))
+                ->where('organization_id', $orgId)
+                ->select('customer_id', DB::raw('SUM(debit) - SUM(credit) as balance'))
+                ->groupBy('customer_id')
+                ->pluck('balance', 'customer_id');
+        }
+
+        return $customers->map(function ($c) use ($userNames, $factorCounts, $balances) {
+            $jDate = null;
+            try {
+                $jDate = \Hekmatinasser\Verta\Verta::instance($c->created_at)->format('Y/m/d');
+            } catch (\Exception $e) {
+                $jDate = '-';
+            }
+            return [
+                'id'            => $c->id,
+                'name'          => $c->name ?? $c->company_name ?? 'نامشخص',
+                'mobile'        => $c->mobile ?? '-',
+                'marketer'      => $userNames[$c->visitor_id ?? 0] ?? '-',
+                'added_by'      => $userNames[$c->added_by ?? 0] ?? '-',
+                'factor_count'  => $factorCounts[$c->id] ?? 0,
+                'balance'       => (int) ($balances[$c->id] ?? 0),
+                'registered_at' => $jDate,
+                'status'        => $c->status ?? 0,
+            ];
+        })->toArray();
+    }
+
+    /**
+     * داده‌های هفتگی برای تب‌های earning reports (۷ روز)
+     */
+    public function getEarningTabsData(User $user): array
+    {
+        $orgId = $this->resolveOrgId($user);
+        $days = [];
+        $ordersData    = [];
+        $salesData     = [];
+        $customersData = [];
+
+        for ($i = 6; $i >= 0; $i--) {
+            $date  = Carbon::now()->subDays($i)->toDateString();
+            $days[] = Carbon::now()->subDays($i)->format('D');
+
+            $ordersData[] = (int) Pishfactor::where('organization_id', $orgId)
+                ->whereIn('status', [1, 4])
+                ->whereDate('created_at', $date)
+                ->count();
+
+            $salesData[] = (int) round(Pishfactor::where('organization_id', $orgId)
+                ->whereIn('status', [1, 4])
+                ->whereDate('created_at', $date)
+                ->sum(DB::raw("CAST(REPLACE(fullPrice, ',', '') AS UNSIGNED)")) / 10);
+
+            $customersData[] = (int) Customers::where('organization_id', $orgId)
+                ->whereDate('created_at', $date)
+                ->count();
+        }
+
+        return [
+            'days'      => $days,
+            'orders'    => $ordersData,
+            'sales'     => $salesData,
+            'customers' => $customersData,
+        ];
+    }
+
+    /**
+     * داده نمودار revenue report گروهی (فروش vs فاکتورها) ۶ ماه
+     */
+    public function getRevenueReportData(User $user, int $months = 6): array
+    {
+        $orgId = $this->resolveOrgId($user);
+        $labels  = [];
+        $sales   = [];
+        $factors = [];
+
+        $persianMonths = [
+            1 => 'فروردین', 2 => 'اردیبهشت', 3 => 'خرداد',
+            4 => 'تیر', 5 => 'مرداد', 6 => 'شهریور',
+            7 => 'مهر', 8 => 'آبان', 9 => 'آذر',
+            10 => 'دی', 11 => 'بهمن', 12 => 'اسفند',
+        ];
+
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $start = Carbon::now()->subMonths($i)->startOfMonth();
+            $end   = Carbon::now()->subMonths($i)->endOfMonth();
+
+            $amount = (int) Pishfactor::where('organization_id', $orgId)
+                ->whereIn('status', [1, 4])
+                ->whereBetween('created_at', [$start, $end])
+                ->sum(DB::raw("CAST(REPLACE(fullPrice, ',', '') AS UNSIGNED)"));
+
+            $count = (int) Pishfactor::where('organization_id', $orgId)
+                ->whereIn('status', [1, 4])
+                ->whereBetween('created_at', [$start, $end])
+                ->count();
+
+            $jalaali   = \Hekmatinasser\Verta\Verta::instance($start);
+            $labels[]  = $persianMonths[$jalaali->month] ?? $start->format('M');
+            $sales[]   = (int) round($amount / 10);
+            $factors[] = $count;
+        }
+
+        return [
+            'labels'  => $labels,
+            'sales'   => $sales,
+            'factors' => $factors,
+        ];
+    }
+
+    /**
+     * برترین محصولات با درصد فروش نسبی برای progress bar
+     */
+    public function getTopProductsWithPercent(User $user, int $limit = 5): array
+    {
+        $orgId = $this->resolveOrgId($user);
+
+        $factorIds = Pishfactor::where('organization_id', $orgId)
+            ->whereIn('status', [1, 4])
+            ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
+            ->pluck('id');
+
+        $items = PishFactorItems::whereIn('pishfactor_id', $factorIds)
+            ->select('pr_id', DB::raw('SUM(tedad + (pack * COALESCE(pack_items, 1))) as total_qty'))
+            ->groupBy('pr_id')
+            ->orderByDesc('total_qty')
+            ->take($limit)
+            ->with('product:id,name,code')
+            ->get();
+
+        $max = $items->max('total_qty') ?: 1;
+
+        return $items->map(function ($item) use ($max) {
+            return [
+                'name'    => $item->product->name ?? 'نامشخص',
+                'code'    => $item->product->code ?? '-',
+                'qty'     => (int) $item->total_qty,
+                'percent' => min(100, (int) round($item->total_qty / $max * 100)),
+            ];
+        })->toArray();
+    }
+
     private function resolveOrgId(User $user): int
     {
         $raw = $user->organization_id;

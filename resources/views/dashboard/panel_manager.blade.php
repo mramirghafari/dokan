@@ -8,7 +8,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" name="viewport" />
-    <title>داشبورد مدیر کل پنل — دارمینو ERP</title>
+    <title>داشبورد مدیر پنل — دارمینو ERP</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="{{ asset('assets/') }}/img/favicon/favicon.ico" rel="icon" type="image/x-icon" />
     <link href="{{ asset('assets/') }}/vendor/css/rtl/core.css" rel="stylesheet" />
@@ -18,6 +18,7 @@
     <script src="{{ asset('assets/') }}/js/config.js"></script>
     <link href="{{ asset('assets/') }}/css/rtl.css" rel="stylesheet" />
     <style>
+        /* ── تایپوگرافی و پالت رنگ ── */
         :root {
             --pm-primary:   #7367f0;
             --pm-success:   #28c76f;
@@ -27,73 +28,79 @@
             --pm-secondary: #82868b;
         }
 
-        /* ── کارت‌های آمار ── */
-        .pm-stat-card {
-            border-radius: 12px;
-            transition: transform .18s, box-shadow .18s;
-            border: none;
-            overflow: hidden;
+        /* ── کارت‌های ویلکام ── */
+        .welcome-card-img {
+            position: absolute;
+            bottom: 0;
+            left: 1rem;
+            width: 140px;
+            opacity: .9;
         }
-        .pm-stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,.12); }
-        .pm-stat-icon {
-            width: 54px; height: 54px; border-radius: 12px;
+        @media (max-width: 575px) { .welcome-card-img { display: none; } }
+
+        /* ── کارت‌های آمار sparkline ── */
+        .stat-card .card-body { padding: 1rem 1.25rem .5rem; }
+        .stat-card .stat-icon {
+            width: 42px; height: 42px; border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; flex-shrink: 0;
+            font-size: 1.3rem; flex-shrink: 0;
         }
-        .pm-stat-label  { font-size: .78rem; color: #9b9bbb; }
-        .pm-stat-value  { font-size: 1.65rem; font-weight: 700; line-height: 1.2; }
-        .pm-stat-sub    { font-size: .78rem; }
-        .pm-trend-up    { color: var(--pm-success); }
-        .pm-trend-down  { color: var(--pm-danger); }
-        .pm-trend-flat  { color: var(--pm-secondary); }
+        .stat-card .stat-val { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+        .stat-card .stat-lbl { font-size: .78rem; color: #9b9bbb; }
+        .stat-card .stat-sub { font-size: .77rem; }
+        .trend-up   { color: var(--pm-success); }
+        .trend-down { color: var(--pm-danger); }
+        .trend-flat { color: var(--pm-secondary); }
 
-        /* ── هدر ویجت ── */
-        .pm-widget-header {
-            display: flex; align-items: center; gap: .5rem;
-            padding: .9rem 1.25rem; border-bottom: 1px solid rgba(0,0,0,.06);
-            font-weight: 600; font-size: .95rem;
-        }
-        .pm-widget-icon { width: 30px; height: 30px; border-radius: 8px;
-            display:flex; align-items:center; justify-content:center; font-size:.9rem; }
+        /* ── Revenue chart wrapper ── */
+        .revenue-split { border-right: 1px solid rgba(0,0,0,.06); }
+        @media (max-width: 767px) { .revenue-split { border-right: none; border-bottom: 1px solid rgba(0,0,0,.06); } }
 
-        /* ── جدول تیم ── */
-        .team-row-leader td { background: rgba(115,103,240,.06); font-weight: 600; }
-        .team-row-visitor td { padding-right: 2.5rem !important; font-size: .87rem; }
-        .team-toggle { cursor: pointer; }
-        .team-visitors { display:none; }
-        .team-visitors.show { display:table-row-group; }
-
-        /* ── Activity Log timeline ── */
+        /* ── Activity timeline ── */
         .activity-timeline { position: relative; padding-right: 1.4rem; }
         .activity-timeline::before {
-            content: ''; position: absolute; right: .5rem; top: 0; bottom: 0;
-            width: 2px; background: rgba(115,103,240,.15);
+            content: ''; position: absolute; right: .55rem; top: 0; bottom: 0;
+            width: 2px; background: rgba(115,103,240,.12);
         }
-        .activity-item {
-            position: relative; padding: .5rem 0 .5rem 0; margin-bottom: .2rem;
-        }
+        .activity-item { position: relative; padding: .45rem 0; }
         .activity-dot {
             position: absolute; right: -1.05rem; top: .55rem;
             width: 10px; height: 10px; border-radius: 50%;
-            border: 2px solid #fff; box-shadow: 0 0 0 2px rgba(115,103,240,.3);
+            border: 2px solid #fff; box-shadow: 0 0 0 2px rgba(115,103,240,.25);
         }
-        .activity-meta { font-size: .75rem; color: #9b9bbb; }
+        .activity-meta { font-size: .74rem; color: #9b9bbb; }
 
-        /* ── responsive ── */
-        @media (max-width:768px) {
-            .pm-stat-value { font-size: 1.25rem; }
+        /* ── Team table ── */
+        .team-row-leader td { background: rgba(115,103,240,.05); font-weight: 600; }
+        .team-row-visitor td { padding-right: 2.5rem !important; font-size: .86rem; }
+        .team-visitors { display: none; }
+        .team-visitors.show { display: table-row-group; }
+        .team-toggle { cursor: pointer; }
+
+        /* ── Progress bars ── */
+        .product-progress { height: 6px; border-radius: 4px; }
+
+        /* ── Skeleton ── */
+        .pm-skeleton {
+            background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);
+            background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px;
         }
+        @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
 
-        /* ── loading skeleton ── */
-        .pm-skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; }
-        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        /* ── Last-update badge ── */
+        .widget-updated { font-size: .7rem; color: #9b9bbb; }
+
+        @media (max-width: 768px) {
+            .stat-card .stat-val { font-size: 1.15rem; }
+        }
     </style>
 </head>
 
 @php
-    $Organ = DB::table('organizations')->where('id', auth()->user()->organization_id)->first();
-    $numberFmt = fn($n) => number_format((int)$n);
+    $Organ   = DB::table('organizations')->where('id', auth()->user()->organization_id)->first();
+    $nf      = fn($n) => number_format((int)$n);
+    $nfToman = fn($n) => number_format((int)($n / 10));
+    $updatedAt = \Hekmatinasser\Verta\Verta::now()->format('H:i');
 @endphp
 
 <body>
@@ -107,159 +114,352 @@
             <div class="container-xxl flex-grow-1 container-p-y">
 
                 {{-- ══════════════════════════════════════
-                     هدر داشبورد
+                     هدر صفحه
                 ══════════════════════════════════════ --}}
                 <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-2">
                     <div>
                         <h4 class="fw-bold mb-1">
-                            <span class="text-muted fw-normal ms-2">داشبورد</span>
-                            مدیر کل پنل
+                            <span class="text-muted fw-normal ms-2">داشبورد</span>مدیر پنل
                         </h4>
                         <small class="text-muted">
                             {{ Verta::now()->format('l، j F Y') }}
-                            &nbsp;·&nbsp;
-                            {{ $Organ->title ?? '' }}
+                            &nbsp;·&nbsp;{{ $Organ->title ?? '' }}
+                            &nbsp;·&nbsp;<span class="widget-updated">بروزرسانی: {{ $updatedAt }}</span>
                         </small>
                     </div>
                     <div class="d-flex gap-2">
-                        <a href="{{ route('settings.dashboardWidgets') }}"
-                           class="btn btn-outline-secondary btn-sm">
+                        <a href="{{ route('settings.dashboardWidgets') }}" class="btn btn-outline-secondary btn-sm">
                             <i class="ti ti-settings me-1"></i> تنظیمات ویجت‌ها
                         </a>
-                        <a href="{{ route('index') }}"
-                           class="btn btn-outline-primary btn-sm">
+                        <a href="{{ route('index') }}" class="btn btn-outline-primary btn-sm">
                             <i class="ti ti-layout-dashboard me-1"></i> داشبورد اصلی
                         </a>
                     </div>
                 </div>
 
                 {{-- ══════════════════════════════════════
-                     ردیف ۱ — کارت‌های آمار کلی
+                     ردیف ۱ — کارت خوش‌آمد + ۴ آمار sparkline
                 ══════════════════════════════════════ --}}
-                @if (!empty($statCards) && ($dashWidgets['dashboard_widget_pm_stat_cards'] ?? true))
-                <div class="row g-3 mb-4">
-                    {{-- مشتریان --}}
-                    <div class="col-6 col-md-3">
-                        <div class="card pm-stat-card h-100">
-                            <div class="card-body d-flex align-items-center gap-3 p-3">
-                                <div class="pm-stat-icon" style="background:rgba(115,103,240,.15);">
-                                    <i class="ti ti-users" style="color:var(--pm-primary)"></i>
-                                </div>
-                                <div class="flex-grow-1 overflow-hidden">
-                                    <div class="pm-stat-label text-truncate">مشتریان فعال</div>
-                                    <div class="pm-stat-value">{{ $numberFmt($statCards['active_customers']) }}</div>
-                                    <div class="pm-stat-sub text-muted">از {{ $numberFmt($statCards['total_customers']) }} کل</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="row g-4 mb-4">
 
-                    {{-- فاکتورهای این ماه --}}
-                    <div class="col-6 col-md-3">
-                        <div class="card pm-stat-card h-100">
-                            <div class="card-body d-flex align-items-center gap-3 p-3">
-                                <div class="pm-stat-icon" style="background:rgba(40,199,111,.15);">
-                                    <i class="ti ti-receipt" style="color:var(--pm-success)"></i>
-                                </div>
-                                <div class="flex-grow-1 overflow-hidden">
-                                    <div class="pm-stat-label text-truncate">فاکتور این ماه</div>
-                                    <div class="pm-stat-value">{{ $numberFmt($statCards['this_month_factors']) }}</div>
-                                    <div class="pm-stat-sub @if($statCards['sales_trend'] >= 0) pm-trend-up @else pm-trend-down @endif">
-                                        @if($statCards['sales_trend'] >= 0)<i class="ti ti-trending-up"></i>@else<i class="ti ti-trending-down"></i>@endif
-                                        {{ abs($statCards['sales_trend']) }}٪ نسبت به ماه قبل
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- فروش این ماه --}}
-                    <div class="col-6 col-md-3">
-                        <div class="card pm-stat-card h-100">
-                            <div class="card-body d-flex align-items-center gap-3 p-3">
-                                <div class="pm-stat-icon" style="background:rgba(255,159,67,.15);">
-                                    <i class="ti ti-currency-dollar" style="color:var(--pm-warning)"></i>
-                                </div>
-                                <div class="flex-grow-1 overflow-hidden">
-                                    <div class="pm-stat-label text-truncate">فروش این ماه</div>
-                                    <div class="pm-stat-value" style="font-size:1.2rem">
-                                        {{ number_format((int)$statCards['this_month_amount'] / 10) }}
-                                        <small class="fw-normal fs-6">ت</small>
-                                    </div>
-                                    <div class="pm-stat-sub text-muted">
-                                        ماه قبل: {{ number_format((int)$statCards['last_month_amount'] / 10) }} ت
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- کارمندان --}}
-                    <div class="col-6 col-md-3">
-                        <div class="card pm-stat-card h-100">
-                            <div class="card-body d-flex align-items-center gap-3 p-3">
-                                <div class="pm-stat-icon" style="background:rgba(0,207,232,.15);">
-                                    <i class="ti ti-user-check" style="color:var(--pm-info)"></i>
-                                </div>
-                                <div class="flex-grow-1 overflow-hidden">
-                                    <div class="pm-stat-label text-truncate">کارمندان فعال</div>
-                                    <div class="pm-stat-value">{{ $numberFmt($statCards['active_employees']) }}</div>
-                                    @if($statCards['warehouse_stock'] > 0)
-                                    <div class="pm-stat-sub text-muted">موجودی انبار: {{ $numberFmt($statCards['warehouse_stock']) }}</div>
+                    {{-- ستون ۱: کارت خوش‌آمد --}}
+                    <div class="col-12 col-xl-4">
+                        <div class="card h-100" style="background: linear-gradient(135deg,rgba(115,103,240,.15) 0%,rgba(115,103,240,.02) 100%); overflow:hidden; position:relative;">
+                            <div class="card-body" style="min-height:160px;">
+                                <h5 class="card-title fw-bold mb-1">
+                                    تبریک 🎉 {{ $User->name }}!
+                                </h5>
+                                <p class="text-muted mb-3" style="font-size:.88rem">
+                                    @if(!empty($statCards))
+                                        این ماه <strong class="text-primary">{{ $nf($statCards['this_month_factors']) }}</strong> فاکتور
+                                        به ارزش
+                                        <strong class="text-success">{{ $nfToman($statCards['this_month_amount']) }}</strong> تومان
+                                        ثبت شده است.
+                                    @else
+                                        به داشبورد مدیریت پنل {{ $Organ->title ?? 'دارمینو' }} خوش آمدید.
                                     @endif
+                                </p>
+                                <a href="{{ route('index') }}" class="btn btn-primary btn-sm">
+                                    <i class="ti ti-chart-bar me-1"></i> مشاهده گزارش فروش
+                                </a>
+                                <a href="{{ route('pishfactor.index') }}" class="btn btn-outline-secondary btn-sm ms-2">
+                                    <i class="ti ti-file-plus me-1"></i> ثبت سفارش
+                                </a>
+                            </div>
+                            <img src="{{ asset('assets/') }}/img/illustrations/card-advance-sale.png"
+                                 alt="" class="welcome-card-img" style="width:120px;" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+
+                    @if(!empty($statCards))
+                    {{-- کارت: مشتریان فعال --}}
+                    <div class="col-6 col-md-3 col-xl-2">
+                        <div class="card stat-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <div class="stat-icon bg-label-primary">
+                                        <i class="ti ti-users text-primary"></i>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="stat-lbl text-truncate">مشتریان فعال</div>
+                                        <div class="stat-val">{{ $nf($statCards['active_customers']) }}</div>
+                                    </div>
+                                </div>
+                                <div id="sparkCustomers" style="min-height:50px"></div>
+                                <div class="stat-sub text-muted mt-1">از {{ $nf($statCards['total_customers']) }} کل</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- کارت: فاکتورهای این ماه --}}
+                    <div class="col-6 col-md-3 col-xl-2">
+                        <div class="card stat-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <div class="stat-icon bg-label-success">
+                                        <i class="ti ti-receipt text-success"></i>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="stat-lbl text-truncate">فاکتور این ماه</div>
+                                        <div class="stat-val">{{ $nf($statCards['this_month_factors']) }}</div>
+                                    </div>
+                                </div>
+                                <div id="sparkFactors" style="min-height:50px"></div>
+                                <div class="stat-sub mt-1 @if(($statCards['sales_trend'] ?? 0) >= 0) trend-up @else trend-down @endif">
+                                    @if(($statCards['sales_trend'] ?? 0) >= 0)
+                                        <i class="ti ti-trending-up"></i>
+                                    @else
+                                        <i class="ti ti-trending-down"></i>
+                                    @endif
+                                    {{ abs($statCards['sales_trend'] ?? 0) }}٪ نسبت به ماه قبل
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    {{-- کارت: فروش این ماه --}}
+                    <div class="col-6 col-md-3 col-xl-2">
+                        <div class="card stat-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <div class="stat-icon bg-label-warning">
+                                        <i class="ti ti-coin text-warning"></i>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="stat-lbl text-truncate">فروش این ماه</div>
+                                        <div class="stat-val" style="font-size:1.1rem">
+                                            {{ $nfToman($statCards['this_month_amount']) }}
+                                            <small class="fw-normal" style="font-size:.7rem">ت</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="sparkSales" style="min-height:50px"></div>
+                                <div class="stat-sub text-muted mt-1">
+                                    ماه قبل: {{ $nfToman($statCards['last_month_amount']) }} ت
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- کارت: کارمندان --}}
+                    <div class="col-6 col-md-3 col-xl-2">
+                        <div class="card stat-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <div class="stat-icon bg-label-info">
+                                        <i class="ti ti-user-check text-info"></i>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="stat-lbl text-truncate">کارمندان فعال</div>
+                                        <div class="stat-val">{{ $nf($statCards['active_employees']) }}</div>
+                                    </div>
+                                </div>
+                                <div id="sparkEmployees" style="min-height:50px"></div>
+                                @if($statCards['warehouse_stock'] > 0)
+                                <div class="stat-sub text-muted mt-1">موجودی انبار: {{ $nf($statCards['warehouse_stock']) }}</div>
+                                @else
+                                <div class="stat-sub text-muted mt-1">آخرین بروزرسانی: {{ $updatedAt }}</div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                </div>
+
+                {{-- ══════════════════════════════════════
+                     ردیف ۲ — Revenue Report + Earning Reports
+                ══════════════════════════════════════ --}}
+                @if(!empty($revenueReport) && ($dashWidgets['dashboard_widget_pm_bi_chart'] ?? true))
+                <div class="row g-4 mb-4">
+
+                    {{-- Revenue Report: نمودار گروهی ۶ ماه --}}
+                    <div class="col-12 col-xl-8">
+                        <div class="card h-100">
+                            <div class="card-body p-0">
+                                <div class="row row-bordered g-0">
+                                    <div class="col-md-8 p-4 revenue-split">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div>
+                                                <h5 class="card-title mb-0">گزارش درآمد</h5>
+                                                <small class="text-muted">مقایسه فروش و فاکتورها — ۶ ماه اخیر</small>
+                                            </div>
+                                            <span class="widget-updated">{{ $updatedAt }}</span>
+                                        </div>
+                                        <div id="revenueReportChart" style="min-height:220px"></div>
+                                    </div>
+                                    <div class="col-md-4 p-4 d-flex flex-column justify-content-center">
+                                        <div class="text-center mb-3">
+                                            <small class="text-muted d-block mb-1">مجموع فروش ۶ ماه</small>
+                                            <h4 class="text-primary mb-0">
+                                                {{ number_format(array_sum($revenueReport['sales'])) }}
+                                                <small class="fw-normal fs-6 text-muted">ت</small>
+                                            </h4>
+                                        </div>
+                                        <div id="revenueBudgetChart" style="min-height:130px"></div>
+                                        <div class="text-center mt-2">
+                                            <small class="text-muted">
+                                                مجموع فاکتور: <strong>{{ number_format(array_sum($revenueReport['factors'])) }}</strong>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Earning Reports: تب‌های هفتگی --}}
+                    <div class="col-12 col-xl-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title mb-0">گزارش درآمد</h5>
+                                    <small class="text-muted">بررسی هفتگی</small>
+                                </div>
+                                <span class="widget-updated">{{ $updatedAt }}</span>
+                            </div>
+                            <div class="card-body">
+                                <ul class="nav nav-tabs widget-nav-tabs pb-3 gap-3 mx-1 d-flex flex-nowrap" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link btn active d-flex flex-column align-items-center justify-content-center"
+                                           data-bs-target="#earning-orders" data-bs-toggle="tab" href="javascript:void(0);" role="tab">
+                                            <div class="badge bg-label-secondary rounded p-2">
+                                                <i class="ti ti-shopping-cart ti-sm"></i>
+                                            </div>
+                                            <h6 class="tab-widget-title mb-0 mt-2" style="font-size:.78rem">سفارشات</h6>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link btn d-flex flex-column align-items-center justify-content-center"
+                                           data-bs-target="#earning-sales" data-bs-toggle="tab" href="javascript:void(0);" role="tab">
+                                            <div class="badge bg-label-secondary rounded p-2">
+                                                <i class="ti ti-chart-bar ti-sm"></i>
+                                            </div>
+                                            <h6 class="tab-widget-title mb-0 mt-2" style="font-size:.78rem">فروش</h6>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link btn d-flex flex-column align-items-center justify-content-center"
+                                           data-bs-target="#earning-customers" data-bs-toggle="tab" href="javascript:void(0);" role="tab">
+                                            <div class="badge bg-label-secondary rounded p-2">
+                                                <i class="ti ti-users ti-sm"></i>
+                                            </div>
+                                            <h6 class="tab-widget-title mb-0 mt-2" style="font-size:.78rem">مشتریان</h6>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content p-0">
+                                    <div class="tab-pane fade show active" id="earning-orders" role="tabpanel">
+                                        <div id="earningOrdersChart" style="min-height:130px"></div>
+                                    </div>
+                                    <div class="tab-pane fade" id="earning-sales" role="tabpanel">
+                                        <div id="earningSalesChart" style="min-height:130px"></div>
+                                    </div>
+                                    <div class="tab-pane fade" id="earning-customers" role="tabpanel">
+                                        <div id="earningCustomersChart" style="min-height:130px"></div>
+                                    </div>
+                                </div>
+
+                                @if(!empty($financialSummary))
+                                <div class="mt-3 pt-3 border-top">
+                                    <div class="d-flex mb-3">
+                                        <div class="avatar flex-shrink-0 me-3">
+                                            <span class="avatar-initial rounded bg-label-primary">
+                                                <i class="ti ti-chart-pie-2 ti-sm"></i>
+                                            </span>
+                                        </div>
+                                        <div class="d-flex w-100 align-items-center justify-content-between gap-2">
+                                            <div>
+                                                <h6 class="mb-0">درآمد این ماه</h6>
+                                                <small class="text-muted">فاکتورهای تأییدشده</small>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <small class="fw-medium">{{ $nfToman($financialSummary['this_month_revenue']) }} ت</small>
+                                                @if($financialSummary['revenue_trend'] >= 0)
+                                                    <i class="ti ti-chevron-up text-success"></i>
+                                                @else
+                                                    <i class="ti ti-chevron-down text-danger"></i>
+                                                @endif
+                                                <small class="text-muted">{{ abs($financialSummary['revenue_trend']) }}٪</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex">
+                                        <div class="avatar flex-shrink-0 me-3">
+                                            <span class="avatar-initial rounded bg-label-warning">
+                                                <i class="ti ti-clock ti-sm"></i>
+                                            </span>
+                                        </div>
+                                        <div class="d-flex w-100 align-items-center justify-content-between gap-2">
+                                            <div>
+                                                <h6 class="mb-0">در انتظار تأیید</h6>
+                                                <small class="text-muted">{{ $nf($financialSummary['pending_factors']) }} فاکتور</small>
+                                            </div>
+                                            <small class="fw-medium">{{ $nfToman($financialSummary['pending_amount']) }} ت</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 @endif
 
                 {{-- ══════════════════════════════════════
-                     ردیف ۲ — تیم فروش + نمودار ماهانه
+                     ردیف ۳ — تیم فروش + آخرین مشتریان
                 ══════════════════════════════════════ --}}
-                <div class="row g-3 mb-4">
+                <div class="row g-4 mb-4">
 
                     {{-- تیم فروش --}}
-                    @if (!empty($salesTeam) && ($dashWidgets['dashboard_widget_pm_sales_team'] ?? true))
-                    <div class="col-12 col-lg-6">
+                    @if(!empty($salesTeam) && ($dashWidgets['dashboard_widget_pm_sales_team'] ?? true))
+                    <div class="col-12 col-xl-4">
                         <div class="card h-100">
-                            <div class="pm-widget-header">
-                                <div class="pm-widget-icon" style="background:rgba(115,103,240,.15);">
-                                    <i class="ti ti-hierarchy" style="color:var(--pm-primary)"></i>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title mb-0">تیم فروش</h5>
+                                    <small class="text-muted">سلسله مراتب سرپرست → ویزیتور</small>
                                 </div>
-                                سلسله مراتب تیم فروش
+                                <span class="widget-updated">{{ $updatedAt }}</span>
                             </div>
                             <div class="table-responsive" style="max-height:420px;overflow-y:auto;">
-                                <table class="table table-hover mb-0" style="font-size:.88rem">
+                                <table class="table table-hover mb-0" style="font-size:.85rem">
                                     <thead class="table-light sticky-top">
                                         <tr>
                                             <th>نام</th>
                                             <th class="text-center">مشتری</th>
                                             <th class="text-center">فاکتور</th>
-                                            <th class="text-center">این ماه (ت)</th>
+                                            <th class="text-center">این ماه</th>
                                             <th class="text-center">روند</th>
                                         </tr>
                                     </thead>
                                     @foreach($salesTeam as $leader)
                                     <tbody>
-                                        <tr class="team-row-leader team-toggle" data-target="visitors-{{ $leader['id'] }}" style="cursor:pointer">
+                                        <tr class="team-row-leader team-toggle" data-target="visitors-{{ $leader['id'] }}">
                                             <td>
-                                                <span class="badge bg-label-primary me-1" style="font-size:.7rem">سرپرست</span>
-                                                {{ $leader['name'] }}
-                                                @if(!empty($leader['visitors']))
-                                                <i class="ti ti-chevron-down ms-1 small"></i>
-                                                @endif
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="avatar avatar-xs">
+                                                        <span class="avatar-initial rounded-circle bg-label-primary" style="font-size:.65rem">
+                                                            {{ mb_substr($leader['name'], 0, 1) }}
+                                                        </span>
+                                                    </span>
+                                                    <div>
+                                                        <span class="badge bg-label-primary" style="font-size:.65rem">سرپرست</span>
+                                                        <div style="font-size:.84rem">{{ $leader['name'] }}</div>
+                                                    </div>
+                                                </div>
                                             </td>
-                                            <td class="text-center">{{ number_format($leader['customer_count']) }}</td>
-                                            <td class="text-center">{{ number_format($leader['factor_count']) }}</td>
-                                            <td class="text-center">{{ number_format((int)$leader['this_month_amount'] / 10) }}</td>
+                                            <td class="text-center">{{ $nf($leader['customer_count']) }}</td>
+                                            <td class="text-center">{{ $nf($leader['factor_count']) }}</td>
+                                            <td class="text-center" style="font-size:.8rem">{{ $nfToman($leader['this_month_amount']) }} ت</td>
                                             <td class="text-center">
                                                 @if($leader['trend'] > 0)
-                                                    <span class="pm-trend-up"><i class="ti ti-trending-up"></i> {{ $leader['trend'] }}٪</span>
+                                                    <span class="badge bg-label-success rounded-pill"><i class="ti ti-trending-up"></i> {{ $leader['trend'] }}٪</span>
                                                 @elseif($leader['trend'] < 0)
-                                                    <span class="pm-trend-down"><i class="ti ti-trending-down"></i> {{ abs($leader['trend']) }}٪</span>
+                                                    <span class="badge bg-label-danger rounded-pill"><i class="ti ti-trending-down"></i> {{ abs($leader['trend']) }}٪</span>
                                                 @else
-                                                    <span class="pm-trend-flat">—</span>
+                                                    <span class="badge bg-label-secondary rounded-pill">—</span>
                                                 @endif
                                             </td>
                                         </tr>
@@ -269,22 +469,31 @@
                                         @foreach($leader['visitors'] as $visitor)
                                         <tr class="team-row-visitor">
                                             <td>
-                                                <span class="badge bg-label-secondary me-1" style="font-size:.68rem">ویزیتور</span>
-                                                {{ $visitor['name'] }}
-                                                @if(!$visitor['is_active'])
-                                                    <span class="badge bg-label-danger ms-1" style="font-size:.65rem">غیرفعال</span>
-                                                @endif
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="avatar avatar-xs">
+                                                        <span class="avatar-initial rounded-circle bg-label-secondary" style="font-size:.65rem">
+                                                            {{ mb_substr($visitor['name'], 0, 1) }}
+                                                        </span>
+                                                    </span>
+                                                    <div>
+                                                        <span class="badge bg-label-secondary" style="font-size:.62rem">ویزیتور</span>
+                                                        @if(!$visitor['is_active'])
+                                                            <span class="badge bg-label-danger" style="font-size:.6rem">غیرفعال</span>
+                                                        @endif
+                                                        <div style="font-size:.82rem">{{ $visitor['name'] }}</div>
+                                                    </div>
+                                                </div>
                                             </td>
-                                            <td class="text-center">{{ number_format($visitor['customer_count']) }}</td>
-                                            <td class="text-center">{{ number_format($visitor['factor_count']) }}</td>
-                                            <td class="text-center">{{ number_format((int)$visitor['this_month_amount'] / 10) }}</td>
+                                            <td class="text-center">{{ $nf($visitor['customer_count']) }}</td>
+                                            <td class="text-center">{{ $nf($visitor['factor_count']) }}</td>
+                                            <td class="text-center" style="font-size:.78rem">{{ $nfToman($visitor['this_month_amount']) }} ت</td>
                                             <td class="text-center">
                                                 @if($visitor['trend'] > 0)
-                                                    <span class="pm-trend-up" style="font-size:.8rem"><i class="ti ti-trending-up"></i> {{ $visitor['trend'] }}٪</span>
+                                                    <span class="badge bg-label-success rounded-pill" style="font-size:.65rem">↑{{ $visitor['trend'] }}٪</span>
                                                 @elseif($visitor['trend'] < 0)
-                                                    <span class="pm-trend-down" style="font-size:.8rem"><i class="ti ti-trending-down"></i> {{ abs($visitor['trend']) }}٪</span>
+                                                    <span class="badge bg-label-danger rounded-pill" style="font-size:.65rem">↓{{ abs($visitor['trend']) }}٪</span>
                                                 @else
-                                                    <span class="pm-trend-flat">—</span>
+                                                    <span class="badge bg-label-secondary rounded-pill" style="font-size:.65rem">—</span>
                                                 @endif
                                             </td>
                                         </tr>
@@ -298,18 +507,216 @@
                     </div>
                     @endif
 
-                    {{-- نمودار فروش ماهانه --}}
-                    @if (!empty($monthlyChart) && ($dashWidgets['dashboard_widget_pm_bi_chart'] ?? true))
-                    <div class="col-12 col-lg-6">
+                    {{-- آخرین مشتریان ثبت‌شده --}}
+                    <div class="{{ !empty($salesTeam) && ($dashWidgets['dashboard_widget_pm_sales_team'] ?? true) ? 'col-12 col-xl-8' : 'col-12' }}">
                         <div class="card h-100">
-                            <div class="pm-widget-header">
-                                <div class="pm-widget-icon" style="background:rgba(40,199,111,.15);">
-                                    <i class="ti ti-chart-bar" style="color:var(--pm-success)"></i>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title mb-0">آخرین مشتریان</h5>
+                                    <small class="text-muted">۱۰ مشتری اخیر ثبت‌شده در سیستم</small>
                                 </div>
-                                نمودار فروش ۶ ماه اخیر
+                                <span class="widget-updated">{{ $updatedAt }}</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0" style="font-size:.84rem">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>نام مشتری</th>
+                                            <th>موبایل</th>
+                                            <th>بازاریاب</th>
+                                            <th>ثبت‌کننده</th>
+                                            <th class="text-center">فاکتور</th>
+                                            <th class="text-center">مانده (ت)</th>
+                                            <th>تاریخ ثبت</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($recentCustomers ?? [] as $idx => $cust)
+                                        <tr>
+                                            <td>
+                                                <span class="badge rounded-pill bg-label-primary" style="min-width:22px">{{ $idx + 1 }}</span>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="avatar avatar-sm">
+                                                        <span class="avatar-initial rounded-circle bg-label-{{ ['primary','success','warning','info','danger'][$idx % 5] }}">
+                                                            {{ mb_substr($cust['name'] ?? '?', 0, 1) }}
+                                                        </span>
+                                                    </span>
+                                                    <span class="fw-medium">{{ $cust['name'] }}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted" dir="ltr">{{ $cust['mobile'] }}</span>
+                                            </td>
+                                            <td>
+                                                @if($cust['marketer'] !== '-')
+                                                    <span class="badge bg-label-success">{{ $cust['marketer'] }}</span>
+                                                @else
+                                                    <span class="text-muted">—</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($cust['added_by'] !== '-')
+                                                    <span class="badge bg-label-info">{{ $cust['added_by'] }}</span>
+                                                @else
+                                                    <span class="text-muted">—</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-label-{{ $cust['factor_count'] > 0 ? 'primary' : 'secondary' }} rounded-pill">
+                                                    {{ $cust['factor_count'] }}
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                @php $bal = $cust['balance']; @endphp
+                                                @if($bal > 0)
+                                                    <span class="text-success fw-medium">{{ number_format((int)($bal/10)) }}</span>
+                                                @elseif($bal < 0)
+                                                    <span class="text-danger fw-medium">{{ number_format((int)(abs($bal)/10)) }}</span>
+                                                @else
+                                                    <span class="text-muted">۰</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="text-muted" style="font-size:.78rem">{{ $cust['registered_at'] }}</span>
+                                            </td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted py-4">
+                                                <i class="ti ti-users-off" style="font-size:2rem"></i>
+                                                <p class="mt-2 mb-0">هنوز مشتری‌ای ثبت نشده است</p>
+                                            </td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- ══════════════════════════════════════
+                     ردیف ۴ — محصولات + لاگ فعالیت
+                ══════════════════════════════════════ --}}
+                <div class="row g-4 mb-4">
+
+                    {{-- برترین محصولات با progress bar --}}
+                    @if(!empty($topProducts) && ($dashWidgets['dashboard_widget_pm_products'] ?? true))
+                    <div class="col-12 col-xl-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title mb-0">محصولات پرفروش</h5>
+                                    <small class="text-muted">۳۰ روز اخیر</small>
+                                </div>
+                                <span class="widget-updated">{{ $updatedAt }}</span>
                             </div>
                             <div class="card-body">
-                                <div id="monthlyChart" style="min-height:300px"></div>
+                                @php $colors = ['primary','success','warning','info','danger']; @endphp
+                                @forelse($topProducts as $pidx => $prod)
+                                <div class="mb-4 @if(!$loop->last) pb-3 border-bottom @endif">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge rounded-pill bg-label-{{ $colors[$pidx % 5] }}" style="min-width:22px;font-size:.7rem">
+                                                {{ $pidx + 1 }}
+                                            </span>
+                                            <span style="font-size:.85rem; font-weight:500">{{ \Illuminate\Support\Str::limit($prod['name'], 26) }}</span>
+                                        </div>
+                                        <span class="badge bg-label-{{ $colors[$pidx % 5] }} rounded-pill">{{ number_format($prod['qty']) }}</span>
+                                    </div>
+                                    <div class="progress product-progress">
+                                        <div class="progress-bar bg-{{ $colors[$pidx % 5] }}"
+                                             role="progressbar"
+                                             style="width:{{ $prod['percent'] }}%"
+                                             aria-valuenow="{{ $prod['percent'] }}"
+                                             aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                @empty
+                                <div class="text-center text-muted py-3">
+                                    <i class="ti ti-package-off" style="font-size:2rem"></i>
+                                    <p class="mt-2 mb-0">داده‌ای یافت نشد</p>
+                                </div>
+                                @endforelse
+
+                                @if(!empty($productSummary))
+                                <div class="d-flex justify-content-between mt-3 pt-3 border-top">
+                                    <div class="text-center">
+                                        <div class="fw-bold text-primary">{{ $nf($productSummary['total_products']) }}</div>
+                                        <small class="text-muted">کل محصولات</small>
+                                    </div>
+                                    @if($productSummary['total_stock_items'] > 0)
+                                    <div class="text-center">
+                                        <div class="fw-bold text-success">{{ $nf($productSummary['total_stock_items']) }}</div>
+                                        <small class="text-muted">موجودی انبار</small>
+                                    </div>
+                                    @endif
+                                    @if($productSummary['low_stock_products']->count() > 0)
+                                    <div class="text-center">
+                                        <div class="fw-bold text-danger">{{ $productSummary['low_stock_products']->count() }}</div>
+                                        <small class="text-muted">کم‌موجود</small>
+                                    </div>
+                                    @endif
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- لاگ فعالیت --}}
+                    @if(!empty($activityLog) && ($dashWidgets['dashboard_widget_pm_activity_log'] ?? true))
+                    <div class="{{ !empty($topProducts) && ($dashWidgets['dashboard_widget_pm_products'] ?? true) ? 'col-12 col-xl-8' : 'col-12' }}">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div>
+                                        <h5 class="card-title mb-0">لاگ فعالیت سیستم</h5>
+                                        <small class="text-muted">آخرین ۱۵ رویداد</small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <input type="text" id="activitySearch" class="form-control form-control-sm"
+                                               placeholder="جستجو..." style="width:160px">
+                                        <select id="activityFilter" class="form-select form-select-sm" style="width:120px">
+                                            <option value="">همه عملیات</option>
+                                            <option value="create">ایجاد</option>
+                                            <option value="update">ویرایش</option>
+                                            <option value="delete">حذف</option>
+                                            <option value="login">ورود</option>
+                                            <option value="approve">تأیید</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="activity-timeline" id="activityList">
+                                    @forelse($activityLog as $log)
+                                    <div class="activity-item"
+                                         data-action="{{ $log['action'] }}"
+                                         data-search="{{ strtolower($log['user_name'] . ' ' . $log['description']) }}">
+                                        <div class="activity-dot bg-{{ $log['action_color'] }}"></div>
+                                        <div class="d-flex flex-wrap gap-2 align-items-start">
+                                            <span class="badge bg-label-{{ $log['action_color'] }}" style="font-size:.7rem;min-width:44px;text-align:center">
+                                                {{ $log['action_label'] }}
+                                            </span>
+                                            <span class="fw-semibold" style="font-size:.84rem">{{ $log['user_name'] }}</span>
+                                            @if($log['description'])
+                                            <span class="text-muted" style="font-size:.82rem">— {{ $log['description'] }}</span>
+                                            @endif
+                                            <span class="activity-meta me-auto">{{ $log['time_ago'] }}</span>
+                                        </div>
+                                    </div>
+                                    @empty
+                                    <div class="text-center text-muted py-4">
+                                        <i class="ti ti-clock-off" style="font-size:2rem"></i>
+                                        <p class="mt-2 mb-0">رویدادی یافت نشد</p>
+                                    </div>
+                                    @endforelse
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -318,155 +725,40 @@
                 </div>
 
                 {{-- ══════════════════════════════════════
-                     ردیف ۳ — خلاصه مالی + محصولات + مناطق
+                     ردیف ۵ — مناطق (اگر فعال باشد)
                 ══════════════════════════════════════ --}}
-                <div class="row g-3 mb-4">
-
-                    {{-- خلاصه مالی --}}
-                    @if (!empty($financialSummary) && ($dashWidgets['dashboard_widget_pm_financial'] ?? true))
+                @if(!empty($routesSummary) && ($routesSummary['enabled'] ?? false) && ($dashWidgets['dashboard_widget_pm_routes'] ?? true))
+                <div class="row g-4 mb-4">
                     <div class="col-12 col-md-6 col-xl-4">
                         <div class="card h-100">
-                            <div class="pm-widget-header">
-                                <div class="pm-widget-icon" style="background:rgba(255,159,67,.15);">
-                                    <i class="ti ti-report-money" style="color:var(--pm-warning)"></i>
-                                </div>
-                                خلاصه مالی
-                            </div>
-                            <div class="card-body p-3">
-                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                    <span class="text-muted small">درآمد این ماه</span>
-                                    <strong class="pm-trend-up">
-                                        {{ number_format((int)$financialSummary['this_month_revenue'] / 10) }} ت
-                                    </strong>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                    <span class="text-muted small">درآمد ماه قبل</span>
-                                    <span>{{ number_format((int)$financialSummary['last_month_revenue'] / 10) }} ت</span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                    <span class="text-muted small">روند فروش</span>
-                                    <span class="{{ $financialSummary['revenue_trend'] >= 0 ? 'pm-trend-up' : 'pm-trend-down' }}">
-                                        @if($financialSummary['revenue_trend'] >= 0)
-                                            <i class="ti ti-trending-up"></i>
-                                        @else
-                                            <i class="ti ti-trending-down"></i>
-                                        @endif
-                                        {{ abs($financialSummary['revenue_trend']) }}٪
-                                    </span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                    <span class="text-muted small">فاکتورهای در انتظار</span>
-                                    <span class="badge bg-label-warning">{{ number_format($financialSummary['pending_factors']) }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                    <span class="text-muted small">مبلغ در انتظار</span>
-                                    <span>{{ number_format((int)$financialSummary['pending_amount'] / 10) }} ت</span>
-                                </div>
-                                @if($financialSummary['receivable'] > 0 || $financialSummary['payable'] > 0)
-                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                    <span class="text-muted small">بدهکاران</span>
-                                    <span class="pm-trend-up">{{ number_format((int)$financialSummary['receivable'] / 10) }} ت</span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-muted small">طلبکاران</span>
-                                    <span class="pm-trend-down">{{ number_format((int)$financialSummary['payable'] / 10) }} ت</span>
-                                </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-
-                    {{-- محصولات و موجودی --}}
-                    @if (!empty($productSummary) && ($dashWidgets['dashboard_widget_pm_products'] ?? true))
-                    <div class="col-12 col-md-6 col-xl-4">
-                        <div class="card h-100">
-                            <div class="pm-widget-header">
-                                <div class="pm-widget-icon" style="background:rgba(0,207,232,.15);">
-                                    <i class="ti ti-package" style="color:var(--pm-info)"></i>
-                                </div>
-                                محصولات و موجودی
-                            </div>
-                            <div class="card-body p-0">
-                                <div class="px-3 py-2 border-bottom">
-                                    <small class="text-muted fw-semibold d-block mb-1">پرفروش‌ترین محصولات (۳۰ روز)</small>
-                                    @forelse($productSummary['top_products'] as $idx => $prod)
-                                    <div class="d-flex justify-content-between align-items-center py-1">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="badge bg-label-primary rounded-circle" style="width:20px;height:20px;font-size:.7rem">{{ $idx + 1 }}</span>
-                                            <span style="font-size:.83rem">{{ Str::limit($prod['product_name'], 22) }}</span>
-                                        </div>
-                                        <span class="badge bg-label-success">{{ number_format($prod['total_qty']) }}</span>
-                                    </div>
-                                    @empty
-                                    <small class="text-muted">داده‌ای یافت نشد</small>
-                                    @endforelse
-                                </div>
-                                @if($productSummary['low_stock_products']->count() > 0)
-                                <div class="px-3 py-2">
-                                    <small class="text-muted fw-semibold d-block mb-1">کم‌موجودترین محصولات</small>
-                                    @foreach($productSummary['low_stock_products']->take(4) as $prod)
-                                    <div class="d-flex justify-content-between align-items-center py-1">
-                                        <span style="font-size:.83rem">{{ Str::limit($prod->name, 22) }}</span>
-                                        <span class="badge bg-label-danger">{{ number_format($prod->quantity) }}</span>
-                                    </div>
-                                    @endforeach
-                                </div>
-                                @endif
-                                <div class="px-3 py-2 border-top bg-light-subtle">
-                                    <div class="d-flex justify-content-between">
-                                        <small class="text-muted">کل محصولات</small>
-                                        <strong>{{ number_format($productSummary['total_products']) }}</strong>
-                                    </div>
-                                    @if($productSummary['total_stock_items'] > 0)
-                                    <div class="d-flex justify-content-between mt-1">
-                                        <small class="text-muted">کل موجودی انبار</small>
-                                        <strong>{{ number_format($productSummary['total_stock_items']) }}</strong>
-                                    </div>
-                                    @endif
+                            <div class="card-header d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title mb-0">مناطق و مسیرها</h5>
+                                    <small class="text-muted">توزیع مشتریان</small>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    @endif
-
-                    {{-- مناطق و مسیرها --}}
-                    @if (!empty($routesSummary) && ($routesSummary['enabled'] ?? false) && ($dashWidgets['dashboard_widget_pm_routes'] ?? true))
-                    <div class="col-12 col-md-6 col-xl-4">
-                        <div class="card h-100">
-                            <div class="pm-widget-header">
-                                <div class="pm-widget-icon" style="background:rgba(234,84,85,.15);">
-                                    <i class="ti ti-map-pin" style="color:var(--pm-danger)"></i>
-                                </div>
-                                مناطق و مسیرها
-                            </div>
-                            <div class="card-body p-3">
-                                <div class="row g-2 mb-3">
-                                    <div class="col-6">
-                                        <div class="text-center p-2 rounded" style="background:rgba(234,84,85,.08)">
-                                            <div style="font-size:1.6rem;font-weight:700;color:var(--pm-danger)">{{ $routesSummary['active_regions'] }}</div>
-                                            <small class="text-muted">منطقه فعال</small>
-                                        </div>
+                            <div class="card-body">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-6 text-center p-2 rounded" style="background:rgba(234,84,85,.08)">
+                                        <div class="fw-bold" style="font-size:1.5rem;color:var(--pm-danger)">{{ $routesSummary['active_regions'] }}</div>
+                                        <small class="text-muted">منطقه فعال</small>
                                     </div>
-                                    <div class="col-6">
-                                        <div class="text-center p-2 rounded" style="background:rgba(115,103,240,.08)">
-                                            <div style="font-size:1.6rem;font-weight:700;color:var(--pm-primary)">{{ $routesSummary['total_areas'] }}</div>
-                                            <small class="text-muted">مسیر کل</small>
-                                        </div>
+                                    <div class="col-6 text-center p-2 rounded" style="background:rgba(115,103,240,.08)">
+                                        <div class="fw-bold" style="font-size:1.5rem;color:var(--pm-primary)">{{ $routesSummary['total_areas'] }}</div>
+                                        <small class="text-muted">مسیر کل</small>
                                     </div>
                                 </div>
-                                @if(!empty($routesSummary['customers_per_region']) && count($routesSummary['customers_per_region']) > 0)
-                                <small class="text-muted fw-semibold d-block mb-2">توزیع مشتریان بر اساس منطقه</small>
+                                @if(!empty($routesSummary['customers_per_region']))
                                 @foreach($routesSummary['customers_per_region'] as $region)
+                                @php
+                                    $maxR = max(collect($routesSummary['customers_per_region'])->pluck('count')->max(), 1);
+                                    $pct  = min(100, round($region['count'] / $maxR * 100));
+                                @endphp
                                 <div class="mb-2">
                                     <div class="d-flex justify-content-between mb-1">
                                         <small>{{ $region['title'] }}</small>
                                         <small class="fw-semibold">{{ number_format($region['count']) }}</small>
                                     </div>
-                                    @php
-                                        $maxCount = max(collect($routesSummary['customers_per_region'])->pluck('count')->toArray() ?: [1]);
-                                        $pct = $maxCount > 0 ? min(100, round($region['count'] / $maxCount * 100)) : 0;
-                                    @endphp
                                     <div class="progress" style="height:6px">
                                         <div class="progress-bar bg-danger" style="width:{{ $pct }}%"></div>
                                     </div>
@@ -476,71 +768,10 @@
                             </div>
                         </div>
                     </div>
-                    @endif
-
-                </div>
-
-                {{-- ══════════════════════════════════════
-                     ردیف ۴ — لاگ فعالیت (عرض کامل)
-                ══════════════════════════════════════ --}}
-                @if (!empty($activityLog) && ($dashWidgets['dashboard_widget_pm_activity_log'] ?? true))
-                <div class="row g-3 mb-4">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="pm-widget-header d-flex justify-content-between">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="pm-widget-icon" style="background:rgba(130,134,139,.15);">
-                                        <i class="ti ti-activity" style="color:var(--pm-secondary)"></i>
-                                    </div>
-                                    لاگ فعالیت سیستم
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <input type="text" id="activitySearch" class="form-control form-control-sm"
-                                           placeholder="جستجو در لاگ..." style="width:200px">
-                                    <select id="activityFilter" class="form-select form-select-sm" style="width:130px">
-                                        <option value="">همه عملیات</option>
-                                        <option value="create">ایجاد</option>
-                                        <option value="update">ویرایش</option>
-                                        <option value="delete">حذف</option>
-                                        <option value="login">ورود</option>
-                                        <option value="approve">تایید</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="card-body p-3">
-                                <div class="activity-timeline" id="activityList">
-                                    @forelse($activityLog as $log)
-                                    <div class="activity-item"
-                                         data-action="{{ $log['action'] }}"
-                                         data-search="{{ strtolower($log['user_name'] . ' ' . $log['description']) }}">
-                                        <div class="activity-dot bg-{{ $log['action_color'] }}"></div>
-                                        <div class="d-flex flex-wrap gap-2 align-items-start">
-                                            <span class="badge bg-label-{{ $log['action_color'] }}" style="font-size:.72rem;min-width:46px;text-align:center">
-                                                {{ $log['action_label'] }}
-                                            </span>
-                                            <span class="fw-semibold" style="font-size:.85rem">{{ $log['user_name'] }}</span>
-                                            @if($log['description'])
-                                            <span class="text-muted" style="font-size:.83rem">—</span>
-                                            <span style="font-size:.83rem">{{ $log['description'] }}</span>
-                                            @endif
-                                            <span class="activity-meta me-auto">{{ $log['time_ago'] }}</span>
-                                        </div>
-                                    </div>
-                                    @empty
-                                    <div class="text-center text-muted py-4">
-                                        <i class="ti ti-clock-off" style="font-size:2rem"></i>
-                                        <p class="mt-2">رویدادی یافت نشد</p>
-                                    </div>
-                                    @endforelse
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 @endif
 
-            </div>
-            {{-- /container --}}
+            </div>{{-- /container --}}
             @include('sections/footer')
         </div>
     </div>
@@ -561,110 +792,186 @@
 (function () {
     'use strict';
 
-    // ── Toggle سطرهای ویزیتور ──
-    document.querySelectorAll('.team-toggle').forEach(function (row) {
-        row.addEventListener('click', function () {
-            var targetId = this.getAttribute('data-target');
-            var target   = document.getElementById(targetId);
-            if (target) {
-                target.classList.toggle('show');
-                var icon = this.querySelector('.ti-chevron-down, .ti-chevron-up');
-                if (icon) {
-                    icon.classList.toggle('ti-chevron-down');
-                    icon.classList.toggle('ti-chevron-up');
-                }
+    var isDark      = document.documentElement.classList.contains('dark-style');
+    var textColor   = isDark ? '#cfd3ec' : '#697a8d';
+    var gridColor   = isDark ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.06)';
+    var cardBg      = isDark ? '#2b2c40' : '#fff';
+
+    // ── توابع کمکی نمودار ──
+    function sparklineOpts(color, data) {
+        return {
+            series: [{ data: data }],
+            chart: { type: 'line', sparkline: { enabled: true }, height: 50, toolbar: { show: false } },
+            stroke: { curve: 'smooth', width: 2 },
+            colors: [color],
+            tooltip: { enabled: false },
+            fill: {
+                type: 'gradient',
+                gradient: { shade: 'light', type: 'vertical', opacityFrom: .4, opacityTo: 0 }
             }
+        };
+    }
+
+    function barOpts(color, categories, data, height) {
+        return {
+            series: [{ name: 'مقدار', data: data }],
+            chart: { type: 'bar', height: height || 130, toolbar: { show: false }, fontFamily: 'inherit' },
+            plotOptions: { bar: { borderRadius: 4, columnWidth: '55%' } },
+            colors: [color],
+            dataLabels: { enabled: false },
+            xaxis: {
+                categories: categories,
+                axisBorder: { show: false },
+                axisTicks:  { show: false },
+                labels: { style: { colors: textColor, fontFamily: 'inherit', fontSize: '11px' } }
+            },
+            yaxis: { show: false },
+            grid: { show: false },
+            tooltip: {
+                y: { formatter: function(v) { return v.toLocaleString('fa-IR'); } }
+            }
+        };
+    }
+
+    // ══════════════════════════════════════
+    // Sparkline کارت‌های آمار
+    // ══════════════════════════════════════
+    @if(!empty($earningTabs))
+    var weekDays = @json($earningTabs['days']);
+
+    var spC = document.getElementById('sparkCustomers');
+    if (spC) new ApexCharts(spC, sparklineOpts('#7367f0', @json($earningTabs['customers']))).render();
+
+    var spF = document.getElementById('sparkFactors');
+    if (spF) new ApexCharts(spF, sparklineOpts('#28c76f', @json($earningTabs['orders']))).render();
+
+    var spS = document.getElementById('sparkSales');
+    if (spS) new ApexCharts(spS, sparklineOpts('#ff9f43', @json($earningTabs['sales']))).render();
+
+    // کارت کارمند: نمودار ساده مستطیل روزانه
+    var spE = document.getElementById('sparkEmployees');
+    if (spE) new ApexCharts(spE, sparklineOpts('#00cfe8', [2,3,2,4,3,4,5])).render();
+    @endif
+
+    // ══════════════════════════════════════
+    // Revenue Report: نمودار گروهی
+    // ══════════════════════════════════════
+    @if(!empty($revenueReport))
+    var rvChartEl = document.getElementById('revenueReportChart');
+    if (rvChartEl) {
+        var rvOpts = {
+            series: [
+                { name: 'فروش (تومان)', data: @json($revenueReport['sales']) },
+                { name: 'تعداد فاکتور', data: @json($revenueReport['factors']) }
+            ],
+            chart: { type: 'bar', height: 220, toolbar: { show: false }, fontFamily: 'inherit' },
+            plotOptions: { bar: { borderRadius: 4, columnWidth: '50%', grouped: true } },
+            colors: ['#7367f0', '#28c76f'],
+            dataLabels: { enabled: false },
+            xaxis: {
+                categories: @json($revenueReport['labels']),
+                axisBorder: { show: false }, axisTicks: { show: false },
+                labels: { style: { colors: textColor, fontFamily: 'inherit' } }
+            },
+            yaxis: {
+                labels: {
+                    style: { colors: textColor, fontFamily: 'inherit' },
+                    formatter: function(v) {
+                        if (v >= 1000000) return (v/1000000).toFixed(1) + 'م';
+                        if (v >= 1000)    return (v/1000).toFixed(0) + 'ه';
+                        return v;
+                    }
+                }
+            },
+            grid: { borderColor: gridColor, strokeDashArray: 4 },
+            legend: {
+                show: true, position: 'top',
+                labels: { colors: textColor },
+                fontFamily: 'inherit'
+            },
+            tooltip: {
+                y: [{
+                    formatter: function(v) { return v.toLocaleString('fa-IR') + ' ت'; }
+                }, {
+                    formatter: function(v) { return v.toLocaleString('fa-IR') + ' فاکتور'; }
+                }]
+            }
+        };
+        new ApexCharts(rvChartEl, rvOpts).render();
+    }
+
+    // Budget donut
+    var bdEl = document.getElementById('revenueBudgetChart');
+    if (bdEl) {
+        var totalSales   = @json(array_sum($revenueReport['sales']));
+        var totalFactors = @json(array_sum($revenueReport['factors']));
+        var bdOpts = {
+            series: [totalSales > 0 ? totalSales : 1, totalFactors],
+            chart: { type: 'donut', height: 130, toolbar: { show: false }, fontFamily: 'inherit' },
+            colors: ['#7367f0', '#28c76f'],
+            labels: ['فروش', 'فاکتورها'],
+            dataLabels: { enabled: false },
+            legend: { show: false },
+            plotOptions: { pie: { donut: { size: '65%' } } },
+            tooltip: {
+                y: { formatter: function(v, opts) {
+                    return opts.seriesIndex === 0
+                        ? v.toLocaleString('fa-IR') + ' ت'
+                        : v.toLocaleString('fa-IR') + ' فاکتور';
+                }}
+            }
+        };
+        new ApexCharts(bdEl, bdOpts).render();
+    }
+    @endif
+
+    // ══════════════════════════════════════
+    // Earning Tabs: نمودار هفتگی
+    // ══════════════════════════════════════
+    @if(!empty($earningTabs))
+    var etDays = @json($earningTabs['days']);
+    var etOrders    = @json($earningTabs['orders']);
+    var etSales     = @json($earningTabs['sales']);
+    var etCustomers = @json($earningTabs['customers']);
+
+    var eoEl = document.getElementById('earningOrdersChart');
+    if (eoEl) new ApexCharts(eoEl, barOpts('#7367f0', etDays, etOrders)).render();
+
+    var esEl = document.getElementById('earningSalesChart');
+    if (esEl) new ApexCharts(esEl, barOpts('#28c76f', etDays, etSales)).render();
+
+    var ecEl = document.getElementById('earningCustomersChart');
+    if (ecEl) new ApexCharts(ecEl, barOpts('#00cfe8', etDays, etCustomers)).render();
+    @endif
+
+    // ══════════════════════════════════════
+    // Toggle ردیف‌های ویزیتور
+    // ══════════════════════════════════════
+    document.querySelectorAll('.team-toggle').forEach(function(row) {
+        row.addEventListener('click', function() {
+            var target = document.getElementById(this.getAttribute('data-target'));
+            if (target) target.classList.toggle('show');
         });
     });
 
-    // ── جستجو و فیلتر لاگ ──
+    // ══════════════════════════════════════
+    // جستجو و فیلتر لاگ
+    // ══════════════════════════════════════
     var searchInput  = document.getElementById('activitySearch');
     var filterSelect = document.getElementById('activityFilter');
 
     function filterLogs() {
-        var q      = (searchInput ? searchInput.value.toLowerCase() : '');
-        var action = (filterSelect ? filterSelect.value.toLowerCase() : '');
-
-        document.querySelectorAll('#activityList .activity-item').forEach(function (item) {
-            var itemAction = item.getAttribute('data-action') || '';
-            var itemSearch = item.getAttribute('data-search') || '';
-            var matchSearch = !q || itemSearch.includes(q);
-            var matchAction = !action || itemAction === action;
-            item.style.display = (matchSearch && matchAction) ? '' : 'none';
+        var q      = searchInput  ? searchInput.value.toLowerCase()  : '';
+        var action = filterSelect ? filterSelect.value.toLowerCase() : '';
+        document.querySelectorAll('#activityList .activity-item').forEach(function(item) {
+            var matchS = !q      || (item.dataset.search  || '').includes(q);
+            var matchA = !action || (item.dataset.action  || '') === action;
+            item.style.display = (matchS && matchA) ? '' : 'none';
         });
     }
 
     if (searchInput)  searchInput.addEventListener('input', filterLogs);
     if (filterSelect) filterSelect.addEventListener('change', filterLogs);
-
-    // ── نمودار فروش ماهانه ──
-    @if (!empty($monthlyChart))
-    var chartLabels  = @json($monthlyChart['labels']);
-    var chartAmounts = @json($monthlyChart['amounts']);
-    var chartAmountsToman = chartAmounts.map(function(v){ return Math.round(v / 10); });
-
-    var isDark   = document.documentElement.classList.contains('dark-style');
-    var textColor = isDark ? '#cfd3ec' : '#697a8d';
-    var gridColor = isDark ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.06)';
-
-    var options = {
-        series: [{
-            name: 'فروش (تومان)',
-            data: chartAmountsToman
-        }],
-        chart: {
-            type: 'bar',
-            height: 300,
-            toolbar: { show: false },
-            fontFamily: 'inherit'
-        },
-        plotOptions: {
-            bar: { borderRadius: 6, columnWidth: '50%' }
-        },
-        colors: ['#7367f0'],
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shade: 'light',
-                type: 'vertical',
-                shadeIntensity: .3,
-                opacityFrom: .9,
-                opacityTo: .6
-            }
-        },
-        dataLabels: { enabled: false },
-        xaxis: {
-            categories: chartLabels,
-            axisBorder: { show: false },
-            axisTicks:  { show: false },
-            labels: { style: { colors: textColor, fontFamily: 'inherit' } }
-        },
-        yaxis: {
-            labels: {
-                style: { colors: textColor, fontFamily: 'inherit' },
-                formatter: function(val) {
-                    if (val >= 1000000) return (val/1000000).toFixed(1) + 'م';
-                    if (val >= 1000)    return (val/1000).toFixed(0) + 'ه';
-                    return val;
-                }
-            }
-        },
-        grid: { borderColor: gridColor, strokeDashArray: 4 },
-        tooltip: {
-            y: {
-                formatter: function(val) {
-                    return val.toLocaleString('fa-IR') + ' تومان';
-                }
-            }
-        }
-    };
-
-    var chartEl = document.getElementById('monthlyChart');
-    if (chartEl) {
-        var chart = new ApexCharts(chartEl, options);
-        chart.render();
-    }
-    @endif
 
 })();
 </script>

@@ -320,12 +320,17 @@ class HomeController extends Controller
                     : null;
 
                 $activityLog = ($dashWidgets['dashboard_widget_pm_activity_log'] ?? true)
-                    ? $dashboardService->getActivityLog($User, 20)
+                    ? $dashboardService->getActivityLog($User, 15)
                     : null;
 
                 $monthlyChart = ($dashWidgets['dashboard_widget_pm_bi_chart'] ?? true)
                     ? $dashboardService->getMonthlyChartData($User, 6)
                     : null;
+
+                $recentCustomers = $dashboardService->getRecentCustomers($User, 10);
+                $earningTabs     = $dashboardService->getEarningTabsData($User);
+                $revenueReport   = $dashboardService->getRevenueReportData($User, 6);
+                $topProducts     = $dashboardService->getTopProductsWithPercent($User, 5);
 
                 return view('dashboard.panel_manager', compact(
                     'User',
@@ -336,7 +341,11 @@ class HomeController extends Controller
                     'productSummary',
                     'routesSummary',
                     'activityLog',
-                    'monthlyChart'
+                    'monthlyChart',
+                    'recentCustomers',
+                    'earningTabs',
+                    'revenueReport',
+                    'topProducts'
                 ));
             }
             // پایان داشبورد کامل
