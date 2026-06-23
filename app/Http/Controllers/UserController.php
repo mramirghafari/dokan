@@ -218,15 +218,12 @@ class UserController extends Controller
         $expert_role = Role::where('title', 'expert')->first();
         $leaderRoleIds = collect([$leader_role?->id, $expert_role?->id])->filter()->values()->all();
         $leader_Users = $leaderRoleIds ? DB::table('role_user')->whereIn('role_id', $leaderRoleIds)->pluck('user_id')->toArray() : [];
-        $authUser = auth()->user();
-        if ($authUser->isGod == 1) {
-            $editedUserTenantId = $user->tenants_id ?: $user->tenant_id;
-            $Leaders = User::whereIn('id', $leader_Users)
-                ->when($editedUserTenantId, fn($q) => $q->where(fn($q2) => $q2->where('tenants_id', $editedUserTenantId)->orWhere('tenant_id', $editedUserTenantId)))
-                ->select('id', 'name')->orderBy('name')->get();
-        } else {
-            $Leaders = User::whereIn('id', $leader_Users)->forOrganizations($user)->select('id', 'name')->orderBy('name')->get();
-        }
+        $editedUserTenantId = $user->tenants_id ?: $user->tenant_id;
+        $Leaders = User::whereIn('id', $leader_Users)
+            ->where('tenants_id', $editedUserTenantId)
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
 
         $role = $user->roles()->first();
         $roleTitle = $role ? $role->title : '-';
