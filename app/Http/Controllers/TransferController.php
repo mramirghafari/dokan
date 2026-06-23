@@ -44,11 +44,11 @@ class TransferController extends Controller
     {
         $user = \Auth::user();
         $roles = Role::all();
+        $admin = 0;
         foreach ($user->roles as $role) {
-            if ($role->title == "admin") {
+            if (in_array($role->title, ['admin', 'panel_manager'], true)) {
                 $admin = 1;
-            } else {
-                $admin = 0;
+                break;
             }
         }
 

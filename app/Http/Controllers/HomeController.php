@@ -63,7 +63,7 @@ class HomeController extends Controller
         $isStore = false;
         $isAgent = false;
         foreach ($User->rolesForActiveTenant() as $role) {
-            if (in_array($role->title, ['expert', 'admin'], true)) {
+            if (in_array($role->title, ['expert', 'admin', 'panel_manager'], true)) {
                 $isManager = true;
             }
             if ($role->title == 'leader') {
@@ -438,7 +438,7 @@ class HomeController extends Controller
 
                 $OrganManagers = User::where('organization_id', $morgan->id)
                     ->whereHas('roles', function ($q) {
-                        $q->whereIn('title', ['expert', 'admin']);
+                        $q->whereIn('title', ['expert', 'admin', 'panel_manager']);
                     })
                     ->pluck('id')
                     ->toArray();
@@ -608,7 +608,7 @@ class HomeController extends Controller
 
                 $OrganManagers = User::whereJsonContains('organization_id', ["$morgan->id"])
                     ->whereHas('roles', function ($q) {
-                        $q->whereIn('title', ['expert', 'admin']);
+                        $q->whereIn('title', ['expert', 'admin', 'panel_manager']);
                     })
                     ->pluck('id')
                     ->toArray();
