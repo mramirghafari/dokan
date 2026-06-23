@@ -1087,7 +1087,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
     var chartData = {
         today:  { labels: {!! json_encode($hourlyLabels) !!}, data: {!! json_encode($hourlyData) !!},  count: {{ $salesTodayCount }},  amount: '{{ $nfT($salesTodayAmount) }}' },
         week:   { labels: {!! json_encode($weeklyLabels) !!},  data: {!! json_encode($weeklyData) !!},  count: {{ $salesWeekCount }},   amount: '{{ $nfT($salesWeekAmount) }}' },
-        month:  { labels: {!! json_encode($monthlyLabels) !!}, data: {!! json_encode($monthlyDailyData) !!}, count: {{ $salesMonthCount }},  amount: '{{ $nfT($salesMonthAmount) }}' }
+        month:  { labels: {!! json_encode($monthlyLabels) !!}, data: {!! json_encode($monthlyData ?? []) !!}, count: {{ $salesMonthCount }},  amount: '{{ $nfT($salesMonthAmount) }}' }
     };
 
     var currentTab = 'today';
