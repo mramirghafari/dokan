@@ -21,6 +21,7 @@ use App\Models\Shipments;
 use App\Models\ShipmentRoute;
 use App\Models\Cargo;
 use App\Models\User;
+use App\Services\DashboardService;
 use App\Services\PanelDashboardWidgetService;
 use App\Services\PanelMembershipService;
 use App\Services\PanelOnboardingService;
@@ -280,6 +281,65 @@ class HomeController extends Controller
             $teamScope = $this->managerTeamUserIds($User->id);
             $leaderIds = $teamScope['leaders'];
             $visitorIds = $teamScope['visitors'];
+
+            // داشبورد کامل مدیر پنل (panel_manager)
+            $isPanelManager = false;
+            foreach ($User->rolesForActiveTenant() as $role) {
+                if ($role->title === 'panel_manager') {
+                    $isPanelManager = true;
+                    break;
+                }
+            }
+
+            $dashWidgets = app(PanelDashboardWidgetService::class)->visibilityMap($User);
+            $fullDashActive = $dashWidgets['dashboard_widget_panel_manager_full_mode'] ?? false;
+
+            if ($isPanelManager && $fullDashActive) {
+                $dashboardService = app(DashboardService::class);
+                $leaderIdsArr  = $leaderIds->toArray();
+                $visitorIdsArr = $visitorIds->toArray();
+
+                $statCards = ($dashWidgets['dashboard_widget_pm_stat_cards'] ?? true)
+                    ? $dashboardService->getStatCards($User, $visitorIdsArr, $leaderIdsArr)
+                    : null;
+
+                $salesTeam = ($dashWidgets['dashboard_widget_pm_sales_team'] ?? true)
+                    ? $dashboardService->getSalesTeamHierarchy($User, $leaderIdsArr, $visitorIdsArr)
+                    : null;
+
+                $financialSummary = ($dashWidgets['dashboard_widget_pm_financial'] ?? true)
+                    ? $dashboardService->getFinancialSummary($User)
+                    : null;
+
+                $productSummary = ($dashWidgets['dashboard_widget_pm_products'] ?? true)
+                    ? $dashboardService->getProductSummary($User, $visitorIdsArr)
+                    : null;
+
+                $routesSummary = ($dashWidgets['dashboard_widget_pm_routes'] ?? true)
+                    ? $dashboardService->getRoutesSummary($User, $leaderIdsArr)
+                    : null;
+
+                $activityLog = ($dashWidgets['dashboard_widget_pm_activity_log'] ?? true)
+                    ? $dashboardService->getActivityLog($User, 20)
+                    : null;
+
+                $monthlyChart = ($dashWidgets['dashboard_widget_pm_bi_chart'] ?? true)
+                    ? $dashboardService->getMonthlyChartData($User, 6)
+                    : null;
+
+                return view('dashboard.panel_manager', compact(
+                    'User',
+                    'dashWidgets',
+                    'statCards',
+                    'salesTeam',
+                    'financialSummary',
+                    'productSummary',
+                    'routesSummary',
+                    'activityLog',
+                    'monthlyChart'
+                ));
+            }
+            // پایان داشبورد کامل
 
             $Target = Targets::where('status', 1)->where('user_id', $User->id)->first();
             if ($Target) {
