@@ -79,7 +79,7 @@
                                                 <input type="text" class="form-control" name="password"
                                                     id="password">
                                             </div>
-                                            <div class="mb-3">
+                                            <div class="mb-3" id="leaderFieldWrapper">
                                                 <label for="userLeader">انتخاب سرپرست:</label>
                                                 <select class="js-example-basic-single form-control" name="leader_id"
                                                     id="userLeader" style="width: 100%;">
@@ -431,17 +431,27 @@
         });
 
         $(document).ready(function() {
+            // Roles that ARE supervisors — subordinate roles do not need this set
+            var supervisorRoles = ['leader', 'expert'];
+
+            function toggleLeaderField() {
+                var roleTitle = $('#role_id').find('option:selected').attr('data-title') || '';
+                var needsSupervisor = roleTitle !== '' && supervisorRoles.indexOf(roleTitle) === -1;
+                $('#leaderFieldWrapper').toggle(needsSupervisor);
+            }
+
             $('#role_id').on('change', function() {
                 var role = $(this).find('option:selected').attr('data-title');
-                if (role == 'store') {
-
-                }
                 if (role == 'driver') {
                     $('.driver_box').removeClass('d-none');
                 } else {
                     $('.driver_box').addClass('d-none');
                 }
+                toggleLeaderField();
             });
+
+            // Run on page load to reflect current role
+            toggleLeaderField();
         });
     </script>
 </body>

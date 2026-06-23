@@ -216,8 +216,14 @@ class UserController extends Controller
 
         $leader_role = Role::where('title', 'leader')->first();
         $expert_role = Role::where('title', 'expert')->first();
-        $leader_Users = DB::table('role_user')->whereIn('role_id', [$leader_role->id, $expert_role->id])->pluck('user_id')->toArray();
-        $Leaders = User::whereIn('id', $leader_Users)->get();
+        $leaderRoleIds = collect([$leader_role?->id, $expert_role?->id])->filter()->values()->all();
+        $leader_Users = $leaderRoleIds ? DB::table('role_user')->whereIn('role_id', $leaderRoleIds)->pluck('user_id')->toArray() : [];
+        $authUser = auth()->user();
+        if ($authUser->isGod == 1) {
+            $Leaders = User::whereIn('id', $leader_Users)->select('id', 'name')->orderBy('name')->get();
+        } else {
+            $Leaders = User::whereIn('id', $leader_Users)->forOrganizations($authUser)->select('id', 'name')->orderBy('name')->get();
+        }
 
         $role = $user->roles()->first();
         $roleTitle = $role ? $role->title : '-';
