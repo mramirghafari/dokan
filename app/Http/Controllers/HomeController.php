@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -295,58 +295,8 @@ class HomeController extends Controller
             $fullDashActive = $dashWidgets['dashboard_widget_panel_manager_full_mode'] ?? false;
 
             if ($isPanelManager && $fullDashActive) {
-                $dashboardService = app(DashboardService::class);
-                $leaderIdsArr  = $leaderIds->toArray();
-                $visitorIdsArr = $visitorIds->toArray();
-
-                $statCards = ($dashWidgets['dashboard_widget_pm_stat_cards'] ?? true)
-                    ? $dashboardService->getStatCards($User, $visitorIdsArr, $leaderIdsArr)
-                    : null;
-
-                $salesTeam = ($dashWidgets['dashboard_widget_pm_sales_team'] ?? true)
-                    ? $dashboardService->getSalesTeamHierarchy($User, $leaderIdsArr, $visitorIdsArr)
-                    : null;
-
-                $financialSummary = ($dashWidgets['dashboard_widget_pm_financial'] ?? true)
-                    ? $dashboardService->getFinancialSummary($User)
-                    : null;
-
-                $productSummary = ($dashWidgets['dashboard_widget_pm_products'] ?? true)
-                    ? $dashboardService->getProductSummary($User, $visitorIdsArr)
-                    : null;
-
-                $routesSummary = ($dashWidgets['dashboard_widget_pm_routes'] ?? true)
-                    ? $dashboardService->getRoutesSummary($User, $leaderIdsArr)
-                    : null;
-
-                $activityLog = ($dashWidgets['dashboard_widget_pm_activity_log'] ?? true)
-                    ? $dashboardService->getActivityLog($User, 15)
-                    : null;
-
-                $monthlyChart = ($dashWidgets['dashboard_widget_pm_bi_chart'] ?? true)
-                    ? $dashboardService->getMonthlyChartData($User, 6)
-                    : null;
-
-                $recentCustomers = $dashboardService->getRecentCustomers($User, 10);
-                $earningTabs     = $dashboardService->getEarningTabsData($User);
-                $revenueReport   = $dashboardService->getRevenueReportData($User, 6);
-                $topProducts     = $dashboardService->getTopProductsWithPercent($User, 5);
-
-                return view('dashboard.panel_manager', compact(
-                    'User',
-                    'dashWidgets',
-                    'statCards',
-                    'salesTeam',
-                    'financialSummary',
-                    'productSummary',
-                    'routesSummary',
-                    'activityLog',
-                    'monthlyChart',
-                    'recentCustomers',
-                    'earningTabs',
-                    'revenueReport',
-                    'topProducts'
-                ));
+                // Dashboard queries are handled inline by the blade view
+                return view('dashboard.panel_manager');
             }
             // پایان داشبورد کامل
 
