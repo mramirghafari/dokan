@@ -97,10 +97,23 @@
 </head>
 
 @php
-    $Organ   = DB::table('organizations')->where('id', auth()->user()->organization_id)->first();
+    try {
+        $rawOrgId = auth()->user()->organization_id ?? 0;
+        if (is_string($rawOrgId)) {
+            $decoded = json_decode($rawOrgId, true);
+            $rawOrgId = (is_array($decoded) && !empty($decoded[0])) ? (int)$decoded[0] : (int)$rawOrgId;
+        }
+        $Organ = DB::table('organizations')->where('id', (int)$rawOrgId)->first();
+    } catch (\Exception $e) {
+        $Organ = null;
+    }
     $nf      = fn($n) => number_format((int)$n);
     $nfToman = fn($n) => number_format((int)($n / 10));
-    $updatedAt = \Hekmatinasser\Verta\Verta::now()->format('H:i');
+    try {
+        $updatedAt = \Hekmatinasser\Verta\Verta::now()->format('H:i');
+    } catch (\Exception $e) {
+        $updatedAt = now()->format('H:i');
+    }
 @endphp
 
 <body>

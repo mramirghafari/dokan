@@ -23,6 +23,7 @@ class DashboardService
      */
     public function getStatCards(User $user, array $visitorIds, array $leaderIds): array
     {
+        try {
         $orgId = $this->resolveOrgId($user);
 
         $activeCustomers = Customers::where('organization_id', $orgId)
@@ -75,6 +76,10 @@ class DashboardService
             'active_employees'   => $activeEmployees,
             'warehouse_stock'    => $warehouseStock,
         ];
+        } catch (\Exception $e) {
+            \Log::warning('DashboardService::getStatCards failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     /**
@@ -82,6 +87,7 @@ class DashboardService
      */
     public function getSalesTeamHierarchy(User $user, array $leaderIds, array $visitorIds): array
     {
+        try {
         $orgId = $this->resolveOrgId($user);
 
         $thisMonthStart = Carbon::now()->startOfMonth();
@@ -176,6 +182,10 @@ class DashboardService
         usort($team, fn($a, $b) => $b['total_amount'] <=> $a['total_amount']);
 
         return $team;
+        } catch (\Exception $e) {
+            \Log::warning('DashboardService::getSalesTeamHierarchy failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     /**
@@ -183,6 +193,7 @@ class DashboardService
      */
     public function getMonthlyChartData(User $user, int $months = 6): array
     {
+        try {
         $orgId = $this->resolveOrgId($user);
         $labels = [];
         $amounts = [];
@@ -212,6 +223,10 @@ class DashboardService
             'labels'  => $labels,
             'amounts' => $amounts,
         ];
+        } catch (\Exception $e) {
+            \Log::warning('DashboardService::getMonthlyChartData failed: ' . $e->getMessage());
+            return ['labels' => [], 'amounts' => []];
+        }
     }
 
     /**
@@ -219,6 +234,7 @@ class DashboardService
      */
     public function getProductSummary(User $user, array $visitorIds): array
     {
+        try {
         $orgId = $this->resolveOrgId($user);
 
         $factorIds = Pishfactor::where('organization_id', $orgId)
@@ -226,8 +242,9 @@ class DashboardService
             ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
             ->pluck('id');
 
+        $qtyExpr = $this->buildQtyExpr();
         $topProducts = PishFactorItems::whereIn('pishfactor_id', $factorIds)
-            ->select('pr_id', DB::raw('SUM(tedad + (pack * COALESCE(pack_items, 1))) as total_qty'), DB::raw('COUNT(*) as times_sold'))
+            ->select('pr_id', DB::raw("{$qtyExpr} as total_qty"), DB::raw('COUNT(*) as times_sold'))
             ->groupBy('pr_id')
             ->orderByDesc('total_qty')
             ->take(5)
@@ -271,6 +288,10 @@ class DashboardService
             'total_stock_items' => $totalStockItems,
             'total_products'    => $totalProducts,
         ];
+        } catch (\Exception $e) {
+            \Log::warning('DashboardService::getProductSummary failed: ' . $e->getMessage());
+            return ['top_products' => collect(), 'low_stock_products' => collect(), 'total_stock_items' => 0, 'total_products' => 0];
+        }
     }
 
     /**
@@ -278,6 +299,7 @@ class DashboardService
      */
     public function getRoutesSummary(User $user, array $leaderIds): array
     {
+        try {
         if (!\App\Services\TenantSettings::enabled('feature_route_management')) {
             return ['enabled' => false];
         }
@@ -308,6 +330,10 @@ class DashboardService
             'total_areas'         => $totalAreas,
             'customers_per_region' => $customersPerRegion,
         ];
+        } catch (\Exception $e) {
+            \Log::warning('DashboardService::getRoutesSummary failed: ' . $e->getMessage());
+            return ['enabled' => false];
+        }
     }
 
     /**
@@ -315,6 +341,7 @@ class DashboardService
      */
     public function getActivityLog(User $user, int $limit = 20): array
     {
+        try {
         $orgId    = $this->resolveOrgId($user);
         $tenantId = $this->resolveTenantId($user);
 
@@ -369,6 +396,10 @@ class DashboardService
         });
 
         return $logs->toArray();
+        } catch (\Exception $e) {
+            \Log::warning('DashboardService::getActivityLog failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     /**
@@ -376,6 +407,7 @@ class DashboardService
      */
     public function getFinancialSummary(User $user): array
     {
+        try {
         $orgId = $this->resolveOrgId($user);
 
         $thisMonthStart = Carbon::now()->startOfMonth();
@@ -429,6 +461,10 @@ class DashboardService
             'receivable'         => (int) $receivable,
             'payable'            => (int) $payable,
         ];
+        } catch (\Exception $e) {
+            \Log::warning('DashboardService::getFinancialSummary failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     /**
@@ -436,6 +472,7 @@ class DashboardService
      */
     public function getRecentCustomers(User $user, int $limit = 10): array
     {
+        try {
         $orgId = $this->resolveOrgId($user);
 
         $customers = Customers::where('organization_id', $orgId)
@@ -485,6 +522,10 @@ class DashboardService
                 'status'        => $c->status ?? 0,
             ];
         })->toArray();
+        } catch (\Exception $e) {
+            \Log::warning('DashboardService::getRecentCustomers failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     /**
@@ -492,6 +533,7 @@ class DashboardService
      */
     public function getEarningTabsData(User $user): array
     {
+        try {
         $orgId = $this->resolveOrgId($user);
         $days = [];
         $ordersData    = [];
@@ -523,6 +565,10 @@ class DashboardService
             'sales'     => $salesData,
             'customers' => $customersData,
         ];
+        } catch (\Exception $e) {
+            \Log::warning('DashboardService::getEarningTabsData failed: ' . $e->getMessage());
+            return ['days' => [], 'orders' => [], 'sales' => [], 'customers' => []];
+        }
     }
 
     /**
@@ -530,6 +576,7 @@ class DashboardService
      */
     public function getRevenueReportData(User $user, int $months = 6): array
     {
+        try {
         $orgId = $this->resolveOrgId($user);
         $labels  = [];
         $sales   = [];
@@ -567,6 +614,10 @@ class DashboardService
             'sales'   => $sales,
             'factors' => $factors,
         ];
+        } catch (\Exception $e) {
+            \Log::warning('DashboardService::getRevenueReportData failed: ' . $e->getMessage());
+            return ['labels' => [], 'sales' => [], 'factors' => []];
+        }
     }
 
     /**
@@ -574,6 +625,7 @@ class DashboardService
      */
     public function getTopProductsWithPercent(User $user, int $limit = 5): array
     {
+        try {
         $orgId = $this->resolveOrgId($user);
 
         $factorIds = Pishfactor::where('organization_id', $orgId)
@@ -581,8 +633,9 @@ class DashboardService
             ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
             ->pluck('id');
 
+        $qtyExpr = $this->buildQtyExpr();
         $items = PishFactorItems::whereIn('pishfactor_id', $factorIds)
-            ->select('pr_id', DB::raw('SUM(tedad + (pack * COALESCE(pack_items, 1))) as total_qty'))
+            ->select('pr_id', DB::raw("{$qtyExpr} as total_qty"))
             ->groupBy('pr_id')
             ->orderByDesc('total_qty')
             ->take($limit)
@@ -599,6 +652,10 @@ class DashboardService
                 'percent' => min(100, (int) round($item->total_qty / $max * 100)),
             ];
         })->toArray();
+        } catch (\Exception $e) {
+            \Log::warning('DashboardService::getTopProductsWithPercent failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     private function resolveOrgId(User $user): int
@@ -616,5 +673,21 @@ class DashboardService
     private function resolveTenantId(User $user): int
     {
         return (int) ($user->tenant_id ?: $user->tenants_id ?: 0);
+    }
+
+    /**
+     * Build the qty expression for pishfactor_items, accounting for optional pack_items column.
+     */
+    private function buildQtyExpr(): string
+    {
+        static $expr = null;
+        if ($expr === null) {
+            if (Schema::hasColumn('pishfactor_items', 'pack_items')) {
+                $expr = "SUM(COALESCE(tedad, 0) + (COALESCE(pack, 0) * COALESCE(pack_items, 1)))";
+            } else {
+                $expr = "SUM(COALESCE(tedad, 0) + COALESCE(pack, 0))";
+            }
+        }
+        return $expr;
     }
 }
