@@ -296,20 +296,136 @@ try {
     } catch (\Throwable $_) { $activeTargets = collect([]); }
 
     /* ══════════════════════════════
-       TOP PRODUCTS THIS MONTH
+       TOP PRODUCTS THIS MONTH (product list card)
     ══════════════════════════════ */
     try {
-        $topProducts = \DB::table('pish_factor_items as pfi')
-            ->join('pishfactors as pf','pf.id','=','pfi.pishfactor_id')
-            ->join('products as p','p.id','=','pfi.pr_id')
-            ->where('pf.organization_id',$orgId)
-            ->where('pf.created_at','>=',$monthStart)->whereNull('pf.deleted_at')
-            ->select(['p.title as pname',\DB::raw('COUNT(DISTINCT pf.id) as sc'),
-                \DB::raw('SUM(pfi.line_total) as rev')])
-            ->groupBy('pfi.pr_id','p.title')
-            ->orderBy('rev','desc')->limit(5)->get();
-        $topProductsTotal = max(1,(float)$topProducts->sum('rev'));
-    } catch (\Throwable $_) { $topProducts=collect([]); $topProductsTotal=1; }
+        $topProducts = \DB::table('pish_factor_items')
+            ->join('pishfactors', 'pish_factor_items.factor_id', '=', 'pishfactors.id')
+            ->join('products', 'pish_factor_items.product_id', '=', 'products.id')
+            ->where('pishfactors.organization_id', $orgId)
+            ->whereMonth('pishfactors.created_at', now()->month)
+            ->whereYear('pishfactors.created_at', now()->year)
+            ->whereNull('pishfactors.deleted_at')
+            ->select('products.name as pname',
+                \DB::raw('SUM(pish_factor_items.count) as total_sold'),
+                \DB::raw('SUM(pish_factor_items.fullPrice) as total_revenue'))
+            ->groupBy('products.id', 'products.name')
+            ->orderByDesc('total_sold')
+            ->limit(10)->get();
+        $topProductsTotal = max(1, (float)$topProducts->sum('total_revenue'));
+    } catch (\Throwable $_) {
+        try {
+            $topProducts = \DB::table('pish_factor_items as pfi')
+                ->join('pishfactors as pf','pf.id','=','pfi.pishfactor_id')
+                ->join('products as p','p.id','=','pfi.pr_id')
+                ->where('pf.organization_id',$orgId)
+                ->where('pf.created_at','>=',$monthStart)->whereNull('pf.deleted_at')
+                ->select(['p.title as pname',
+                    \DB::raw('COUNT(DISTINCT pf.id) as total_sold'),
+                    \DB::raw('SUM(pfi.line_total) as total_revenue')])
+                ->groupBy('pfi.pr_id','p.title')
+                ->orderBy('total_revenue','desc')->limit(10)->get();
+            $topProductsTotal = max(1,(float)$topProducts->sum('total_revenue'));
+        } catch (\Throwable $_) { $topProducts=collect([]); $topProductsTotal=1; }
+    }
+
+    /* ══════════════════════════════
+       SUPERVISORS (leaders) THIS MONTH
+    ══════════════════════════════ */
+    try {
+        $supervisorRows = \DB::table('users as u')
+            ->join('model_has_roles as mhr', fn($j) =>
+                $j->on('mhr.model_id','=','u.id')->where('mhr.model_type','App\Models\User'))
+            ->join('roles as r','r.id','=','mhr.role_id')
+            ->where('r.title','leader')
+            ->whereRaw("u.organization_id LIKE ?", ["%{$orgId}%"])
+            ->whereNull('u.deleted_at')->where('u.isActive',1)
+            ->select('u.id','u.name')
+            ->distinct()->get();
+
+        $supIds = $supervisorRows->pluck('id')->toArray();
+
+        $subCounts = \DB::table('users')
+            ->whereIn('leader_id', $supIds)->whereNull('deleted_at')->where('isActive',1)
+            ->select('leader_id',\DB::raw('COUNT(*) as cnt'))
+            ->groupBy('leader_id')->get()->keyBy('leader_id');
+
+        $custByLeaderSup = \DB::table('customers')
+            ->where('organization_id',$orgId)->whereNull('deleted_at')
+            ->whereIn('leader_id',$supIds)
+            ->select('leader_id',\DB::raw('COUNT(*) as cnt'))
+            ->groupBy('leader_id')->get()->keyBy('leader_id');
+
+        $ldInvStats = \DB::table('pishfactors')
+            ->where('organization_id',$orgId)->whereNull('deleted_at')
+            ->where('created_at','>=',$monthStart)
+            ->whereIn('sarparast_id',$supIds)
+            ->select('sarparast_id',
+                \DB::raw('COUNT(*) as inv_count'),
+                \DB::raw("SUM(REPLACE(fullPrice,',','')) as total_sales"))
+            ->groupBy('sarparast_id')->get()->keyBy('sarparast_id');
+    } catch (\Throwable $_) {
+        $supervisorRows=collect([]); $subCounts=collect([]);
+        $custByLeaderSup=collect([]); $ldInvStats=collect([]);
+    }
+
+    /* ══════════════════════════════
+       MARKETERS (visitors/experts) THIS MONTH
+    ══════════════════════════════ */
+    try {
+        $marketerRows = \DB::table('users as u')
+            ->join('model_has_roles as mhr', fn($j) =>
+                $j->on('mhr.model_id','=','u.id')->where('mhr.model_type','App\Models\User'))
+            ->join('roles as r','r.id','=','mhr.role_id')
+            ->whereIn('r.title',['visitor','expert','bazaryab'])
+            ->whereRaw("u.organization_id LIKE ?", ["%{$orgId}%"])
+            ->whereNull('u.deleted_at')->where('u.isActive',1)
+            ->select('u.id','u.name','u.leader_id')
+            ->distinct()->get();
+
+        $mktIds = $marketerRows->pluck('id')->toArray();
+
+        $custByMkt = \DB::table('customers')
+            ->where('organization_id',$orgId)->whereNull('deleted_at')
+            ->whereIn('created_by',$mktIds)
+            ->select('created_by',\DB::raw('COUNT(*) as cnt'))
+            ->groupBy('created_by')->get()->keyBy('created_by');
+
+        $mktInvStats = \DB::table('pishfactors')
+            ->where('organization_id',$orgId)->whereNull('deleted_at')
+            ->where('created_at','>=',$monthStart)
+            ->whereIn('visitor_id',$mktIds)
+            ->select('visitor_id',
+                \DB::raw('COUNT(*) as inv_count'),
+                \DB::raw("SUM(REPLACE(fullPrice,',','')) as total_sales"))
+            ->groupBy('visitor_id')->get()->keyBy('visitor_id');
+
+        $leaderNames = \DB::table('users')
+            ->whereIn('id', $marketerRows->pluck('leader_id')->filter()->unique()->toArray())
+            ->pluck('name','id');
+    } catch (\Throwable $_) {
+        $marketerRows=collect([]); $custByMkt=collect([]);
+        $mktInvStats=collect([]); $leaderNames=collect([]);
+    }
+
+    /* ══════════════════════════════
+       TRANSPORT / DELIVERY CHECK
+    ══════════════════════════════ */
+    try {
+        $hasTransport = \DB::table('cargos')->where('organization_id', $orgId)->exists();
+        if ($hasTransport) {
+            $transportStats = \DB::table('cargos as c')
+                ->join('users as u','u.id','=','c.driver_id')
+                ->where('c.organization_id',$orgId)
+                ->select('u.name as driver_name',
+                    \DB::raw('COUNT(c.id) as order_count'),
+                    \DB::raw('MAX(c.status) as status'))
+                ->groupBy('u.id','u.name')
+                ->orderByDesc('order_count')->limit(10)->get();
+        } else {
+            $transportStats = collect([]);
+        }
+    } catch (\Throwable $_) { $hasTransport=false; $transportStats=collect([]); }
 
     /* ══════════════════════════════
        FINANCIAL SUMMARY
@@ -402,6 +518,9 @@ try {
     $teamById=collect([]);
     $activeTargets=collect([]);
     $topProducts=collect([]); $topProductsTotal=1;
+    $supervisorRows=collect([]); $subCounts=collect([]); $custByLeaderSup=collect([]); $ldInvStats=collect([]);
+    $marketerRows=collect([]); $custByMkt=collect([]); $mktInvStats=collect([]); $leaderNames=collect([]);
+    $hasTransport=false; $transportStats=collect([]);
     $totalDebit=$totalCredit=0; $hasFinancialData=false;
     $crmToday=$crmWeek=$crmMonth=$inactiveCustomers=0;
     $topCustomers=$recentCustomers=collect([]); $rcInvCounts=collect([]);
@@ -486,102 +605,93 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                         </div>
                     </div>
 
-                    {{-- ══ 6 STAT CARDS ══ --}}
+                    {{-- ══ STAT CARDS (مشتریان / پرسنل / محصولات / انبار) ══ --}}
+                    {{-- فاکتور ماه و فروش ماه از اینجا حذف شدند — در بخش آمار فروش موجودند --}}
                     <div class="row g-4 mb-4">
+
                         {{-- مشتریان --}}
-                        <div class="col-6 col-md-4 col-xl-2">
+                        <div class="col-6 col-md-3">
                             <div class="card stat-card h-100">
                                 <div class="card-body">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <div class="stat-icon bg-label-primary"><i class="ti ti-users text-primary"></i></div>
-                                        <span class="text-muted small">مشتریان</span>
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <div class="stat-icon" style="background:rgba(115,103,240,.12)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7367f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                                <circle cx="9" cy="7" r="4"/>
+                                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                            </svg>
+                                        </div>
+                                        <span class="text-muted small fw-semibold">مشتریان</span>
                                     </div>
-                                    <h4 class="mb-0 fw-bold">{{ $nf($customerCount) }}</h4>
+                                    <h3 class="mb-0 fw-bold">{{ $nf($customerCount) }}</h3>
                                     <p class="text-muted small mb-0 mt-1">مشتری ثبت‌شده</p>
                                 </div>
                             </div>
                         </div>
 
-                        {{-- فاکتور این ماه --}}
-                        <div class="col-6 col-md-4 col-xl-2">
-                            <div class="card stat-card h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <div class="stat-icon bg-label-success"><i class="ti ti-file-invoice text-success"></i></div>
-                                        <span class="text-muted small">فاکتور ماه</span>
-                                    </div>
-                                    <h4 class="mb-0 fw-bold">{{ $nf($invoiceCount) }}</h4>
-                                    <p class="text-muted small mb-0 mt-1">این ماه</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- فروش این ماه --}}
-                        <div class="col-6 col-md-4 col-xl-2">
-                            <div class="card stat-card h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <div class="stat-icon bg-label-warning"><i class="ti ti-currency-dollar text-warning"></i></div>
-                                        <span class="text-muted small">فروش ماه</span>
-                                    </div>
-                                    <h4 class="mb-0 fw-bold" style="font-size:1rem">{{ $nfT($revenue) }}</h4>
-                                    <p class="text-muted small mb-0 mt-1">تومان</p>
-                                </div>
-                            </div>
-                        </div>
-
                         {{-- پرسنل --}}
-                        <div class="col-6 col-md-4 col-xl-2">
+                        <div class="col-6 col-md-3">
                             <div class="card stat-card h-100">
                                 <div class="card-body">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <div class="stat-icon bg-label-info"><i class="ti ti-user-check text-info"></i></div>
-                                        <span class="text-muted small">پرسنل</span>
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <div class="stat-icon" style="background:rgba(0,207,232,.12)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00cfe8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                                <path d="M8 21h8M12 17v4"/>
+                                                <circle cx="9" cy="9" r="2"/>
+                                                <path d="M15 8h2M15 11h2"/>
+                                            </svg>
+                                        </div>
+                                        <span class="text-muted small fw-semibold">پرسنل</span>
                                     </div>
-                                    <h4 class="mb-0 fw-bold">{{ $nf($personnelCount) }}</h4>
+                                    <h3 class="mb-0 fw-bold">{{ $nf($personnelCount) }}</h3>
                                     <p class="text-muted small mb-0 mt-1">نفر فعال</p>
                                 </div>
                             </div>
                         </div>
 
-                        {{-- محصولات فعال --}}
-                        <div class="col-6 col-md-4 col-xl-2">
+                        {{-- محصولات --}}
+                        <div class="col-6 col-md-3">
                             <div class="card stat-card h-100">
                                 <div class="card-body">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <div class="stat-icon bg-label-danger"><i class="ti ti-package text-danger"></i></div>
-                                        <span class="text-muted small">محصولات</span>
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <div class="stat-icon" style="background:rgba(234,84,85,.12)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ea5455" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                                                <line x1="12" y1="22.08" x2="12" y2="12"/>
+                                            </svg>
+                                        </div>
+                                        <span class="text-muted small fw-semibold">محصولات</span>
                                     </div>
-                                    <h4 class="mb-0 fw-bold">{{ $nf($activeProductCount) }}</h4>
+                                    <h3 class="mb-0 fw-bold">{{ $nf($activeProductCount) }}</h3>
                                     <p class="text-muted small mb-0 mt-1">محصول فعال</p>
                                 </div>
                             </div>
                         </div>
 
-                        {{-- موجودی انبار --}}
+                        {{-- انبار (فقط وقتی موجودی دارد) --}}
                         @if($hasStocks)
-                        <div class="col-6 col-md-4 col-xl-2">
+                        <div class="col-6 col-md-3">
                             <div class="card stat-card h-100">
                                 <div class="card-body">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <div class="stat-icon" style="background:rgba(115,103,240,.12)"><i class="ti ti-building-warehouse text-primary"></i></div>
-                                        <span class="text-muted small">انبار</span>
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <div class="stat-icon" style="background:rgba(115,103,240,.12)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7367f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35z"/>
+                                                <path d="M6 18h12M6 14h12M2 10h20"/>
+                                            </svg>
+                                        </div>
+                                        <span class="text-muted small fw-semibold">انبار</span>
                                     </div>
-                                    <h4 class="mb-0 fw-bold">{{ $nf($stockTotal) }}</h4>
+                                    <h3 class="mb-0 fw-bold">{{ $nf($stockTotal) }}</h3>
                                     <p class="text-muted small mb-0 mt-1">موجودی کل</p>
                                 </div>
                             </div>
                         </div>
-                        @else
-                        <div class="col-6 col-md-4 col-xl-2">
-                            <div class="card stat-card h-100 border-dashed">
-                                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                                    <i class="ti ti-building-warehouse text-muted mb-1" style="font-size:1.5rem"></i>
-                                    <small class="text-muted">اطلاعات انبار موجود نیست</small>
-                                </div>
-                            </div>
-                        </div>
                         @endif
+
                     </div>{{-- /stat cards --}}
 
                     {{-- ══ SALES TODAY/WEEK/MONTH TABS ══ --}}
@@ -838,32 +948,68 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                     {{-- ══ TOP PRODUCTS + FINANCIAL ══ --}}
                     <div class="row g-4 mb-4">
 
-                        {{-- Top Products --}}
+                        {{-- Top Products — Vuexy-style product list card --}}
                         <div class="col-12 col-lg-6">
-                            <div class="card h-100">
-                                <div class="card-header border-bottom">
-                                    <h5 class="card-title mb-0">
-                                        <i class="ti ti-star text-warning me-2"></i>
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header border-bottom d-flex align-items-center justify-content-between" style="background:linear-gradient(90deg,#f8f7ff 0%,#fff 100%)">
+                                    <h5 class="card-title mb-0 d-flex align-items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7367f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                                        </svg>
                                         پرفروش‌ترین محصولات این ماه
                                     </h5>
+                                    <span class="badge bg-label-primary rounded-pill">{{ $topProducts->count() }}</span>
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body p-0">
                                     @if($topProducts->isEmpty())
-                                        <p class="text-muted text-center py-4">داده‌ای موجود نیست</p>
+                                        <div class="text-center py-5">
+                                            <i class="ti ti-package-off text-muted" style="font-size:2.5rem"></i>
+                                            <p class="text-muted mt-2 mb-0">داده‌ای موجود نیست</p>
+                                        </div>
                                     @else
-                                    @foreach($topProducts as $idx => $prod)
-                                    @php $barPct = $topProductsTotal > 0 ? min(100, round((float)$prod->rev / $topProductsTotal * 100)) : 0; @endphp
-                                    <div class="mb-3">
-                                        <div class="d-flex justify-content-between mb-1">
-                                            <span class="fw-semibold small">{{ $idx+1 }}. {{ $prod->pname }}</span>
-                                            <span class="text-muted small">{{ $nf($prod->sc) }} فاکتور · {{ $nfT((float)$prod->rev) }} ت</span>
-                                        </div>
-                                        <div class="product-bar">
-                                            <div class="product-bar-fill"
-                                                style="width:{{ $barPct }}%; background:{{ ['#7367f0','#28c76f','#ff9f43','#00cfe8','#ea5455'][$idx] }}"></div>
-                                        </div>
+                                    @php $productColors = ['#7367f0','#28c76f','#ff9f43','#00cfe8','#ea5455','#7367f0','#28c76f','#ff9f43','#00cfe8','#ea5455']; @endphp
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0" dir="rtl">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="ps-3" style="width:45%">نام محصول</th>
+                                                    <th class="text-center">تعداد فروش</th>
+                                                    <th class="text-center pe-3">درآمد (تومان)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach($topProducts as $idx => $prod)
+                                            @php
+                                                $color = $productColors[$idx % 10];
+                                                $revPct = $topProductsTotal > 0 ? min(100, round((float)$prod->total_revenue / $topProductsTotal * 100)) : 0;
+                                            @endphp
+                                            <tr>
+                                                <td class="ps-3">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <div style="width:8px;height:8px;border-radius:50%;background:{{ $color }};flex-shrink:0"></div>
+                                                        <div>
+                                                            <div class="fw-semibold small">{{ $prod->pname }}</div>
+                                                            <div class="product-bar mt-1" style="width:70px">
+                                                                <div class="product-bar-fill" style="width:{{ $revPct }}%;background:{{ $color }}"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge rounded-pill" style="background:{{ $color }}20;color:{{ $color }}">
+                                                        {{ $nf($prod->total_sold) }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-center pe-3 fw-semibold small">
+                                                    {{ $nfT((float)$prod->total_revenue) }}
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    @endforeach
                                     @endif
                                 </div>
                             </div>
@@ -1056,6 +1202,229 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                             <h4 class="mb-0 fw-bold">{{ $nf($driverCount) }}</h4>
                                             <p class="text-muted small mb-0">راننده فعال در سیستم</p>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- ══════════════════════════════════════════════════
+                         BOTTOM TABLES: وضعیت سرپرستان فروش / بازاریاب‌ها / حمل‌ونقل
+                    ══════════════════════════════════════════════════ --}}
+
+                    {{-- Table A: وضعیت سرپرستان فروش --}}
+                    <div class="row g-4 mb-4">
+                        <div class="col-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header border-bottom d-flex align-items-center gap-2" style="background:linear-gradient(90deg,#fff9e6 0%,#fff 100%)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff9f43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="8" r="4"/>
+                                        <path d="M20 21a8 8 0 1 0-16 0"/>
+                                        <path d="M9 13l-2 8 5-3 5 3-2-8"/>
+                                    </svg>
+                                    <h5 class="card-title mb-0">وضعیت سرپرستان فروش</h5>
+                                    <small class="text-muted me-auto">این ماه</small>
+                                </div>
+                                <div class="card-body p-0">
+                                    @if($supervisorRows->isEmpty())
+                                        <div class="text-center py-5">
+                                            <i class="ti ti-user-star text-muted" style="font-size:2rem"></i>
+                                            <p class="text-muted mt-2 mb-0">سرپرست فروشی یافت نشد</p>
+                                        </div>
+                                    @else
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0" dir="rtl">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="ps-4">نام سرپرست</th>
+                                                    <th class="text-center">تعداد بازاریاب‌ها</th>
+                                                    <th class="text-center">تعداد مشتریان جذب‌شده</th>
+                                                    <th class="text-center">تعداد فاکتور</th>
+                                                    <th class="text-center pe-4">جمع فروش این ماه (تومان)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach($supervisorRows as $sup)
+                                            @php
+                                                $supSubCount = (int)($subCounts[$sup->id]->cnt ?? 0);
+                                                $supCustCount = (int)($custByLeaderSup[$sup->id]->cnt ?? 0);
+                                                $supInvCount  = (int)($ldInvStats[$sup->id]->inv_count ?? 0);
+                                                $supSales     = (float)($ldInvStats[$sup->id]->total_sales ?? 0);
+                                            @endphp
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <div class="stat-icon" style="width:36px;height:36px;background:rgba(255,159,67,.15)">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff9f43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/>
+                                                            </svg>
+                                                        </div>
+                                                        <span class="fw-semibold">{{ $sup->name }}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-label-info">{{ $nf($supSubCount) }}</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-label-primary">{{ $nf($supCustCount) }}</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-label-success">{{ $nf($supInvCount) }}</span>
+                                                </td>
+                                                <td class="text-center pe-4 fw-semibold">
+                                                    @if($supSales > 0)
+                                                        <span class="text-success">{{ $nfT($supSales) }}</span>
+                                                    @else
+                                                        <span class="text-muted">—</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Table B: وضعیت بازاریاب‌ها --}}
+                    <div class="row g-4 mb-4">
+                        <div class="col-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header border-bottom d-flex align-items-center gap-2" style="background:linear-gradient(90deg,#f0fff6 0%,#fff 100%)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#28c76f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    </svg>
+                                    <h5 class="card-title mb-0">وضعیت بازاریاب‌ها</h5>
+                                    <small class="text-muted me-auto">این ماه</small>
+                                </div>
+                                <div class="card-body p-0">
+                                    @if($marketerRows->isEmpty())
+                                        <div class="text-center py-5">
+                                            <i class="ti ti-users text-muted" style="font-size:2rem"></i>
+                                            <p class="text-muted mt-2 mb-0">بازاریابی یافت نشد</p>
+                                        </div>
+                                    @else
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0" dir="rtl">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="ps-4">نام بازاریاب</th>
+                                                    <th class="text-center">سرپرست</th>
+                                                    <th class="text-center">تعداد مشتری</th>
+                                                    <th class="text-center">تعداد فاکتور</th>
+                                                    <th class="text-center pe-4">جمع فروش این ماه (تومان)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach($marketerRows as $mkt)
+                                            @php
+                                                $mktCust  = (int)($custByMkt[$mkt->id]->cnt ?? 0);
+                                                $mktInv   = (int)($mktInvStats[$mkt->id]->inv_count ?? 0);
+                                                $mktSales = (float)($mktInvStats[$mkt->id]->total_sales ?? 0);
+                                                $mktLeaderName = $mkt->leader_id ? ($leaderNames[$mkt->leader_id] ?? '—') : '—';
+                                            @endphp
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <div class="stat-icon" style="width:36px;height:36px;background:rgba(40,199,111,.15)">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#28c76f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                                                <circle cx="12" cy="7" r="4"/>
+                                                            </svg>
+                                                        </div>
+                                                        <span class="fw-semibold">{{ $mkt->name }}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    @if($mktLeaderName !== '—')
+                                                        <span class="badge bg-label-warning">{{ $mktLeaderName }}</span>
+                                                    @else
+                                                        <span class="text-muted small">—</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-label-primary">{{ $nf($mktCust) }}</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-label-success">{{ $nf($mktInv) }}</span>
+                                                </td>
+                                                <td class="text-center pe-4 fw-semibold">
+                                                    @if($mktSales > 0)
+                                                        <span class="text-success">{{ $nfT($mktSales) }}</span>
+                                                    @else
+                                                        <span class="text-muted">—</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Table C: وضعیت حمل و نقل (conditional) --}}
+                    @if($hasTransport && $transportStats->isNotEmpty())
+                    <div class="row g-4 mb-4">
+                        <div class="col-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header border-bottom d-flex align-items-center gap-2" style="background:linear-gradient(90deg,#e8f8ff 0%,#fff 100%)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00cfe8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="1" y="3" width="15" height="13" rx="2"/>
+                                        <path d="M16 8h4l3 3v5h-7V8z"/>
+                                        <circle cx="5.5" cy="18.5" r="2.5"/>
+                                        <circle cx="18.5" cy="18.5" r="2.5"/>
+                                    </svg>
+                                    <h5 class="card-title mb-0">وضعیت حمل و نقل</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0" dir="rtl">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="ps-4">راننده / ناوگان</th>
+                                                    <th class="text-center">تعداد سفارش</th>
+                                                    <th class="text-center pe-4">وضعیت</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach($transportStats as $tr)
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <div class="stat-icon" style="width:36px;height:36px;background:rgba(0,207,232,.12)">
+                                                            <i class="ti ti-truck text-info" style="font-size:.9rem"></i>
+                                                        </div>
+                                                        <span class="fw-semibold">{{ $tr->driver_name }}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-label-info">{{ $nf($tr->order_count) }}</span>
+                                                </td>
+                                                <td class="text-center pe-4">
+                                                    @php
+                                                        $statusMap = [0=>'در انتظار',1=>'در حال تحویل',2=>'تحویل شده',3=>'لغو شده'];
+                                                        $statusBadge = [0=>'warning',1=>'primary',2=>'success',3=>'danger'];
+                                                        $statusKey = (int)($tr->status ?? 0);
+                                                    @endphp
+                                                    <span class="badge bg-{{ $statusBadge[$statusKey] ?? 'secondary' }}">
+                                                        {{ $statusMap[$statusKey] ?? 'نامشخص' }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
