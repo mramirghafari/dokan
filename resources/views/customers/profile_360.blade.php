@@ -99,7 +99,7 @@
                                                         <p class="text-muted mb-0 small">{{ \Illuminate\Support\Str::limit($event['description'], 180) }}</p>
                                                     @endif
                                                 </div>
-                                                <small class="text-muted">{{ $event['occurred_at']->format('Y-m-d H:i') }}</small>
+                                                <small class="text-muted">{{ verta_datetime($event['occurred_at']) }}</small>
                                             </div>
                                         </div>
                                     @endforeach

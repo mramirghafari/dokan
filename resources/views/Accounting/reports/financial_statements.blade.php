@@ -38,8 +38,8 @@
                                         @foreach ($fiscalYears as $fiscalYear)
                                             <option value="{{ $fiscalYear->id }}" @selected($selectedFiscalYear && (int) $selectedFiscalYear->id === (int) $fiscalYear->id)>
                                                 {{ $fiscalYear->title }} |
-                                                {{ optional($fiscalYear->starts_at)->format('Y-m-d') }} تا
-                                                {{ optional($fiscalYear->ends_at)->format('Y-m-d') }}
+                                                {{ verta_date($fiscalYear->starts_at) }} تا
+                                                {{ verta_date($fiscalYear->ends_at) }}
                                             </option>
                                         @endforeach
                                     </select>

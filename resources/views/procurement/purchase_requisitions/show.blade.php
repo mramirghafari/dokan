@@ -55,7 +55,7 @@
                                 <div class="card h-100">
                                     <div class="card-body"><small class="text-muted">تاریخ درخواست</small>
                                         <h6 class="mb-0">
-                                            {{ $purchaseRequisition->request_date_fa ?: optional($purchaseRequisition->request_date_en)->format('Y-m-d') }}
+                                            {{ $purchaseRequisition->request_date_fa ?: verta_date($purchaseRequisition->request_date_en) }}
                                         </h6>
                                     </div>
                                 </div>
@@ -204,9 +204,8 @@
                                                 <td>{{ $quotation->quotation_number }}</td>
                                                 <td>{{ optional($quotation->supplier)->title ?: optional($quotation->supplier)->name }}
                                                 </td>
-                                                <td>{{ $quotation->quotation_date_fa ?: optional($quotation->quotation_date_en)->format('Y-m-d') }}
-                                                </td>
-                                                <td>{{ optional($quotation->valid_until)->format('Y-m-d') }}</td>
+                                                <td>{{ $quotation->quotation_date_fa ?: verta_date($quotation->quotation_date_en) }}</td>
+                                                <td>{{ verta_date($quotation->valid_until) }}</td>
                                                 <td class="text-end">
                                                     {{ number_format((float) $quotation->total_amount) }}</td>
                                                 <td>

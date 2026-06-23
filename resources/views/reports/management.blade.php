@@ -149,8 +149,8 @@
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h5 class="mb-0">مقایسه با دوره قبل</h5>
                                         <small
-                                            class="text-muted">{{ $report['period']['previous_start']->format('Y-m-d') }}
-                                            تا {{ $report['period']['previous_end']->format('Y-m-d') }}</small>
+                                            class="text-muted">{{ verta_date($report['period']['previous_start']) }}
+                                            تا {{ verta_date($report['period']['previous_end']) }}</small>
                                     </div>
                                     <div class="table-responsive">
                                         <table class="table">
@@ -414,8 +414,7 @@
                                                         </td>
                                                         <td>{{ $schedule->frequency }}</td>
                                                         <td>{{ $schedule->delivery_format }}</td>
-                                                        <td>{{ optional($schedule->next_run_at)->format('Y-m-d H:i') ?: '-' }}
-                                                        </td>
+                                                        <td>{{ verta_datetime($schedule->next_run_at) }}</td>
                                                         <td>{{ $schedule->is_active ? 'فعال' : 'غیرفعال' }}</td>
                                                     </tr>
                                                 @empty

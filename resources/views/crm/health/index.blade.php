@@ -131,7 +131,7 @@
                                     <tbody>
                                         @forelse ($snapshots as $snapshot)
                                             <tr>
-                                                <td>{{ optional($snapshot->generated_at)->format('Y-m-d H:i') }}</td>
+                                                <td>{{ verta_datetime($snapshot->generated_at) }}</td>
                                                 <td>{{ $snapshot->scope_label }}</td>
                                                 <td>{{ $snapshot->health_score }}</td>
                                                 <td>{{ $snapshot->riskText() }}</td>

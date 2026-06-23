@@ -452,7 +452,7 @@
                                                             <span
                                                                 class="badge bg-label-primary">{{ $assetStatuses[$asset->status] ?? $asset->status }}</span>
                                                             <div class="small text-muted mt-1">
-                                                                {{ $asset->in_service_date_fa ?: optional($asset->in_service_date_en)->format('Y-m-d') }}
+                                                                {{ $asset->in_service_date_fa ?: verta_date($asset->in_service_date_en) }}
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -681,7 +681,7 @@
                                                                             <div
                                                                                 class="small border-top pt-2 mt-2 text-muted">
                                                                                 آخرین خروج:
-                                                                                {{ optional($lastDisposal->disposal_date_en)->format('Y-m-d') }}
+                                                                                {{ verta_date($lastDisposal->disposal_date_en) }}
                                                                                 / سود:
                                                                                 {{ number_format((float) $lastDisposal->gain_amount) }}
                                                                                 / زیان:
@@ -856,7 +856,7 @@
                                                                                 <div class="text-muted">
                                                                                     {{ $assetEventTypes[$event->event_type] ?? $event->event_type }}
                                                                                     |
-                                                                                    {{ $event->event_date_fa ?: optional($event->event_date_en)->format('Y-m-d') }}
+                                                                                    {{ $event->event_date_fa ?: verta_date($event->event_date_en) }}
                                                                                 </div>
                                                                                 <div class="text-muted">
                                                                                     {{ optional($event->fromStore)->title ? 'از ' . optional($event->fromStore)->title : '' }}
@@ -1002,7 +1002,7 @@
                                                                                 @forelse($asset->capitalAdditions->take(3) as $addition)
                                                                                     <span
                                                                                         class="badge bg-label-success me-1">
-                                                                                        {{ $addition->addition_date_fa ?: optional($addition->addition_date_en)->format('Y-m-d') }}
+                                                                                        {{ $addition->addition_date_fa ?: verta_date($addition->addition_date_en) }}
                                                                                         /
                                                                                         {{ $assetCapitalAdditionTypes[$addition->addition_type] ?? $addition->addition_type }}
                                                                                         /
@@ -1146,7 +1146,7 @@
                                                                                 @forelse($asset->depreciationPolicies->take(3) as $policy)
                                                                                     <span
                                                                                         class="badge bg-label-secondary me-1">
-                                                                                        {{ $policy->effective_date_fa ?: optional($policy->effective_date_en)->format('Y-m-d') }}
+                                                                                        {{ $policy->effective_date_fa ?: verta_date($policy->effective_date_en) }}
                                                                                         /
                                                                                         {{ $policy->depreciation_method }}
                                                                                         {{ $policy->annual_rate_percent ? ' / ' . number_format((float) $policy->annual_rate_percent, 2) . '%' : '' }}

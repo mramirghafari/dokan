@@ -99,8 +99,7 @@
                                                     @endif
                                                 </td>
                                                 <td>{{ $voucher->voucher_number }}</td>
-                                                <td>{{ $voucher->voucher_date_fa ?: optional($voucher->voucher_date_en)->format('Y-m-d') }}
-                                                </td>
+                                                <td>{{ $voucher->voucher_date_fa ?: verta_date($voucher->voucher_date_en) }}</td>
                                                 <td>{{ $voucher->description }}</td>
                                                 <td class="text-end">{{ number_format((float) $voucher->total_debit) }}
                                                 </td>
@@ -110,7 +109,7 @@
                                                             <div>{{ $instrument->cheque_number ?: 'بدون شماره' }} -
                                                                 {{ $instrument->issuing_bank ?: 'بانک نامشخص' }}</div>
                                                             <div class="text-muted">سررسید:
-                                                                {{ optional($instrument->due_date)->format('Y-m-d') ?: '-' }}
+                                                                {{ verta_date($instrument->due_date) }}
                                                             </div>
                                                             <div class="text-muted">محل فعلی:
                                                                 {{ optional($instrument->currentHolderAccount)->name ?: ($instrument->current_holder_name ?: '-') }}
@@ -151,7 +150,7 @@
                                                         @if ($instrument->histories->isNotEmpty())
                                                             <div class="small text-muted mt-1">
                                                                 آخرین گردش:
-                                                                {{ optional($instrument->histories->first()->action_date)->format('Y-m-d') ?: '-' }}
+                                                                {{ verta_date($instrument->histories->first()->action_date) }}
                                                                 -
                                                                 {{ $statuses[$instrument->histories->first()->new_status] ?? $instrument->histories->first()->new_status }}
                                                             </div>

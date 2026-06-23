@@ -182,7 +182,7 @@
                                                         class="{{ $item->is_done ? 'text-decoration-line-through text-muted' : '' }}">
                                                         {{ $item->title }}</div>
                                                     <small
-                                                        class="text-muted">{{ $item->is_done ? 'تکمیل توسط ' . optional($item->doneBy)->name . ' در ' . optional($item->done_at)->format('Y-m-d H:i') : 'باز' }}</small>
+                                                        class="text-muted">{{ $item->is_done ? 'تکمیل توسط ' . optional($item->doneBy)->name . ' در ' . verta_datetime($item->done_at) : 'باز' }}</small>
                                                 </div>
                                                 <button
                                                     class="btn btn-sm {{ $item->is_done ? 'btn-label-secondary' : 'btn-label-success' }}"
@@ -223,7 +223,7 @@
                                                 <div class="d-flex justify-content-between mb-2">
                                                     <strong>{{ optional($comment->user)->name ?: 'کاربر حذف شده' }}</strong>
                                                     <small
-                                                        class="text-muted">{{ optional($comment->created_at)->format('Y-m-d H:i') }}</small>
+                                                        class="text-muted">{{ verta_datetime($comment->created_at) }}</small>
                                                 </div>
                                                 <div style="white-space: pre-line">{{ $comment->comment }}</div>
                                             </div>
@@ -249,7 +249,7 @@
                                         <div class="mb-2"><span class="text-muted">تخمین زمان:</span>
                                             {{ $card->estimateText() }}</div>
                                         <div><span class="text-muted">آخرین جابجایی:</span>
-                                            {{ optional($card->moved_at)->format('Y-m-d H:i') ?: '-' }}</div>
+                                            {{ verta_datetime($card->moved_at) }}</div>
                                     </div>
                                 </div>
 

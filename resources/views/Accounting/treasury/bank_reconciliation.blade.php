@@ -154,7 +154,7 @@
                                             <tr>
                                                 <td>{{ $loop->iteration + ($lines->currentPage() - 1) * $lines->perPage() }}
                                                 </td>
-                                                <td>{{ optional($line->statement_date)->format('Y-m-d') ?: '-' }}</td>
+                                                <td>{{ verta_date($line->statement_date) }}</td>
                                                 <td>{{ optional($line->account)->code }} -
                                                     {{ optional($line->account)->name }}
                                                 </td>

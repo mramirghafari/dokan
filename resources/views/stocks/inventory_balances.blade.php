@@ -100,8 +100,7 @@
                                                 <td>{{ number_format((float) $balance->total_cost) }}</td>
                                                 <td>{{ number_format($reserved, 3) }}</td>
                                                 <td>{{ $orderLimit > 0 ? number_format($orderLimit, 3) : '-' }}</td>
-                                                <td>{{ optional($balance->last_movement_at)->format('Y-m-d H:i') ?: '-' }}
-                                                </td>
+                                                <td>{{ verta_datetime($balance->last_movement_at) }}</td>
                                                 <td>
                                                     @if ($quantity < 0)
                                                         <span class="badge bg-label-danger">منفی</span>

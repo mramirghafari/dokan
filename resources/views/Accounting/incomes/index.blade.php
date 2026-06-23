@@ -290,8 +290,7 @@
                                                 @forelse($incomes as $income)
                                                     <tr>
                                                         <td>{{ $income->income_number }}</td>
-                                                        <td>{{ $income->income_date_fa ?: optional($income->income_date_en)->format('Y-m-d') }}
-                                                        </td>
+                                                        <td>{{ $income->income_date_fa ?: verta_date($income->income_date_en) }}</td>
                                                         <td>
                                                             <div class="fw-semibold">
                                                                 {{ optional($income->incomeType)->name ?: '-' }}</div>

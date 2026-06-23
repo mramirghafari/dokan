@@ -229,8 +229,7 @@
                                                     <tr>
                                                         <td>{{ optional($snapshot->user)->name ?: 'کاربر حذف شده' }}
                                                         </td>
-                                                        <td>{{ optional($snapshot->period_start)->format('Y-m-d') }} تا
-                                                            {{ optional($snapshot->period_end)->format('Y-m-d') }}</td>
+                                                        <td>{{ verta_date($snapshot->period_start) }} تا {{ verta_date($snapshot->period_end) }}</td>
                                                         <td>{{ $snapshot->total_score }}</td>
                                                         <td>{{ $snapshot->priorityText() }}</td>
                                                         <td>{{ implode(' | ', array_slice($snapshot->risks ?: [], 0, 2)) }}

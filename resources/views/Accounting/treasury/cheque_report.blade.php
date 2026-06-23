@@ -100,7 +100,7 @@
                                                 <td>{{ $instrument->direction === 'incoming' ? 'دریافتنی' : 'پرداختنی' }}
                                                 </td>
                                                 <td>{{ $statuses[$instrument->status] ?? $instrument->status }}</td>
-                                                <td>{{ optional($instrument->due_date)->format('Y-m-d') ?: '-' }}</td>
+                                                <td>{{ verta_date($instrument->due_date) }}</td>
                                                 <td class="text-end">{{ number_format((float) $instrument->amount) }}
                                                 </td>
                                                 <td>{{ optional($instrument->counterAccount)->code }} -
@@ -111,7 +111,7 @@
                                                 </td>
                                                 <td>
                                                     @if ($lastHistory)
-                                                        {{ optional($lastHistory->action_date)->format('Y-m-d') ?: '-' }}<br>
+                                                        {{ verta_date($lastHistory->action_date) }}<br>
                                                         <small>{{ $statuses[$lastHistory->new_status] ?? $lastHistory->new_status }}</small>
                                                     @else
                                                         -

@@ -132,8 +132,7 @@
                                                         <td><strong>{{ $row[3] }}</strong></td>
                                                         <td>{{ $row[4] ?: '-' }}</td>
                                                         <td>{{ $row[5] }}</td>
-                                                        <td>{{ $row[6] ? \Illuminate\Support\Carbon::parse($row[6])->format('Y-m-d H:i') : '-' }}
-                                                        </td>
+                                                        <td>{{ verta_datetime($row[6]) }}</td>
                                                         <td style="min-width: 280px;">
                                                             <form method="POST"
                                                                 action="{{ route('crm.workbench.comments.store') }}"
@@ -227,7 +226,7 @@
                                                 </div>
                                                 <div class="mb-2">{{ optional($mention->comment)->body }}</div>
                                                 <div class="text-muted small mb-2">
-                                                    {{ optional($mention->created_at)->format('Y-m-d H:i') }}</div>
+                                                    {{ verta_datetime($mention->created_at) }}</div>
                                                 <form method="POST"
                                                     action="{{ route('crm.workbench.mentions.read', $mention) }}"
                                                     class="text-end">
@@ -254,7 +253,7 @@
                                                 <div class="d-flex justify-content-between gap-2 mb-1">
                                                     <strong>{{ optional($comment->user)->name ?: 'کاربر حذف شده' }}</strong>
                                                     <span
-                                                        class="text-muted small">{{ optional($comment->created_at)->format('Y-m-d H:i') }}</span>
+                                                        class="text-muted small">{{ verta_datetime($comment->created_at) }}</span>
                                                 </div>
                                                 <div>{{ $comment->body }}</div>
                                                 @if (($comment->mentioned_user_ids ?: []) !== [])

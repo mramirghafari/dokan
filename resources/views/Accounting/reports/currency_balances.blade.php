@@ -235,7 +235,7 @@
                                     <tbody>
                                         @forelse ($report['recent_rates'] as $rate)
                                             <tr>
-                                                <td>{{ optional($rate->rate_date)->format('Y-m-d') }}</td>
+                                                <td>{{ verta_date($rate->rate_date) }}</td>
                                                 <td>{{ $rate->currency?->code }} - {{ $rate->currency?->title }}</td>
                                                 <td class="text-end">{{ number_format((float) $rate->rate, 6) }}</td>
                                                 <td>{{ $rate->source ?: '-' }}</td>

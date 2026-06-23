@@ -334,7 +334,7 @@
                                                                                 <small class="text-muted">تحویل: {{ $order['delivery_date'] }}</small>
                                                                             @endif
                                                                             @if ($isSubscriptionPanel && $order['subscription_end'])
-                                                                                <small class="text-muted">پایان اشتراک: {{ \Illuminate\Support\Carbon::parse($order['subscription_end'])->format('Y/m/d') }}</small>
+                                                                                <small class="text-muted">پایان اشتراک: {{ verta_date($order['subscription_end']) }}</small>
                                                                             @endif
                                                                         </div>
                                                                         <ul class="list-unstyled mb-0 small">
@@ -402,7 +402,7 @@
                                                         <tbody>
                                                             @foreach ($financial['transactions'] as $txn)
                                                                 <tr>
-                                                                    <td><small>{{ optional($txn['date'])->format('Y/m/d') }}</small></td>
+                                                                    <td><small>{{ verta_date($txn['date']) }}</small></td>
                                                                     <td><span class="badge bg-label-{{ $txn['type_class'] }}">{{ $txn['type_label'] }}</span></td>
                                                                     <td>{{ $txn['description'] }}</td>
                                                                     <td><span class="badge bg-label-{{ $txn['payment']['class'] }}">{{ $txn['payment']['label'] }}</span></td>

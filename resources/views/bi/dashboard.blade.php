@@ -110,8 +110,7 @@
                                                     <tr>
                                                         <td>{{ $summary->metric_key }}</td>
                                                         <td>{{ number_format((float) $summary->value, 2) }}</td>
-                                                        <td>{{ optional($summary->summary_date)->format('Y-m-d') }}
-                                                        </td>
+                                                        <td>{{ verta_date($summary->summary_date) }}</td>
                                                     </tr>
                                                 @empty
                                                     <tr>
@@ -144,7 +143,7 @@
                                                         <td><span
                                                                 class="badge bg-label-{{ $log->status === 'success' ? 'success' : 'danger' }}">{{ $log->status }}</span>
                                                         </td>
-                                                        <td>{{ optional($log->finished_at)->format('Y-m-d H:i') }}</td>
+                                                        <td>{{ verta_datetime($log->finished_at) }}</td>
                                                     </tr>
                                                 @empty
                                                     <tr>

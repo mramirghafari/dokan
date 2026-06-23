@@ -236,8 +236,7 @@
                                         @forelse($review['unbalanced_vouchers'] as $row)
                                             <tr>
                                                 <td>{{ $row->voucher_number ?: $row->id }}</td>
-                                                <td>{{ optional($row->voucher_date_en ? \Carbon\Carbon::parse($row->voucher_date_en) : null)->format('Y-m-d') ?: '-' }}
-                                                </td>
+                                                <td>{{ verta_date($row->voucher_date_en) }}</td>
                                                 <td>{{ $row->document_type ?: '-' }}</td>
                                                 <td>{{ $row->status ?: '-' }}</td>
                                                 <td class="text-end">{{ $money($row->debit) }}</td>
@@ -280,8 +279,7 @@
                                                 @forelse($review['vouchers_without_items'] as $row)
                                                     <tr>
                                                         <td>{{ $row->voucher_number ?: $row->id }}</td>
-                                                        <td>{{ optional($row->voucher_date_en ? \Carbon\Carbon::parse($row->voucher_date_en) : null)->format('Y-m-d') ?: '-' }}
-                                                        </td>
+                                                        <td>{{ verta_date($row->voucher_date_en) }}</td>
                                                         <td>{{ $row->document_type ?: '-' }}</td>
                                                         <td>{{ $row->status ?: '-' }}</td>
                                                         <td><a class="btn btn-sm btn-label-primary"

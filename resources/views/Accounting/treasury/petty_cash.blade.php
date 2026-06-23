@@ -341,8 +341,7 @@
                                     <tbody>
                                         @forelse($report['transactions'] as $transaction)
                                             <tr>
-                                                <td>{{ optional($transaction->transaction_date_en)->format('Y-m-d') ?: '-' }}
-                                                </td>
+                                                <td>{{ verta_date($transaction->transaction_date_en) }}</td>
                                                 <td>{{ optional($transaction->fund)->title }}</td>
                                                 <td>{{ ['charge' => 'شارژ', 'expense' => 'هزینه', 'settlement' => 'تسویه'][$transaction->transaction_type] ?? $transaction->transaction_type }}
                                                 </td>

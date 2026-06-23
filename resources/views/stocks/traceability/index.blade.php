@@ -121,11 +121,10 @@
                                                     {{ $balance->size ? ' / ' . $balance->size : '' }}
                                                     {{ $balance->quality_grade ? ' / ' . $balance->quality_grade : '' }}
                                                 </td>
-                                                <td>{{ optional($balance->expiry_date)->format('Y-m-d') ?: '-' }}</td>
+                                                <td>{{ verta_date($balance->expiry_date) }}</td>
                                                 <td>{{ number_format((float) $balance->quantity, 3) }}</td>
                                                 <td>{{ number_format((float) $balance->total_cost) }}</td>
-                                                <td>{{ optional($balance->last_movement_at)->format('Y-m-d H:i') ?: '-' }}
-                                                </td>
+                                                <td>{{ verta_datetime($balance->last_movement_at) }}</td>
                                             </tr>
                                         @empty
                                             <tr>
@@ -159,8 +158,7 @@
                                     <tbody>
                                         @forelse($movements as $movement)
                                             <tr>
-                                                <td>{{ optional($movement->occurred_at)->format('Y-m-d H:i') ?: '-' }}
-                                                </td>
+                                                <td>{{ verta_datetime($movement->occurred_at) }}</td>
                                                 <td>{{ $movement->movement_type }}</td>
                                                 <td>{{ optional($movement->product)->title ?? '-' }}</td>
                                                 <td>{{ $movement->batch_no ?: '-' }} / {{ $movement->lot_no ?: '-' }}

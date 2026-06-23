@@ -408,8 +408,7 @@
                                                             <tr>
                                                                 <td>{{ $schedule->title }}</td>
                                                                 <td>{{ $schedule->frequency }}</td>
-                                                                <td>{{ optional($schedule->next_run_at)->format('Y-m-d H:i') }}
-                                                                </td>
+                                                                <td>{{ verta_datetime($schedule->next_run_at) }}</td>
                                                             </tr>
                                                         @empty
                                                             <tr>
@@ -518,8 +517,7 @@
                                                             <tr>
                                                                 <td>{{ $run->dataset_key }}</td>
                                                                 <td>{{ number_format($run->row_count) }}</td>
-                                                                <td>{{ optional($run->finished_at)->format('Y-m-d H:i') }}
-                                                                </td>
+                                                                <td>{{ verta_datetime($run->finished_at) }}</td>
                                                             </tr>
                                                         @empty
                                                             <tr>

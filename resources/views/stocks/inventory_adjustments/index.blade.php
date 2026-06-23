@@ -49,8 +49,7 @@
                                             @php($totalDifference = $adjustment->items->sum(fn($item) => (float) $item->difference_quantity))
                                             <tr>
                                                 <td>{{ $adjustment->number }}</td>
-                                                <td>{{ $adjustment->date_fa ?: optional($adjustment->date_en)->format('Y-m-d') }}
-                                                </td>
+                                                <td>{{ $adjustment->date_fa ?: verta_date($adjustment->date_en) }}</td>
                                                 <td>{{ optional($adjustment->store)->title ?: '-' }}</td>
                                                 <td>{{ optional($adjustment->user)->name ?: '-' }}</td>
                                                 <td>{{ $adjustment->items->count() }}</td>

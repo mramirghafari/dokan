@@ -180,8 +180,7 @@
                                                 <td>{{ $purchaseOrder->order_number }}</td>
                                                 <td>{{ optional($purchaseOrder->supplier)->title ?: optional($purchaseOrder->supplier)->name }}
                                                 </td>
-                                                <td>{{ $purchaseOrder->order_date_fa ?: optional($purchaseOrder->order_date_en)->format('Y-m-d') }}
-                                                </td>
+                                                <td>{{ $purchaseOrder->order_date_fa ?: verta_date($purchaseOrder->order_date_en) }}</td>
                                                 <td class="text-end">
                                                     {{ number_format((float) $purchaseOrder->total_amount) }}</td>
                                                 <td class="text-end">

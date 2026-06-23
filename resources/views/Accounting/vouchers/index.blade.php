@@ -141,8 +141,7 @@
                                                         <div class="small text-muted mt-1">عطف: {{ $voucher->reference_number }}</div>
                                                     @endif
                                                 </td>
-                                                <td>{{ $voucher->voucher_date_fa ?: optional($voucher->voucher_date_en)->format('Y-m-d') }}
-                                                </td>
+                                                <td>{{ $voucher->voucher_date_fa ?: verta_date($voucher->voucher_date_en) }}</td>
                                                 <td>{{ $voucher->description }}</td>
                                                 <td class="text-end">{{ number_format((float) $voucher->total_debit) }}
                                                 </td>

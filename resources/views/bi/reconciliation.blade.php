@@ -182,7 +182,7 @@
                                             <td><span class="badge bg-label-{{ $log->status === 'success' ? 'success' : ($log->status === 'failed' ? 'danger' : 'warning') }}">{{ $log->status }}</span></td>
                                             <td>{{ number_format($log->rows_count ?? 0) }}</td>
                                             <td class="small text-muted">{{ \Illuminate\Support\Str::limit($log->message, 80) }}</td>
-                                            <td class="small">{{ optional($log->finished_at ?? $log->started_at)->format('Y-m-d H:i') }}</td>
+                                            <td class="small">{{ verta_datetime($log->finished_at ?? $log->started_at) }}</td>
                                         </tr>
                                     @empty
                                         <tr><td colspan="5" class="text-center text-muted py-4">لاگی ثبت نشده</td></tr>

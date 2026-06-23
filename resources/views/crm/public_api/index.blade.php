@@ -128,8 +128,7 @@
                                                 <td>{{ collect((array) $client->scopes)->map(fn($scope) => $scopes[$scope] ?? $scope)->implode('، ') }}
                                                 </td>
                                                 <td>{{ number_format($client->request_count) }}</td>
-                                                <td>{{ optional($client->last_used_at)->format('Y-m-d H:i') ?: '-' }}
-                                                </td>
+                                                <td>{{ verta_datetime($client->last_used_at) }}</td>
                                                 <td><span
                                                         class="badge bg-label-{{ $client->is_active ? 'success' : 'secondary' }}">{{ $client->is_active ? 'فعال' : 'غیرفعال' }}</span>
                                                 </td>

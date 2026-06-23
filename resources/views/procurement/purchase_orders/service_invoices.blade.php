@@ -196,7 +196,7 @@
                                         @forelse($serviceInvoices as $invoice)
                                             <tr>
                                                 <td>{{ $invoice->invoice_number }}<br><small
-                                                        class="text-muted">{{ $invoice->invoice_date_fa ?: optional($invoice->invoice_date_en)->format('Y-m-d') }}</small>
+                                                        class="text-muted">{{ $invoice->invoice_date_fa ?: verta_date($invoice->invoice_date_en) }}</small>
                                                 </td>
                                                 <td>{{ optional($invoice->supplier)->title ?: optional($invoice->supplier)->name }}
                                                 </td>

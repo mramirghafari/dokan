@@ -223,7 +223,7 @@
                                                             </div>
                                                         </td>
                                                         <td>
-                                                            {{ $ticket->due_at ? $ticket->due_at->format('Y-m-d H:i') : '-' }}
+                                                            {{ verta_datetime($ticket->due_at) }}
                                                             @if ($ticket->isOverdue())
                                                                 <div class="text-danger small">تاخیر در SLA</div>
                                                             @endif

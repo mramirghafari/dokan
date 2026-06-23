@@ -612,8 +612,7 @@
                                                 @forelse($expenses as $expense)
                                                     <tr>
                                                         <td>{{ $expense->expense_number }}</td>
-                                                        <td>{{ $expense->expense_date_fa ?: optional($expense->expense_date_en)->format('Y-m-d') }}
-                                                        </td>
+                                                        <td>{{ $expense->expense_date_fa ?: verta_date($expense->expense_date_en) }}</td>
                                                         <td>{{ optional($expense->expenseType)->name }}</td>
                                                         <td>
                                                             @if ($expense->specialized_kind)

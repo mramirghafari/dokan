@@ -206,7 +206,7 @@
                                                         <td>{{ $cheque->cheque_number }}</td>
                                                         <td>{{ $cheque->direction === 'incoming' ? 'دریافتنی' : 'پرداختنی' }}
                                                         </td>
-                                                        <td>{{ optional($cheque->due_date)->format('Y-m-d') }}</td>
+                                                        <td>{{ verta_date($cheque->due_date) }}</td>
                                                         <td class="text-end">
                                                             {{ number_format((float) $cheque->amount) }}</td>
                                                         <td>{{ optional($cheque->counterAccount)->name ?: '-' }}</td>
@@ -310,7 +310,7 @@
                                                     {{ optional($leaf->account)->name }}</td>
                                                 <td>{{ ['available' => 'آماده', 'issued' => 'صادر شده', 'blocked' => 'مسدود', 'voided' => 'باطل', 'cancelled' => 'لغو شده'][$leaf->status] ?? $leaf->status }}
                                                 </td>
-                                                <td>{{ optional($leaf->due_date)->format('Y-m-d') ?: '-' }}</td>
+                                                <td>{{ verta_date($leaf->due_date) }}</td>
                                                 <td class="text-end">{{ number_format((float) $leaf->amount) }}</td>
                                                 <td>{{ optional($leaf->instrument?->counterAccount)->name ?: '-' }}
                                                 </td>

@@ -261,7 +261,7 @@
                                                     <td colspan="9">
                                                         @foreach ($purchaseOrder->approvalEvents->sortByDesc('id')->take(3) as $event)
                                                             <div class="small text-muted">
-                                                                {{ $event->created_at?->format('Y-m-d H:i') }} -
+                                                                {{ verta_datetime($event->created_at) }} -
                                                                 {{ ['requested' => 'ارسال برای تایید', 'approved' => 'تایید', 'rejected' => 'برگشت'][$event->event_type] ?? $event->event_type }}
                                                                 @if ($event->description)
                                                                     - {{ $event->description }}

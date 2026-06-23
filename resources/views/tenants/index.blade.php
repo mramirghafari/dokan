@@ -290,7 +290,7 @@
                                                             </div>
                                                             <div class="text-muted small">
                                                                 تاریخ ساخت:
-                                                                {{ $tenant->created_at ? $tenant->created_at->format('Y/m/d') : 'ثبت نشده' }}
+                                                                {{ $tenant->created_at ? verta_date($tenant->created_at) : 'ثبت نشده' }}
                                                             </div>
                                                         </td>
                                                         <td>{{ number_format($stats['organizations_count']) }}</td>
@@ -304,11 +304,11 @@
                                                                 {{ $subscriptionOptions[$tenant->subscription_type]['label'] ?? 'ثبت نشده' }}
                                                             </span>
                                                             <div class="text-muted small">شروع:
-                                                                {{ $tenant->subscription_started_at ? $tenant->subscription_started_at->format('Y/m/d') : 'ثبت نشده' }}
+                                                                {{ $tenant->subscription_started_at ? verta_date($tenant->subscription_started_at) : 'ثبت نشده' }}
                                                             </div>
                                                             @if ($tenant->subscription_ends_at)
                                                                 <div class="text-muted small">پایان:
-                                                                    {{ $tenant->subscription_ends_at->format('Y/m/d') }}
+                                                                    {{ verta_date($tenant->subscription_ends_at) }}
                                                                 </div>
                                                             @elseif ($tenant->subscription_type === 'permanent')
                                                                 <div class="text-muted small">پایان: بدون انقضا</div>

@@ -120,8 +120,7 @@
                                     <tbody>
                                         @forelse($report['journal_rows'] as $item)
                                             <tr>
-                                                <td>{{ optional($item->voucher?->voucher_date_en)->format('Y-m-d') ?: optional($item->voucher)->voucher_date_fa }}
-                                                </td>
+                                                <td>{{ $item->voucher?->voucher_date_fa ?: verta_date($item->voucher?->voucher_date_en) }}</td>
                                                 <td>{{ optional($item->voucher)->voucher_number ?: '-' }}</td>
                                                 <td>{{ optional($item->account)->code }} -
                                                     {{ optional($item->account)->name }}</td>
@@ -164,8 +163,7 @@
                                         <tbody>
                                             @forelse($report['ledger_rows'] as $item)
                                                 <tr>
-                                                    <td>{{ optional($item->voucher?->voucher_date_en)->format('Y-m-d') ?: optional($item->voucher)->voucher_date_fa }}
-                                                    </td>
+                                                    <td>{{ $item->voucher?->voucher_date_fa ?: verta_date($item->voucher?->voucher_date_en) }}</td>
                                                     <td>{{ optional($item->voucher)->voucher_number ?: '-' }}</td>
                                                     <td>{{ $item->description ?: optional($item->voucher)->description }}
                                                     </td>

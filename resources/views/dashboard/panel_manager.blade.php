@@ -1172,10 +1172,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                         @endif
                                                     </td>
                                                     <td class="pe-3 text-muted small">
-                                                        @php
-                                                            try { echo \Carbon\Carbon::parse($cust->created_at)->format('Y/m/d'); }
-                                                            catch(\Throwable $_) { echo '—'; }
-                                                        @endphp
+                                                        {{ verta_date($cust->created_at) }}
                                                     </td>
                                                 </tr>
                                                 @endforeach

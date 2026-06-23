@@ -579,14 +579,13 @@
                                                             @else
                                                                 <div>تخمین زمان: {{ $card->estimateText() }}</div>
                                                                 <div>شروع:
-                                                                    {{ optional($card->started_at)->format('Y-m-d H:i') ?: '-' }}
+                                                                    {{ verta_datetime($card->started_at) }}
                                                                     / پایان:
-                                                                    {{ optional($card->ended_at)->format('Y-m-d H:i') ?: '-' }}
+                                                                    {{ verta_datetime($card->ended_at) }}
                                                                 </div>
                                                             @endif
                                                             <div>اقدام بعدی:
-                                                                {{ optional($card->next_action_date_en)->format('Y-m-d') ?: '-' }}
-                                                                {{ $card->next_action_date_fa ? '/ ' . $card->next_action_date_fa : '' }}
+                                                                {{ $card->next_action_date_fa ?: verta_date($card->next_action_date_en) }}
                                                             </div>
                                                         </div>
                                                         @if ($cardLabels->isNotEmpty())

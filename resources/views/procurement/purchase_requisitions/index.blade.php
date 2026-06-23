@@ -56,8 +56,7 @@
                                                 <td>{{ $loop->iteration + ($purchaseRequisitions->currentPage() - 1) * $purchaseRequisitions->perPage() }}
                                                 </td>
                                                 <td>{{ $requisition->request_number }}</td>
-                                                <td>{{ $requisition->request_date_fa ?: optional($requisition->request_date_en)->format('Y-m-d') }}
-                                                </td>
+                                                <td>{{ $requisition->request_date_fa ?: verta_date($requisition->request_date_en) }}</td>
                                                 <td>{{ optional($requisition->store)->title }}</td>
                                                 <td>{{ ['low' => 'کم', 'normal' => 'عادی', 'high' => 'بالا', 'urgent' => 'فوری'][$requisition->priority] ?? $requisition->priority }}
                                                 </td>

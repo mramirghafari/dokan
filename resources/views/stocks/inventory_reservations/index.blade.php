@@ -124,8 +124,7 @@
                                                         <span class="badge bg-label-secondary">آزاد شده</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ optional($reservation->reserved_at)->format('Y-m-d H:i') ?: '-' }}
-                                                </td>
+                                                <td>{{ verta_datetime($reservation->reserved_at) }}</td>
                                             </tr>
                                         @empty
                                             <tr>

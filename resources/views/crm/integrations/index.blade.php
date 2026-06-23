@@ -271,8 +271,7 @@
                                                 <td><code
                                                         class="ltr-chip">{{ route('crm.integrations.voip.webhook', $connection) }}</code>
                                                 </td>
-                                                <td>{{ optional($connection->last_synced_at)->format('Y-m-d H:i') ?: '-' }}
-                                                </td>
+                                                <td>{{ verta_datetime($connection->last_synced_at) }}</td>
                                                 <td>{{ number_format($connection->logs_count) }}</td>
                                                 <td>
                                                     <form method="POST"
@@ -315,7 +314,7 @@
                                     <tbody>
                                         @forelse ($logs as $log)
                                             <tr>
-                                                <td>{{ optional($log->created_at)->format('Y-m-d H:i') }}</td>
+                                                <td>{{ verta_datetime($log->created_at) }}</td>
                                                 <td>{{ optional($log->connection)->title ?: '-' }}</td>
                                                 <td>{{ $log->operation }}<div class="text-muted small ltr-chip">
                                                         {{ $log->external_id }}</div>

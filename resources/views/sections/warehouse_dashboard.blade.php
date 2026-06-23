@@ -90,7 +90,7 @@
                                     <tbody>
                                         @forelse ($warehouseDashboard['recent_movements'] as $movement)
                                             <tr>
-                                                <td>{{ optional($movement->occurred_at)->format('Y-m-d') ?: '-' }}</td>
+                                                <td>{{ verta_date($movement->occurred_at) }}</td>
                                                 <td>{{ optional($movement->product)->title ?: '-' }}</td>
                                                 <td>{{ $movement->direction === 'out' ? 'خروج' : 'ورود' }}</td>
                                                 <td>{{ number_format((float) $movement->quantity, 3) }}</td>

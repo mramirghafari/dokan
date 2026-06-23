@@ -299,8 +299,7 @@
                                         <tbody>
                                             @foreach ($report['cardex'] as $movement)
                                                 <tr>
-                                                    <td>{{ optional($movement['occurred_at'])->format('Y-m-d H:i') ?: '-' }}
-                                                    </td>
+                                                    <td>{{ verta_datetime($movement['occurred_at']) }}</td>
                                                     <td>{{ $movement['store_title'] }}<br><small>{{ $movement['location_title'] }}</small>
                                                     </td>
                                                     <td>{{ $movement['movement_type'] }}</td>

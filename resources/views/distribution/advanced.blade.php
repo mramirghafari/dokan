@@ -225,8 +225,7 @@
                                                         class="text-muted">{{ $plan->title }}</small></td>
                                                 <td>{{ optional($plan->visitor)->name ?: optional($plan->visitor)->username }}
                                                 </td>
-                                                <td>{{ $plan->planned_date_fa ?: optional($plan->planned_date_en)->format('Y-m-d') }}
-                                                </td>
+                                                <td>{{ $plan->planned_date_fa ?: verta_date($plan->planned_date_en) }}</td>
                                                 <td>
                                                     <span
                                                         class="badge bg-label-{{ $plan->status === 'completed' ? 'success' : ($plan->status === 'planned' ? 'info' : 'secondary') }}">{{ $plan->status }}</span>

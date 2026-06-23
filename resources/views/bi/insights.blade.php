@@ -230,8 +230,7 @@
                                                         <td>{{ $forecast->domain }}<div class="text-muted small">
                                                                 {{ $forecast->metric_key }}</div>
                                                         </td>
-                                                        <td>{{ optional($forecast->forecast_date)->format('Y-m-d') }}
-                                                        </td>
+                                                        <td>{{ verta_date($forecast->forecast_date) }}</td>
                                                         <td>{{ number_format((float) $forecast->forecast_value, 2) }}
                                                             <div class="text-muted small">
                                                                 {{ number_format((float) $forecast->lower_bound, 2) }}

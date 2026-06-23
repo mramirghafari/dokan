@@ -37,8 +37,8 @@
                                         @foreach ($fiscalYears as $fiscalYear)
                                             <option value="{{ $fiscalYear->id }}" @selected($selectedFiscalYear && (int) $selectedFiscalYear->id === (int) $fiscalYear->id)>
                                                 {{ $fiscalYear->title }} |
-                                                {{ optional($fiscalYear->starts_at)->format('Y-m-d') }} تا
-                                                {{ optional($fiscalYear->ends_at)->format('Y-m-d') }} |
+                                                {{ verta_date($fiscalYear->starts_at) }} تا
+                                                {{ verta_date($fiscalYear->ends_at) }} |
                                                 {{ $fiscalYear->status === 'closed' ? 'بسته' : 'باز' }}
                                             </option>
                                         @endforeach
@@ -174,7 +174,7 @@
                                                 <td>{{ $closing->openingVoucher?->voucher_number }}</td>
                                                 <td class="text-end">
                                                     {{ number_format((float) $closing->total_debit) }}</td>
-                                                <td>{{ optional($closing->closed_at)->format('Y-m-d H:i') }}</td>
+                                                <td>{{ verta_datetime($closing->closed_at) }}</td>
                                             </tr>
                                         @empty
                                             <tr>

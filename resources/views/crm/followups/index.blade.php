@@ -204,9 +204,7 @@
                                                         <td>{{ $followup->typeText() }}<br><span
                                                                 class="badge bg-label-{{ in_array($followup->priority, ['high', 'urgent'], true) ? 'danger' : 'secondary' }}">{{ $followup->priorityText() }}</span>
                                                         </td>
-                                                        <td>{{ optional($followup->due_date_en)->format('Y-m-d') ?: '-' }}<br><small
-                                                                class="text-muted">{{ $followup->due_date_fa }}</small>
-                                                        </td>
+                                                        <td>{{ $followup->due_date_fa ?: verta_date($followup->due_date_en) }}</td>
                                                         <td>{{ optional($followup->assignedUser)->name ?: '-' }}</td>
                                                         <td>
                                                             <form method="POST"

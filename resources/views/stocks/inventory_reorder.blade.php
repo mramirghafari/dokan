@@ -191,8 +191,7 @@
                                                         @endif
                                                     </td>
                                                     <td>{{ number_format($row['suggested_cost']) }}</td>
-                                                    <td>{{ optional($row['last_movement_at'])->format('Y-m-d H:i') ?: '-' }}
-                                                    </td>
+                                                    <td>{{ verta_datetime($row['last_movement_at']) }}</td>
                                                     <td>
                                                         @if ($row['status'] === 'negative')
                                                             <span class="badge bg-label-danger">منفی</span>

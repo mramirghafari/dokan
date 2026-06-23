@@ -241,7 +241,7 @@
                                                             <div class="text-muted small">
                                                                 {{ $callLog->channelText() }}</div>
                                                         </td>
-                                                        <td>{{ optional($callLog->call_started_at)->format('Y-m-d H:i') ?: '-' }}
+                                                        <td>{{ verta_datetime($callLog->call_started_at) }}
                                                             <div class="text-muted small">
                                                                 {{ number_format($callLog->duration_seconds) }} ثانیه
                                                             </div>

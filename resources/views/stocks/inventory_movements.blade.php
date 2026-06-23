@@ -74,8 +74,7 @@
                                         @forelse ($movements as $movement)
                                             <tr>
                                                 <td>{{ $movements->firstItem() + $loop->index }}</td>
-                                                <td>{{ optional($movement->occurred_at)->format('Y-m-d H:i') ?: '-' }}
-                                                </td>
+                                                <td>{{ verta_datetime($movement->occurred_at) }}</td>
                                                 <td>{{ optional($movement->store)->title ?: '-' }}</td>
                                                 <td>{{ optional($movement->warehouseLocation)->path ?: 'بدون مکان' }}
                                                 </td>

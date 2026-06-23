@@ -227,7 +227,7 @@
                                             <tr>
                                                 <td>{{ optional($payment->customer)->name ?? '-' }}<div
                                                         class="text-muted small">
-                                                        {{ optional($payment->submitted_at)->format('Y-m-d H:i') }}
+                                                        {{ verta_datetime($payment->submitted_at) }}
                                                     </div>
                                                 </td>
                                                 <td>{{ $payment->pishfactor_id ? '#' . $payment->pishfactor_id : '-' }}
@@ -250,7 +250,7 @@
                                                         <span class="badge bg-label-success">سند
                                                             #{{ $payment->accountingVoucher->voucher_number }}</span>
                                                         <div class="text-muted small">
-                                                            {{ optional($payment->gateway_settled_at)->format('Y-m-d H:i') }}
+                                                            {{ verta_datetime($payment->gateway_settled_at) }}
                                                         </div>
                                                     @elseif ($payment->gateway_settlement_status === 'failed')
                                                         <span class="badge bg-label-danger">خطای سند</span>

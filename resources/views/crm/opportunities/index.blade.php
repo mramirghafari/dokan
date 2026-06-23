@@ -250,9 +250,7 @@
                                                                 class="badge bg-label-{{ in_array($opportunity->status, ['won'], true) ? 'success' : (in_array($opportunity->status, ['lost', 'canceled'], true) ? 'danger' : 'primary') }}">{{ $opportunity->stageText() }}</span><br><small
                                                                 class="text-muted">{{ $opportunity->priorityText() }}
                                                                 - {{ $opportunity->statusText() }}</small></td>
-                                                        <td>{{ optional($opportunity->next_action_date_en)->format('Y-m-d') ?: '-' }}<br><small
-                                                                class="text-muted">{{ $opportunity->next_action_date_fa }}</small>
-                                                        </td>
+                                                        <td>{{ $opportunity->next_action_date_fa ?: verta_date($opportunity->next_action_date_en) }}</td>
                                                         <td>
                                                             <form method="POST"
                                                                 action="{{ route('crm.opportunities.stage', $opportunity) }}"

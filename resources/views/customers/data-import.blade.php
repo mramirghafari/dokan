@@ -241,7 +241,7 @@
                                             <td>{{ $import->file_name ?: '—' }}</td>
                                             <td class="import-counts">{{ $import->success_rows }}/{{ $import->total_rows ?: '—' }}</td>
                                             <td class="import-failed">{{ $import->failed_rows ?: '—' }}</td>
-                                            <td>{{ optional($import->started_at)->format('Y/m/d H:i') ?: '—' }}</td>
+                                            <td>{{ verta_datetime($import->started_at) }}</td>
                                             <td>
                                                 @if ($hasErrorDetails)
                                                     <button type="button"

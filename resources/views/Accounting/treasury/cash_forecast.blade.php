@@ -273,8 +273,7 @@
                                             <tbody>
                                                 @forelse($report['due_cheques'] as $cheque)
                                                     <tr>
-                                                        <td>{{ optional($cheque->due_date)->format('Y-m-d') ?: '-' }}
-                                                        </td>
+                                                        <td>{{ verta_date($cheque->due_date) }}</td>
                                                         <td>{{ $cheque->cheque_number ?: '-' }}</td>
                                                         <td>{{ $cheque->direction === 'incoming' ? 'دریافتنی' : 'پرداختنی' }}
                                                         </td>

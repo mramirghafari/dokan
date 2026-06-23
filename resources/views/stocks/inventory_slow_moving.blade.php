@@ -164,8 +164,7 @@
                                                 <td>{{ number_format($row['sales_quantity'], 3) }}</td>
                                                 <td>{{ number_format($row['turnover_ratio'] * 100, 2) }}%</td>
                                                 <td>{{ number_format($row['stock_value']) }}</td>
-                                                <td>{{ optional($row['last_movement_at'])->format('Y-m-d H:i') ?: '-' }}
-                                                </td>
+                                                <td>{{ verta_datetime($row['last_movement_at']) }}</td>
                                                 <td>
                                                     @if ($row['status'] === 'stagnant')
                                                         <span class="badge bg-label-danger">راکد</span>
