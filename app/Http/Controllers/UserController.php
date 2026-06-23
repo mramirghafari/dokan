@@ -214,9 +214,7 @@ class UserController extends Controller
         $selectedUserScopes = $scopeService->userScopeValues($user);
         $userEdit = $user;
 
-        $leader_role = Role::where('title', 'leader')->first();
-        $expert_role = Role::where('title', 'expert')->first();
-        $leaderRoleIds = collect([$leader_role?->id, $expert_role?->id])->filter()->values()->all();
+        $leaderRoleIds = Role::whereIn('title', ['leader', 'expert'])->pluck('id')->toArray();
         $leader_Users = $leaderRoleIds ? DB::table('role_user')->whereIn('role_id', $leaderRoleIds)->pluck('user_id')->toArray() : [];
         $editedUserTenantId = $user->tenants_id ?: $user->tenant_id;
         $Leaders = User::whereIn('id', $leader_Users)
