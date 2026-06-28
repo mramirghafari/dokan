@@ -158,6 +158,47 @@
             align-items: center;
         }
 
+        body.login-page .password-field-wrap {
+            position: relative;
+        }
+
+        body.login-page .password-field-wrap .btn-password-toggle {
+            position: absolute;
+            top: 50%;
+            inset-inline-start: 12px;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            padding: 4px;
+            cursor: pointer;
+            color: #6c757d;
+            z-index: 5;
+            line-height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.login-page .password-field-wrap .btn-password-toggle:hover {
+            color: #543C92;
+        }
+
+        body.login-page .password-field-wrap .btn-password-toggle:focus-visible {
+            outline: 2px solid rgba(84, 60, 146, 0.35);
+            outline-offset: 2px;
+            border-radius: 0.35rem;
+        }
+
+        body.login-page .password-field-wrap .btn-password-toggle svg {
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+
+        body.login-page .password-field-wrap input.form-control {
+            padding-inline-start: 2.75rem;
+        }
+
         body.login-page .login-helper-link {
             color: #543C92;
             text-decoration: none;
@@ -371,13 +412,26 @@
                             <small>فراموش کرده‌اید؟</small>
                         </a>
                     </div>
-                    <div class="input-group input-group-merge">
+                    <div class="password-field-wrap position-relative">
                         <input class="form-control" type="password" required="" name="password" id="password"
                             autocomplete="current-password" placeholder="">
-                        <span class="input-group-text cursor-pointer" id="togglePassword" style="cursor:pointer">
-                            <x-ui.icon name="eye-off" id="icon-eye-off" />
-                            <x-ui.icon name="eye" id="icon-eye" style="display:none" />
-                        </span>
+                        <button type="button" class="btn-password-toggle" id="togglePassword"
+                            aria-label="نمایش رمز عبور">
+                            <svg class="icon-eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="icon-eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+                                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                                <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -551,22 +605,25 @@
     <script>
         (function () {
             var toggleBtn = document.getElementById('togglePassword');
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', function () {
-                    var input = document.getElementById('password');
-                    var iconOff = document.getElementById('icon-eye-off');
-                    var iconOn = document.getElementById('icon-eye');
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        if (iconOff) iconOff.style.display = 'none';
-                        if (iconOn) iconOn.style.display = '';
-                    } else {
-                        input.type = 'password';
-                        if (iconOff) iconOff.style.display = '';
-                        if (iconOn) iconOn.style.display = 'none';
-                    }
-                });
+            if (!toggleBtn) {
+                return;
             }
+
+            var input = document.getElementById('password');
+            var iconOpen = toggleBtn.querySelector('.icon-eye-open');
+            var iconClosed = toggleBtn.querySelector('.icon-eye-closed');
+
+            toggleBtn.addEventListener('click', function () {
+                var isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                toggleBtn.setAttribute('aria-label', isPassword ? 'پنهان کردن رمز عبور' : 'نمایش رمز عبور');
+                if (iconOpen) {
+                    iconOpen.style.display = isPassword ? 'none' : 'block';
+                }
+                if (iconClosed) {
+                    iconClosed.style.display = isPassword ? 'block' : 'none';
+                }
+            });
         })();
     </script>
     </body>
