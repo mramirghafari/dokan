@@ -164,7 +164,8 @@
 
         body.login-page .password-toggle-wrap .password-eye-btn {
             position: absolute !important;
-            inset-inline-start: 10px !important;
+            left: 10px !important;
+            right: auto !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
             border: 0 !important;
@@ -198,9 +199,9 @@
         }
 
         body.login-page .password-toggle-wrap .password-eye-btn svg {
-            width: 20px !important;
-            height: 20px !important;
-            display: block !important;
+            display: block;
+            width: 20px;
+            height: 20px;
             flex-shrink: 0 !important;
             opacity: 1 !important;
             visibility: visible !important;
@@ -208,8 +209,26 @@
             stroke: currentColor !important;
         }
 
-        body.login-page .password-toggle-wrap input.form-control#password {
-            padding-inline-start: 2.75rem !important;
+        body.login-page .password-toggle-wrap .password-eye-btn .icon-eye-open {
+            display: block !important;
+        }
+
+        body.login-page .password-toggle-wrap .password-eye-btn .icon-eye-off {
+            display: none !important;
+        }
+
+        body.login-page .password-toggle-wrap .password-eye-btn.is-visible .icon-eye-open {
+            display: none !important;
+        }
+
+        body.login-page .password-toggle-wrap .password-eye-btn.is-visible .icon-eye-off {
+            display: block !important;
+        }
+
+        body.login-page .password-toggle-wrap input[type="password"],
+        body.login-page .password-toggle-wrap input[type="text"] {
+            padding-left: 2.75rem !important;
+            padding-right: 1rem !important;
         }
 
         body.login-page .login-helper-link {
@@ -427,10 +446,9 @@
                     </div>
                     <div class="position-relative mb-0 password-toggle-wrap">
                         <input class="form-control" type="password" required="" name="password" id="password"
-                            autocomplete="current-password" placeholder="" style="padding-inline-start: 2.75rem;">
+                            autocomplete="current-password" placeholder="">
                         <button type="button" id="togglePassword" class="password-eye-btn"
-                            aria-label="نمایش رمز عبور"
-                            style="position:absolute; inset-inline-start:10px; top:50%; transform:translateY(-50%); border:0; background:transparent; padding:6px; min-width:40px; min-height:40px; cursor:pointer; color:#697a8d; display:flex; align-items:center; justify-content:center; z-index:10; opacity:1; visibility:visible;">
+                            aria-label="نمایش رمز عبور">
                             <svg class="icon-eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -439,7 +457,7 @@
                             </svg>
                             <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
                                 <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
                                 <line x1="1" y1="1" x2="23" y2="23"></line>
@@ -618,19 +636,10 @@
     <script>
         document.getElementById('togglePassword')?.addEventListener('click', function () {
             var pwd = document.getElementById('password');
-            var open = this.querySelector('.icon-eye-open');
-            var off = this.querySelector('.icon-eye-off');
-            if (pwd.type === 'password') {
-                pwd.type = 'text';
-                open.style.display = 'none';
-                off.style.display = 'block';
-                this.setAttribute('aria-label', 'پنهان کردن رمز عبور');
-            } else {
-                pwd.type = 'password';
-                open.style.display = 'block';
-                off.style.display = 'none';
-                this.setAttribute('aria-label', 'نمایش رمز عبور');
-            }
+            var showing = pwd.type === 'text';
+            pwd.type = showing ? 'password' : 'text';
+            this.classList.toggle('is-visible', !showing);
+            this.setAttribute('aria-label', showing ? 'نمایش رمز عبور' : 'پنهان کردن رمز عبور');
         });
     </script>
     </body>
