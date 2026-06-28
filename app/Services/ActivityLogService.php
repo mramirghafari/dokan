@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Models\Log;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log as Logger;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 class ActivityLogService
 {
@@ -30,6 +32,26 @@ class ActivityLogService
         'login' => 'bg-label-primary',
         'logout' => 'bg-label-secondary',
         'failed_login' => 'bg-label-warning',
+    ];
+
+    public const SECTION_LABELS = [
+        'auth' => 'احراز هویت',
+        'crm' => 'CRM',
+        'accounting' => 'مالی و حسابداری',
+        'warehouse' => 'انبار',
+        'sales' => 'فروش و بازاریابی',
+        'invoice' => 'فاکتور',
+        'product' => 'محصول',
+        'procurement' => 'تدارکات',
+        'report' => 'گزارش',
+        'settings' => 'تنظیمات',
+        'users' => 'کاربران',
+        'roles' => 'نقش و دسترسی',
+        'organization' => 'سازمان',
+        'delivery' => 'تحویل',
+        'contracting' => 'پیمانکاری',
+        'bi' => 'هوش تجاری',
+        'system' => 'سیستم',
     ];
 
     public static function log(
@@ -67,6 +89,42 @@ class ActivityLogService
         }
 
         return Log::create($attributes);
+    }
+
+    public static function safeLog(
+        string $action,
+        ?string $description = null,
+        ?int $userId = null,
+        array $context = []
+    ): ?Log {
+        try {
+            return self::log($action, $description, $userId, $context);
+        } catch (Throwable $exception) {
+            Logger::warning('Activity log failed', [
+                'action' => $action,
+                'description' => $description,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    public static function safeLogModel(string $action, string $description, ?Model $source = null, array $context = []): ?Log
+    {
+        try {
+            return self::logModel($action, $description, $source, $context);
+        } catch (Throwable $exception) {
+            Logger::warning('Activity log failed', [
+                'action' => $action,
+                'description' => $description,
+                'source_type' => $source ? get_class($source) : null,
+                'source_id' => $source?->getKey(),
+                'message' => $exception->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 
     public static function logModel(string $action, string $description, ?Model $source = null, array $context = []): ?Log

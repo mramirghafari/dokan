@@ -34,7 +34,7 @@ class EmployeeController extends Controller
 
         $employee = Employee::create($data);
 
-        ActivityLogService::logModel('create', 'یک پرسنل ایجاد شد' . '-' . $employee->name, $employee);
+        ActivityLogService::safeLogModel('create', 'یک پرسنل ایجاد شد' . '-' . $employee->name, $employee);
 
         Alert::success('تشکر', 'پرسنل با موفقیت ایجاد شد');
         return redirect()->route('employees.index');
@@ -56,7 +56,7 @@ class EmployeeController extends Controller
 
         $employee->update($data);
 
-        ActivityLogService::logModel('update', 'یک پرسنل ویرایش شد' . '-' . $employee->name, $employee);
+        ActivityLogService::safeLogModel('update', 'یک پرسنل ویرایش شد' . '-' . $employee->name, $employee);
 
         Alert::success('تشکر', 'پرسنل با موفقیت ویرایش شد');
         return redirect()->route('employees.index');

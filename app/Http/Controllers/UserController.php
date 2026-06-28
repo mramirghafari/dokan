@@ -127,7 +127,7 @@ class UserController extends Controller
         app(\App\Services\PanelMembershipService::class)->syncMembership($user, (int) $tenantId, (int) $organizationId ?: null);
         $scopeService->syncUserScopes($user, $tenantId, $this->scopesFromRequest($request, $organizationId), $currentUser->id);
 
-        ActivityLogService::logModel('create', 'یک کاربر ایجاد شد' . '-' . $user->name, $user);
+        ActivityLogService::safeLogModel('create', 'یک کاربر ایجاد شد' . '-' . $user->name, $user);
 
         try {
             $receptor = $user->mobile;
@@ -328,7 +328,7 @@ class UserController extends Controller
         }
 
 
-        ActivityLogService::logModel('update', 'کاربر ویرایش شد' . '-' . $user->name, $user);
+        ActivityLogService::safeLogModel('update', 'کاربر ویرایش شد' . '-' . $user->name, $user);
 
         Alert::success('تشکر', 'رکورد با موفقیت ویرایش شد');
         return back();
@@ -580,7 +580,7 @@ class UserController extends Controller
         $me = Auth::user();
 
         $user->delete();
-        ActivityLogService::logModel('delete', 'کاربر حذف شد' . '-' . $user->name, $user);
+        ActivityLogService::safeLogModel('delete', 'کاربر حذف شد' . '-' . $user->name, $user);
 
         Alert::success('تشکر', 'کاربر با موفقیت حذف شد');
         return redirect()->route('users.index');

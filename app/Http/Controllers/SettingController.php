@@ -210,7 +210,7 @@ class SettingController extends Controller
         $tenant = Tenants::find($targetTenantId);
         $user = auth()->user();
 
-        ActivityLogService::log('update', 'تنظیمات پنل ویرایش شد' . ($tenant ? ' - ' . $tenant->name : ''), $user->id, [
+        ActivityLogService::safeLog('update', 'تنظیمات پنل ویرایش شد' . ($tenant ? ' - ' . $tenant->name : ''), $user->id, [
             'section' => 'settings',
             'event_key' => 'settings.update',
         ]);

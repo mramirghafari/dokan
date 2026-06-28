@@ -40,6 +40,7 @@ class ActivityLogController extends Controller
 
         $query->when($request->filled('user_id'), fn ($builder) => $builder->where('user_id', (int) $request->user_id))
             ->when($request->filled('action'), fn ($builder) => $builder->where('action', $request->action))
+            ->when($request->filled('section'), fn ($builder) => $builder->where('section', $request->section))
             ->when($request->filled('search'), function ($builder) use ($request) {
                 $term = '%' . trim((string) $request->search) . '%';
                 $builder->where(function ($inner) use ($term) {
@@ -56,7 +57,8 @@ class ActivityLogController extends Controller
             'users' => $this->teamUsers($user),
             'actionLabels' => self::ACTION_LABELS,
             'actionBadges' => self::ACTION_BADGES,
-            'filters' => $request->only(['user_id', 'action', 'search']),
+            'sectionLabels' => ActivityLogService::SECTION_LABELS,
+            'filters' => $request->only(['user_id', 'action', 'section', 'search']),
         ]);
     }
 

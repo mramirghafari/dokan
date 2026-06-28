@@ -59,7 +59,7 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <label class="form-label" for="action">عملیات</label>
                                         <select class="form-select" id="action" name="action">
                                             <option value="">همه عملیات</option>
@@ -70,7 +70,18 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-2">
+                                        <label class="form-label" for="section">بخش</label>
+                                        <select class="form-select" id="section" name="section">
+                                            <option value="">همه بخش‌ها</option>
+                                            @foreach ($sectionLabels as $key => $label)
+                                                <option value="{{ $key }}"
+                                                    @selected(($filters['section'] ?? '') === $key)>{{ $label }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
                                         <label class="form-label" for="search">جستجو</label>
                                         <input class="form-control" id="search" name="search" type="text"
                                             value="{{ $filters['search'] ?? '' }}"
@@ -112,7 +123,7 @@
                                                         {{ $actionLabels[$actionKey] ?? $log->action }}
                                                     </span>
                                                     @if ($log->section)
-                                                        <div class="text-muted small">{{ $log->section }}</div>
+                                                        <div class="text-muted small">{{ $sectionLabels[$log->section] ?? $log->section }}</div>
                                                     @endif
                                                 </td>
                                                 <td class="activity-log-description">{{ $log->description }}</td>
