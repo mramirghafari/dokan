@@ -131,7 +131,7 @@
                             <span class="badge bg-danger rounded-pill badge-notifications">{{ count($MyNotifs) }}</span>
                         @endif
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end py-0">
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-notifications-menu py-0">
                         <li class="dropdown-menu-header border-bottom">
                             <div class="dropdown-header d-flex align-items-center py-3">
                                 <h5 class="text-body mb-0 me-auto">اعلانات</h5>
