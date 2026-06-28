@@ -1441,6 +1441,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
 <script src="{{ asset('assets/') }}/vendor/libs/jquery/jquery.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/popper/popper.js"></script>
 <script src="{{ asset('assets/') }}/vendor/js/bootstrap.js"></script>
+<script src="{{ asset('assets/') }}/vendor/js/helpers.js"></script>
 <script src="{{ asset('assets/') }}/vendor/libs/apex-charts/apexcharts.js"></script>
 <script src="{{ asset('assets/') }}/vendor/js/menu.js"></script>
 <script src="{{ asset('assets/') }}/js/main.js"></script>
