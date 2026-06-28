@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Log;
 use App\Models\User;
+use App\Services\ActivityLogService;
 use App\Services\TenantContextService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,15 +12,9 @@ use Illuminate\Support\Facades\Schema;
 
 class ActivityLogController extends Controller
 {
-    private const ACTION_LABELS = [
-        'create' => 'ایجاد',
-        'update' => 'ویرایش',
-        'delete' => 'حذف',
-        'restore' => 'بازیابی',
-        'forceDelete' => 'حذف دائم',
-        'login' => 'ورود',
-        'logout' => 'خروج',
-    ];
+    private const ACTION_LABELS = ActivityLogService::ACTION_LABELS;
+
+    private const ACTION_BADGES = ActivityLogService::ACTION_BADGES;
 
     public function __construct()
     {
@@ -40,8 +35,7 @@ class ActivityLogController extends Controller
             ->orderByDesc('id');
 
         if ((int) $user->isGod !== 1) {
-            $teamUserIds = $this->teamUserIds($user);
-            $query->whereIn('user_id', $teamUserIds);
+            $this->applyTeamScope($query, $user);
         }
 
         $query->when($request->filled('user_id'), fn ($builder) => $builder->where('user_id', (int) $request->user_id))
@@ -61,8 +55,25 @@ class ActivityLogController extends Controller
             'logs' => $logs,
             'users' => $this->teamUsers($user),
             'actionLabels' => self::ACTION_LABELS,
+            'actionBadges' => self::ACTION_BADGES,
             'filters' => $request->only(['user_id', 'action', 'search']),
         ]);
+    }
+
+    private function applyTeamScope($query, User $user): void
+    {
+        $teamUserIds = $this->teamUserIds($user);
+        $tenantId = app(TenantContextService::class)->tenantId($user);
+
+        $query->where(function ($inner) use ($teamUserIds, $tenantId) {
+            $inner->whereIn('user_id', $teamUserIds);
+
+            if ($tenantId && Schema::hasColumn('logs', 'tenant_id')) {
+                $inner->orWhere(function ($tenantScoped) use ($tenantId) {
+                    $tenantScoped->where('tenant_id', $tenantId)->whereNull('user_id');
+                });
+            }
+        });
     }
 
     public static function canViewActivityLogs(?User $user): bool

@@ -107,8 +107,9 @@
                                                 <td>{{ verta_datetime($log->getRawOriginal('created_at')) }}</td>
                                                 <td>{{ optional($log->user)->name ?: 'کاربر ناشناس' }}</td>
                                                 <td>
-                                                    <span class="badge bg-label-secondary">
-                                                        {{ $actionLabels[strtolower($log->action)] ?? $log->action }}
+                                                    @php($actionKey = strtolower((string) $log->action))
+                                                    <span class="badge {{ $actionBadges[$actionKey] ?? 'bg-label-secondary' }}">
+                                                        {{ $actionLabels[$actionKey] ?? $log->action }}
                                                     </span>
                                                     @if ($log->section)
                                                         <div class="text-muted small">{{ $log->section }}</div>
