@@ -330,7 +330,7 @@
                                                                         <option
                                                                             value="{{ \Auth::user()->organization_id }}"
                                                                             selected>
-                                                                            {{ \Auth::user()->organization->title }}
+                                                                            {{ optional(\Auth::user()->organization)->title ?? '—' }}
                                                                         </option>
                                                                     @endif
                                                                 </select>

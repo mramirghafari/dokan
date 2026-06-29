@@ -94,7 +94,7 @@
                                                     @endforeach
                                                 @else
                                                     <option value="{{ \Auth::user()->organization_id }}">
-                                                        {{ \Auth::user()->organization->title }}</option>
+                                                        {{ optional(\Auth::user()->organization)->title ?? '—' }}</option>
                                                 @endif
                                             </select>
                                         </div>

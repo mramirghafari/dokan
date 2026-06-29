@@ -107,8 +107,8 @@
                                             <tr>
                                                 <td>{{ $x }}</td>
                                                 <td><small>{{ $store->title }}</small></td>
-                                                <td><small>{{ $store->organization->title }}</small></td>
-                                                <td><small>{{ $store->organization->title }}</small></td>
+                                                <td><small>{{ optional($store->organization)->title ?? '—' }}</small></td>
+                                                <td><small>{{ optional($store->organization)->title ?? '—' }}</small></td>
                                                 <td>
                                                     <small>@if ($store->isActive == 1)
                                                             <div class='badge badge-success'>فعال</div>

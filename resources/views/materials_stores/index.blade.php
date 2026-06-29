@@ -68,7 +68,7 @@
                                                     @endforeach
                                                 @else
                                                     <option value="{{ \Auth::user()->organization_id }}">
-                                                        {{ \Auth::user()->organization->title }}</option>
+                                                        {{ optional(\Auth::user()->organization)->title ?? '—' }}</option>
                                                 @endif
                                             </select>
                                         </div>
@@ -107,8 +107,8 @@
                                             <tr>
                                                 <td>{{ $x }}</td>
                                                 <td>{{ $store->title }}</td>
-                                                <td><small>{{ $store->organization->title }}</small></td>
-                                                <td><small>{{ $store->organization->title }}</small></td>
+                                                <td><small>{{ optional($store->organization)->title ?? '—' }}</small></td>
+                                                <td><small>{{ optional($store->organization)->title ?? '—' }}</small></td>
                                                 <td>
                                                    <small>
                                                        @if ($store->isActive == 1)
