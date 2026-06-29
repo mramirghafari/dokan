@@ -430,7 +430,7 @@ class SettingController extends Controller
         );
     }
 
-    private function normalizeValue($value, array $definition): ?string
+    private function normalizeValue(mixed $value, array $definition): ?string
     {
         $type = $definition['type'] ?? 'text';
         $default = $definition['default'] ?? null;
@@ -440,26 +440,82 @@ class SettingController extends Controller
         }
 
         if ($type === 'number') {
-            return is_numeric($value) ? (string) $value : (string) $default;
+            return is_numeric($value) ? (string) $value : $this->stringifySettingScalar($default);
         }
 
         if ($type === 'select') {
-            return array_key_exists((string) $value, $definition['options'] ?? []) ? (string) $value : (string) $default;
+            return array_key_exists((string) $value, $definition['options'] ?? [])
+                ? (string) $value
+                : $this->stringifySettingScalar($default);
         }
 
         if ($type === 'multiselect') {
-            $values = is_array($value) ? $value : [$value];
+            $values = is_array($value) ? $value : ($value === null || $value === '' ? [] : [$value]);
             $allowed = array_keys($definition['options'] ?? []);
             $normalized = array_values(array_intersect(array_map('strval', $values), $allowed));
 
-            if (empty($normalized)) {
-                $normalized = is_array($default) ? $default : [$default];
+            if ($normalized === []) {
+                $normalized = is_array($default) ? $default : ($default === null || $default === '' ? [] : [(string) $default]);
             }
 
-            return json_encode(array_values(array_filter($normalized)));
+            return json_encode(array_values(array_filter($normalized)), JSON_UNESCAPED_UNICODE);
         }
 
-        return $value !== null ? trim((string) $value) : $default;
+        if ($type === 'json') {
+            if ($value === null || $value === '') {
+                return $this->stringifySettingDefault($default ?? []);
+            }
+
+            if (is_array($value)) {
+                return json_encode($value, JSON_UNESCAPED_UNICODE);
+            }
+
+            $decoded = json_decode((string) $value, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return json_encode($decoded, JSON_UNESCAPED_UNICODE);
+            }
+
+            return trim((string) $value);
+        }
+
+        if ($value === null || $value === '') {
+            return $this->stringifySettingDefault($default);
+        }
+
+        if (is_array($value)) {
+            $filtered = array_values(array_filter($value, fn ($item) => $item !== null && $item !== ''));
+
+            return json_encode($filtered, JSON_UNESCAPED_UNICODE);
+        }
+
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+
+        return trim((string) $value);
+    }
+
+    private function stringifySettingDefault(mixed $default): ?string
+    {
+        if ($default === null || $default === '') {
+            return null;
+        }
+
+        if (is_array($default)) {
+            return json_encode($default, JSON_UNESCAPED_UNICODE);
+        }
+
+        if (is_bool($default)) {
+            return $default ? '1' : '0';
+        }
+
+        return trim((string) $default);
+    }
+
+    private function stringifySettingScalar(mixed $default): string
+    {
+        return $this->stringifySettingDefault($default) ?? '';
     }
 
     private function castSettingValueForView($value, array $definition)
