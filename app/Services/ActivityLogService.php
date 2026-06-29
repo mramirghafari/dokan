@@ -75,7 +75,7 @@ class ActivityLogService
             'tenant_id' => $context['tenant_id'] ?? $tenantContext->tenantId($user),
             'organization_id' => $context['organization_id'] ?? $tenantContext->organizationId($user),
             'section' => $context['section'] ?? null,
-            'section_id' => $context['section_id'] ?? null,
+            'section_id' => $context['section_id'] ?? 0,
             'event_key' => $context['event_key'] ?? null,
             'source_type' => $context['source_type'] ?? null,
             'source_id' => $context['source_id'] ?? null,
@@ -149,7 +149,7 @@ class ActivityLogService
 
     public static function logLogin(User $user): ?Log
     {
-        return self::log('login', 'ورود به سیستم - ' . $user->name, $user->id, [
+        return self::safeLog('login', 'ورود به سیستم - ' . $user->name, $user->id, [
             'section' => 'auth',
             'event_key' => 'auth.login',
             'payload' => ['user_name' => $user->name],
@@ -158,7 +158,7 @@ class ActivityLogService
 
     public static function logLogout(User $user): ?Log
     {
-        return self::log('logout', 'خروج از سیستم - ' . $user->name, $user->id, [
+        return self::safeLog('logout', 'خروج از سیستم - ' . $user->name, $user->id, [
             'section' => 'auth',
             'event_key' => 'auth.logout',
             'payload' => ['user_name' => $user->name],
@@ -192,6 +192,6 @@ class ActivityLogService
             $context['organization_id'] = $tenantContext->organizationId($user);
         }
 
-        return self::log('failed_login', $description, $user?->id, $context);
+        return self::safeLog('failed_login', $description, $user?->id, $context);
     }
 }
