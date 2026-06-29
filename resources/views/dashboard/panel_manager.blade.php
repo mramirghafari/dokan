@@ -89,6 +89,30 @@ try {
     $prevMonthStart = now()->subMonth()->startOfMonth();
     $prevMonthEnd   = now()->subMonth()->endOfMonth();
 
+    /* ── Role IDs (app uses role_user, not model_has_roles) ── */
+    try {
+        $supervisorRoleIds = \DB::table('roles')->whereNull('deleted_at')
+            ->where(function ($q) {
+                $q->whereIn('title', ['leader', 'expert'])
+                    ->orWhere('description', 'like', '%سرپرست%');
+            })->pluck('id')->toArray();
+        $salesTeamRoleIds = \DB::table('roles')->whereNull('deleted_at')
+            ->where(function ($q) {
+                $q->whereIn('title', ['sales_manager', 'leader', 'expert', 'visitor'])
+                    ->orWhere('description', 'like', '%سرپرست%');
+            })->pluck('id')->toArray();
+        $marketerRoleIds = \DB::table('roles')->whereNull('deleted_at')
+            ->whereIn('title', ['visitor', 'expert', 'bazaryab'])
+            ->pluck('id')->toArray();
+        $personnelRoleIds = \DB::table('roles')->whereNull('deleted_at')
+            ->whereIn('title', ['leader', 'expert', 'visitor', 'driver', 'sales_manager', 'accountant'])
+            ->pluck('id')->toArray();
+        $driverRoleIds = \DB::table('roles')->whereNull('deleted_at')
+            ->where('title', 'driver')->pluck('id')->toArray();
+    } catch (\Throwable $_) {
+        $supervisorRoleIds = $salesTeamRoleIds = $marketerRoleIds = $personnelRoleIds = $driverRoleIds = [];
+    }
+
     /* ══════════════════════════════
        STAT CARDS
     ══════════════════════════════ */
@@ -110,10 +134,9 @@ try {
     /* پرسنل — users with sales roles */
     try {
         $personnelCount = \DB::table('users as u')
-            ->join('model_has_roles as mhr', fn($j) =>
-                $j->on('mhr.model_id','=','u.id')->where('mhr.model_type','App\Models\User'))
-            ->join('roles as r','r.id','=','mhr.role_id')
-            ->whereIn('r.title',['leader','expert','visitor','driver','sales_manager','accountant'])
+            ->join('role_user as ru', 'ru.user_id', '=', 'u.id')
+            ->join('roles as r', 'r.id', '=', 'ru.role_id')
+            ->whereIn('r.id', $personnelRoleIds)
             ->whereRaw("u.organization_id LIKE ?", ["%{$orgId}%"])
             ->whereNull('u.deleted_at')->where('u.isActive',1)
             ->distinct()->count('u.id');
@@ -202,14 +225,21 @@ try {
     ══════════════════════════════ */
     try {
         $salesTeamUsers = \DB::table('users as u')
-            ->join('model_has_roles as mhr', fn($j)=>
-                $j->on('mhr.model_id','=','u.id')->where('mhr.model_type','App\Models\User'))
-            ->join('roles as r','r.id','=','mhr.role_id')
-            ->whereIn('r.title',['sales_manager','leader','visitor'])
+            ->join('role_user as ru', 'ru.user_id', '=', 'u.id')
+            ->join('roles as r', 'r.id', '=', 'ru.role_id')
+            ->whereIn('r.id', $salesTeamRoleIds)
             ->whereRaw("u.organization_id LIKE ?", ["%{$orgId}%"])
             ->whereNull('u.deleted_at')->where('u.isActive',1)
             ->select(['u.id','u.name','u.leader_id','r.title as role'])
             ->distinct()->get();
+
+        /* expert role = supervisor in UI */
+        $salesTeamUsers = $salesTeamUsers->map(function ($u) {
+            if ($u->role === 'expert') {
+                $u->role = 'leader';
+            }
+            return $u;
+        });
 
         /* Invoice stats this month */
         $ldStats = \DB::table('pishfactors')->where('organization_id',$orgId)
@@ -334,10 +364,9 @@ try {
     ══════════════════════════════ */
     try {
         $supervisorRows = \DB::table('users as u')
-            ->join('model_has_roles as mhr', fn($j) =>
-                $j->on('mhr.model_id','=','u.id')->where('mhr.model_type','App\Models\User'))
-            ->join('roles as r','r.id','=','mhr.role_id')
-            ->where('r.title','leader')
+            ->join('role_user as ru', 'ru.user_id', '=', 'u.id')
+            ->join('roles as r', 'r.id', '=', 'ru.role_id')
+            ->whereIn('r.id', $supervisorRoleIds)
             ->whereRaw("u.organization_id LIKE ?", ["%{$orgId}%"])
             ->whereNull('u.deleted_at')->where('u.isActive',1)
             ->select('u.id','u.name')
@@ -374,10 +403,9 @@ try {
     ══════════════════════════════ */
     try {
         $marketerRows = \DB::table('users as u')
-            ->join('model_has_roles as mhr', fn($j) =>
-                $j->on('mhr.model_id','=','u.id')->where('mhr.model_type','App\Models\User'))
-            ->join('roles as r','r.id','=','mhr.role_id')
-            ->whereIn('r.title',['visitor','expert','bazaryab'])
+            ->join('role_user as ru', 'ru.user_id', '=', 'u.id')
+            ->join('roles as r', 'r.id', '=', 'ru.role_id')
+            ->whereIn('r.id', $marketerRoleIds)
             ->whereRaw("u.organization_id LIKE ?", ["%{$orgId}%"])
             ->whereNull('u.deleted_at')->where('u.isActive',1)
             ->select('u.id','u.name','u.leader_id')
@@ -490,10 +518,9 @@ try {
     ══════════════════════════════ */
     try {
         $driverCount = \DB::table('users as u')
-            ->join('model_has_roles as mhr',fn($j)=>
-                $j->on('mhr.model_id','=','u.id')->where('mhr.model_type','App\Models\User'))
-            ->join('roles as r','r.id','=','mhr.role_id')
-            ->where('r.title','driver')
+            ->join('role_user as ru', 'ru.user_id', '=', 'u.id')
+            ->join('roles as r', 'r.id', '=', 'ru.role_id')
+            ->whereIn('r.id', $driverRoleIds)
             ->whereRaw("u.organization_id LIKE ?", ["%{$orgId}%"])
             ->whereNull('u.deleted_at')->where('u.isActive',1)
             ->distinct()->count('u.id');
