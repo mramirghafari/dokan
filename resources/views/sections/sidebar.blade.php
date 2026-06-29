@@ -584,7 +584,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
         @endif
 
         @canany(['customers-add', 'customers'])
-            <li class="menu-item customers {{ Request::routeIs(['customers.index', 'customers.show', 'customers.360', 'customers.search', 'customers.edit', 'customers.update', 'customers.trashed', 'customers.create', 'customers.createdByMe', 'customers.activeCustomers', 'customers.orders', 'tasks.CustomerInfo', 'customers.data-import.*', 'crm.dashboard.*', 'crm.health.*', 'crm.workbench.*', 'crm.followups.*', 'crm.leads.*', 'crm.service-tickets.*', 'crm.call-center.*', 'crm.campaigns.*', 'crm.loyalty.*', 'crm.customer-portal.*', 'crm.public-api.*', 'crm.integrations.*', 'crm.employee-performance.*', 'crm.opportunities.*', 'crm.sales-boards.*']) ? 'active' : '' }}"
+            <li class="menu-item customers {{ Request::routeIs(['customers.index', 'customers.show', 'customers.360', 'customers.search', 'customers.edit', 'customers.update', 'customers.trashed', 'customers.create', 'customers.createdByMe', 'customers.activeCustomers', 'customers.orders', 'tasks.CustomerInfo', 'customers.data-import.*', 'customer-groups.*', 'crm.dashboard.*', 'crm.health.*', 'crm.workbench.*', 'crm.followups.*', 'crm.leads.*', 'crm.service-tickets.*', 'crm.call-center.*', 'crm.campaigns.*', 'crm.loyalty.*', 'crm.customer-portal.*', 'crm.public-api.*', 'crm.integrations.*', 'crm.employee-performance.*', 'crm.opportunities.*', 'crm.sales-boards.*']) ? 'active' : '' }}"
                 data-menu-key="customers">
                 <a class="menu-link menu-toggle" href="javascript:void(0);">
                     <svg width="22" height="22" viewBox="0 0 19 19" fill="none"
@@ -613,6 +613,11 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                     @endcan
 
                     @can('customers')
+                        <li class="menu-item customer-groups {{ Request::routeIs(['customer-groups.*']) ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('customer-groups.index') }}">
+                                <div>گروه مشتری</div>
+                            </a>
+                        </li>
                         <li class="menu-item search {{ Request::routeIs(['customers.search']) ? 'active' : '' }}">
                             <a class="menu-link" href="{{ route('customers.search') }}">
                                 <div>جستجوی مشتری</div>

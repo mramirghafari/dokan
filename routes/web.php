@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\CustomerGroupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -123,6 +124,7 @@ Route::middleware(['auth', 'panel.active'])->group(function () {
     Route::get('productsByStore/{store?}', "ProductController@productsByStore")->name('products.productsByStore');
 
     //Customers
+    Route::resource('customer-groups', CustomerGroupController::class)->except('create', 'show');
     Route::get('customers/datatable', "CustomersController@datatable")->name('customers.datatable');
     Route::post('customers/list-columns', "CustomersController@saveListColumns")->name('customers.list-columns.save');
     Route::get('customers/data-import', "CustomerDataImportController@index")->name('customers.data-import.index');

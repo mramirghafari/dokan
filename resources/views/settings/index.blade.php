@@ -30,6 +30,10 @@
             gap: .75rem;
         }
 
+        .setting-row--wide {
+            grid-column: 1 / -1;
+        }
+
         .setting-row__control {
             width: 100%;
         }
@@ -364,7 +368,7 @@
                                                         ? json_encode($organizationValue, JSON_UNESCAPED_UNICODE)
                                                         : ($organizationValue ?? '');
                                                 @endphp
-                                                <div class="setting-row" id="tour-setting-{{ $settingKey }}">
+                                                <div class="setting-row @if (($setting['type'] ?? 'text') === 'field_rules') setting-row--wide @endif" id="tour-setting-{{ $settingKey }}">
                                                     <div class="setting-row__head">
                                                         <label class="form-label mb-1"
                                                             for="setting_{{ $settingKey }}">{{ $setting['label'] }}</label>
@@ -414,6 +418,48 @@
                                                                         {{ $label }}</option>
                                                                 @endforeach
                                                             </select>
+                                                        @elseif (($setting['type'] ?? 'text') === 'field_rules')
+                                                            @php
+                                                                $formKey = $setting['form'] ?? 'customer';
+                                                                $fieldCatalog = $formKey === 'invoice'
+                                                                    ? app(\App\Services\FormFieldRuleService::class)->invoiceFieldCatalog()
+                                                                    : app(\App\Services\FormFieldRuleService::class)->customerFieldCatalog();
+                                                                $fieldRules = is_array($setting['value'])
+                                                                    ? $setting['value']
+                                                                    : [];
+                                                                $resolvedRules = app(\App\Services\FormFieldRuleService::class)->normalizeSavedRules($formKey, $fieldRules);
+                                                            @endphp
+                                                            @if (!empty($setting['description']))
+                                                                <small class="text-muted d-block mb-2">{{ $setting['description'] }}</small>
+                                                            @endif
+                                                            <div class="table-responsive">
+                                                                <table class="table table-sm table-bordered mb-0">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>فیلد</th>
+                                                                            <th class="text-center">الزامی</th>
+                                                                            <th class="text-center">اختیاری</th>
+                                                                            <th class="text-center">مخفی</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach ($fieldCatalog as $fieldKey => $fieldDefinition)
+                                                                            @php $currentRule = $resolvedRules[$fieldKey] ?? ($fieldDefinition['default'] ?? 'optional'); @endphp
+                                                                            <tr>
+                                                                                <td>{{ $fieldDefinition['label'] }}</td>
+                                                                                @foreach (['required', 'optional', 'hidden'] as $ruleValue)
+                                                                                    <td class="text-center">
+                                                                                        <input type="radio"
+                                                                                            name="settings[{{ $settingKey }}][{{ $fieldKey }}]"
+                                                                                            value="{{ $ruleValue }}"
+                                                                                            @if ($currentRule === $ruleValue) checked @endif />
+                                                                                    </td>
+                                                                                @endforeach
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
                                                         @elseif (($setting['type'] ?? 'text') === 'number')
                                                             <input class="form-control"
                                                                 id="setting_{{ $settingKey }}"

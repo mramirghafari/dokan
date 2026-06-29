@@ -837,6 +837,14 @@ class InvoiceController extends Controller
         $visitor_id = $user->id;
         $sarparast_id = $user->leader_id;
         $Customer = $customer_id ? Customers::find($customer_id) : null;
+
+        $invoiceFieldRules = app(\App\Services\FormFieldRuleService::class);
+        if ($invoiceFieldRules->isRequired('invoice', 'customer') && (!$customer_id || !$Customer)) {
+            Alert::warning('خطا در ثبت سفارش', 'انتخاب مشتری برای این پنل الزامی است');
+
+            return back()->withInput();
+        }
+
         $Area = $Customer ? Area::find($Customer->area) : null;
         $Region = $Area ? Region::find($Area->region_id) : null;
 

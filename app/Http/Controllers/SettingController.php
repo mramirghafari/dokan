@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\TenantFeature;
 use App\Models\Tenants;
 use App\Services\ActivityLogService;
+use App\Services\FormFieldRuleService;
 use App\Services\SettingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -461,6 +462,16 @@ class SettingController extends Controller
             return json_encode(array_values(array_filter($normalized)), JSON_UNESCAPED_UNICODE);
         }
 
+        if ($type === 'field_rules') {
+            $form = $definition['form'] ?? 'customer';
+            $inputArray = is_array($value) ? $value : [];
+
+            return json_encode(
+                app(FormFieldRuleService::class)->normalizeSavedRules($form, $inputArray),
+                JSON_UNESCAPED_UNICODE
+            );
+        }
+
         if ($type === 'json') {
             if ($value === null || $value === '') {
                 return $this->stringifySettingDefault($default ?? []);
@@ -542,6 +553,22 @@ class SettingController extends Controller
             return [(string) $value];
         }
 
+        if ($type === 'field_rules') {
+            if (is_array($value)) {
+                return $value;
+            }
+
+            $decoded = json_decode((string) $value, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+
+            $form = $definition['form'] ?? 'customer';
+
+            return app(FormFieldRuleService::class)->normalizeSavedRules($form, []);
+        }
+
         if ($type === 'json') {
             if (is_array($value)) {
                 return $value;
@@ -582,6 +609,23 @@ class SettingController extends Controller
             return collect($values)
                 ->map(fn ($item) => $options[(string) $item] ?? (string) $item)
                 ->implode('، ');
+        }
+
+        if ($type === 'field_rules') {
+            $rules = is_array($value) ? $value : $this->castSettingValueForView($value, $definition);
+            $form = $definition['form'] ?? 'customer';
+            $catalog = $form === 'invoice'
+                ? app(FormFieldRuleService::class)->invoiceFieldCatalog()
+                : app(FormFieldRuleService::class)->customerFieldCatalog();
+            $requiredLabels = [];
+
+            foreach ((array) $rules as $fieldKey => $rule) {
+                if ($rule === 'required') {
+                    $requiredLabels[] = $catalog[$fieldKey]['label'] ?? $fieldKey;
+                }
+            }
+
+            return $requiredLabels === [] ? 'پیش‌فرض سیستم' : implode('، ', $requiredLabels);
         }
 
         if ($type === 'json') {

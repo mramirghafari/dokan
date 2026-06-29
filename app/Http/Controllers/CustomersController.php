@@ -27,7 +27,9 @@ use App\Services\CustomerListColumnService;
 use App\Services\CustomerListService;
 use App\Services\CustomerListSummaryService;
 use App\Services\CustomerProfilePageService;
+use App\Services\CustomerSegmentService;
 use App\Services\CustomerTimelineService;
+use App\Services\FormFieldRuleService;
 use App\Services\PishFactorListService;
 use App\Services\TenantSettings;
 use Illuminate\Database\Eloquent\Builder;
@@ -242,8 +244,13 @@ class CustomersController extends Controller
         $salesChannels = $this->customerSegments($user, 'sales_channel');
         $customerStatuses = $this->customerSegments($user, 'customer_status');
 
+        app(CustomerSegmentService::class)->ensureDefaultStatuses($user, $this->primaryOrganizationId($user), $user->tenant_id ?: $user->tenants_id);
+        $customerStatuses = $this->customerSegments($user, 'customer_status');
+
+        $formFields = app(FormFieldRuleService::class);
+
         session()->put('backlink', asset('/customers'));
-        return view('customers.create', compact('Regions', 'isVisitor', 'MyTasks', 'Areas', 'usesAreaWorkflow', 'usesRouteWorkflow', 'requiresAreaWorkflow', 'requiresRouteWorkflow', 'customerGroups', 'salesChannels', 'customerStatuses'));
+        return view('customers.create', compact('Regions', 'isVisitor', 'MyTasks', 'Areas', 'usesAreaWorkflow', 'usesRouteWorkflow', 'requiresAreaWorkflow', 'requiresRouteWorkflow', 'customerGroups', 'salesChannels', 'customerStatuses', 'formFields'));
     }
 
     public function profile360(Customers $customer, CustomerTimelineService $timelineService)
@@ -343,6 +350,17 @@ class CustomersController extends Controller
             return back()->withInput();
         }
 
+        try {
+            app(FormFieldRuleService::class)->validateCustomerRequest($request->all(), null, [
+                'requiresAreaWorkflow' => $requiresAreaWorkflow,
+                'requiresRouteWorkflow' => $requiresRouteWorkflow,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Alert::warning('خطا در ثبت', collect($e->errors())->flatten()->first() ?: 'اطلاعات فرم نامعتبر است');
+
+            return back()->withInput()->withErrors($e->errors());
+        }
+
         $regionId = $usesAreaWorkflow && $request->filled('region_id') ? (int) $request->region_id : 0;
         $areaId = $usesRouteWorkflow && $request->filled('area') ? (int) $request->area : 0;
         $organizationId = $this->primaryOrganizationId($user);
@@ -429,8 +447,13 @@ class CustomersController extends Controller
         $salesChannels = $this->customerSegments($user, 'sales_channel');
         $customerStatuses = $this->customerSegments($user, 'customer_status');
 
+        app(CustomerSegmentService::class)->ensureDefaultStatuses($user, $customer->organization_id, $customer->tenant_id);
+        $customerStatuses = $this->customerSegments($user, 'customer_status');
+
+        $formFields = app(FormFieldRuleService::class);
+
         session()->put('backlink', asset("/customers/$customer->id"));
-        return view('customers.edit', compact('Regions', 'customer', 'Cur_Region', 'This_areas', 'Areas', 'usesAreaWorkflow', 'usesRouteWorkflow', 'requiresAreaWorkflow', 'requiresRouteWorkflow', 'customerGroups', 'salesChannels', 'customerStatuses'));
+        return view('customers.edit', compact('Regions', 'customer', 'Cur_Region', 'This_areas', 'Areas', 'usesAreaWorkflow', 'usesRouteWorkflow', 'requiresAreaWorkflow', 'requiresRouteWorkflow', 'customerGroups', 'salesChannels', 'customerStatuses', 'formFields'));
     }
 
     public function update(Request $request, Customers $customer)
@@ -450,6 +473,17 @@ class CustomersController extends Controller
         if ($requiresRouteWorkflow && (!$request->filled('area') || (int) $request->area === 0)) {
             Alert::warning('خطا در ثبت', 'انتخاب مسیر برای این پنل الزامی است');
             return back()->withInput();
+        }
+
+        try {
+            app(FormFieldRuleService::class)->validateCustomerRequest($request->all(), null, [
+                'requiresAreaWorkflow' => $requiresAreaWorkflow,
+                'requiresRouteWorkflow' => $requiresRouteWorkflow,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Alert::warning('خطا در ثبت', collect($e->errors())->flatten()->first() ?: 'اطلاعات فرم نامعتبر است');
+
+            return back()->withInput()->withErrors($e->errors());
         }
 
         $this->normalizeCustomerSegments($request, $customer->organization_id, $customer->tenant_id);
