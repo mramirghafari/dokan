@@ -53,6 +53,12 @@ class HomeController extends Controller
     public function index()
     {
         $User = Auth::user();
+
+        $panelOnboardingEarly = app(PanelOnboardingService::class)->dashboardState($User);
+        if (!empty($panelOnboardingEarly['show_setup_card'])) {
+            return $this->renderOnboardingDashboard($User, $panelOnboardingEarly);
+        }
+
         $products = Product::count();
         $employees = Employee::count();
         $repairs = Repair::count();
@@ -786,6 +792,33 @@ class HomeController extends Controller
 
             return view('welcome', compact('user', 'employees', 'repairs', 'logs', 'OrganInfos', 'FullTargetsPrices', 'AllFactorPrices', 'StartTarget', 'EndTarget', 'topVisitors', 'MyLeaders', 'Factors', 'AcceptedFactorFullPrices', 'CompletedFactorFullPrices', 'warehouseDashboard', 'panelOnboarding', 'dashboardWidgets', 'showSetupCard'));
         }
+    }
+
+    private function renderOnboardingDashboard(User $user, ?array $panelOnboarding = null): \Illuminate\Contracts\View\View
+    {
+        $panelOnboarding ??= app(PanelOnboardingService::class)->dashboardState($user);
+        $dashboardWidgets = app(PanelDashboardWidgetService::class)->visibilityMap($user);
+
+        return view('welcome', [
+            'user' => $user,
+            'employees' => 0,
+            'repairs' => 0,
+            'logs' => collect(),
+            'OrganInfos' => [],
+            'FullTargetsPrices' => 0,
+            'AllFactorPrices' => 0,
+            'StartTarget' => null,
+            'EndTarget' => null,
+            'topVisitors' => collect(),
+            'MyLeaders' => collect(),
+            'Factors' => collect(),
+            'AcceptedFactorFullPrices' => 0,
+            'CompletedFactorFullPrices' => 0,
+            'warehouseDashboard' => app(WarehouseDashboardService::class)->forUser($user),
+            'panelOnboarding' => $panelOnboarding,
+            'dashboardWidgets' => $dashboardWidgets,
+            'showSetupCard' => true,
+        ]);
     }
 
     private function getSubUsersWithFactors($leaderId, $target)

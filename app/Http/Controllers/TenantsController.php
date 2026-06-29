@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ActivityLogService;
+use App\Services\NewTenantProvisioner;
 
 use App\Models\Organization;
 use App\Models\User;
@@ -116,7 +117,7 @@ class TenantsController extends Controller
                 'tenant_id' => $tenant->id,
             ]);
 
-            User::create([
+            $admin = User::create([
                 'name' => $request->admin_name,
                 'username' => $request->admin_username,
                 'email' => $request->admin_email,
@@ -133,6 +134,8 @@ class TenantsController extends Controller
                 'isAdmin' => 1,
                 'isGod' => 0,
             ]);
+
+            app(NewTenantProvisioner::class)->provision($tenant, $organization, $admin);
 
             return $tenant;
         });

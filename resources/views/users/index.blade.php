@@ -470,9 +470,25 @@
                                                         <td>{{ $user->mobile }}</td>
                                                         <td>{{ $user->email }}</td>
                                                         <td>
-                                                            @foreach ($user->roles as $role)
-                                                                {{ $role->description }} -
-                                                            @endforeach
+                                                            @php
+                                                                $roleTenantId = auth()->user()->isGod == 1
+                                                                    ? ($user->tenants_id ?? null)
+                                                                    : app(\App\Services\TenantContextService::class)->tenantId();
+                                                                $displayRoles = $user->roles->filter(function ($role) use ($roleTenantId) {
+                                                                    if (!$roleTenantId || empty($role->tenant_id)) {
+                                                                        return true;
+                                                                    }
+
+                                                                    return (int) $role->tenant_id === (int) $roleTenantId;
+                                                                });
+                                                            @endphp
+                                                            @forelse ($displayRoles as $role)
+                                                                {{ $role->description }}@if (!$loop->last)
+                                                                    -
+                                                                @endif
+                                                            @empty
+                                                                —
+                                                            @endforelse
                                                         </td>
                                                         <td>{{ $userScopeSummaries[$user->id] ?? 'از نقش' }}</td>
 
