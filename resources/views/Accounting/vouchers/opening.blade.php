@@ -101,9 +101,7 @@
                                 <div class="card-body">
                                     <div class="row g-3">
                                         <div class="col-12 col-md-3">
-                                            <label class="form-label">تاریخ سند</label>
-                                            <input type="date" name="voucher_date_en" class="form-control"
-                                                value="{{ old('voucher_date_en', $today) }}">
+                                            @include('partials.accounting.voucher-date-field')
                                         </div>
                                         <div class="col-12 col-md-3">
                                             <label class="form-label">شماره عطف</label>
@@ -290,6 +288,7 @@
     <script src="{{ asset('assets/') }}/js/main.js"></script>
     @include('partials.erp-remote-select-assets')
     @include('partials.accounting.account-cascader-script', ['accounts' => $accounts])
+    @include('partials.accounting.voucher-date-picker-assets')
     <script>
         $(function() {
             function initSelects() {
