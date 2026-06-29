@@ -1074,7 +1074,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                         خلاصه CRM مشتریان
                                     </h5>
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body pt-3">
                                     <div class="row g-3">
                                         <div class="col-6 col-md-3">
                                             <div class="crm-mini-stat bg-label-info text-center">
