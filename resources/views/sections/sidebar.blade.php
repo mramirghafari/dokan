@@ -295,14 +295,6 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                             </li>
                         @endcan
                     @endif
-                    @if (\App\Http\Controllers\ActivityLogController::canViewActivityLogs(auth()->user()))
-                        <li
-                            class="menu-item activity-logs {{ Request::routeIs(['activity-logs.index', 'logs.index']) ? 'active' : '' }}">
-                            <a class="menu-link" href="{{ route('activity-logs.index') }}">
-                                <div>لاگ‌ها و گزارشات</div>
-                            </a>
-                        </li>
-                    @endif
                     @can('accountManager')
                         <li class="menu-item accounts">
                             <a class="menu-link" href="{{ route('Account.index') }}">
@@ -333,6 +325,14 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                             </li>
                         @endif
                     @endcan
+                    @if (\App\Http\Controllers\ActivityLogController::canViewActivityLogs(auth()->user()))
+                        <li
+                            class="menu-item activity-logs {{ Request::routeIs(['activity-logs.index', 'logs.index']) ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('activity-logs.index') }}">
+                                <div>لاگ‌ها و گزارشات</div>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
         @endcanany
