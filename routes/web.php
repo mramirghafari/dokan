@@ -334,6 +334,7 @@ Route::middleware(['auth', 'panel.active'])->group(function () {
     Route::post('Accounting/incomes/{income}/attachments', "AccountingController@storeIncomeAttachment")->name('Accounting.incomes.attachments.store');
     Route::post('Accounting/incomes', "AccountingController@storeIncome")->name('Accounting.incomes.store');
     Route::get('Accounting/fiscal-closing', "AccountingController@fiscalClosing")->name('Accounting.fiscalClosing');
+    Route::post('Accounting/fiscal-years', "AccountingController@storeFiscalYear")->name('Accounting.fiscalYears.store');
     Route::post('Accounting/fiscal-closing/{fiscalYear}/close', "AccountingController@closeFiscalYear")->name('Accounting.fiscalClosing.close');
     Route::get('Accounting/expenses', "AccountingController@expenses")->name('Accounting.expenses');
     Route::post('Accounting/expenses/cost-centers', "AccountingController@storeCostCenter")->name('Accounting.expenses.costCenters.store');

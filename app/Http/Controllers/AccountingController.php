@@ -51,6 +51,7 @@ use App\Services\AccountingCurrencyReportService;
 use App\Services\AccountingFinancialStatementService;
 use App\Services\AccountingLedgerReportService;
 use App\Services\AccountingPeriodClosingService;
+use App\Services\FiscalYearService;
 use App\Services\OpeningVoucherService;
 use App\Services\FixedAssetCapitalAdditionService;
 use App\Services\FixedAssetDisposalService;
@@ -511,10 +512,10 @@ class AccountingController extends Controller
         return redirect()->route('Accounting.currencyBalances', ['currency_id' => $payload['currency_id'], 'to_date' => $payload['rate_date']]);
     }
 
-    public function fiscalClosing(Request $request, AccountingPeriodClosingService $service)
+    public function fiscalClosing(Request $request, AccountingPeriodClosingService $service, FiscalYearService $fiscalYearService)
     {
         $user = Auth::user();
-        $fiscalYears = $this->fiscalYearsForCurrentUser();
+        $fiscalYears = $this->fiscalYearsForCurrentUser($fiscalYearService);
         $selectedFiscalYear = $fiscalYears->firstWhere('id', (int) $request->get('fiscal_year_id')) ?: $fiscalYears->first();
         $preview = $selectedFiscalYear ? $service->preview($selectedFiscalYear, $user) : null;
         $closings = FinancialPeriodClosing::with(['fiscalYear', 'nextFiscalYear', 'closingVoucher', 'openingVoucher'])
@@ -522,8 +523,46 @@ class AccountingController extends Controller
             ->orderByDesc('id')
             ->limit(20)
             ->get();
+        $tenantId = $this->currentTenantId($user);
+        [$suggestedStart, $suggestedEnd, $suggestedTitle] = $fiscalYearService->previewRange($tenantId);
 
-        return view('Accounting.reports.fiscal_closing', compact('fiscalYears', 'selectedFiscalYear', 'preview', 'closings'));
+        return view('Accounting.reports.fiscal_closing', compact(
+            'fiscalYears',
+            'selectedFiscalYear',
+            'preview',
+            'closings',
+            'suggestedStart',
+            'suggestedEnd',
+            'suggestedTitle'
+        ));
+    }
+
+    public function storeFiscalYear(Request $request, FiscalYearService $fiscalYearService)
+    {
+        $request->validate([
+            'jalali_year' => ['nullable', 'integer', 'min:1300', 'max:1500'],
+        ]);
+
+        $tenantId = $this->currentTenantId(Auth::user());
+
+        if (!$tenantId) {
+            return redirect()->back()->withErrors(['jalali_year' => 'پنل فعال برای ایجاد سال مالی شناسایی نشد.']);
+        }
+
+        $fiscalYear = $fiscalYearService->createForJalaliYear(
+            $tenantId,
+            $request->filled('jalali_year') ? (int) $request->get('jalali_year') : null
+        );
+
+        if (!$fiscalYear) {
+            return redirect()->back()->withErrors(['jalali_year' => 'ایجاد سال مالی انجام نشد.']);
+        }
+
+        $this->logAccounting('create', 'عملیات حسابداری: Fiscal Year', null, 'accounting.storeFiscalYear');
+
+        Alert::success('ثبت شد', 'سال مالی «' . $fiscalYear->title . '» ایجاد شد.');
+
+        return redirect()->route('Accounting.fiscalClosing', ['fiscal_year_id' => $fiscalYear->id]);
     }
 
     public function closeFiscalYear(FiscalYear $fiscalYear, AccountingPeriodClosingService $service)
@@ -1610,9 +1649,9 @@ class AccountingController extends Controller
         return view('Accounting.vouchers.create', array_merge(compact('accounts', 'today', 'fiscalYears', 'selectedFiscalYear'), $this->voucherDimensionOptions()));
     }
 
-    public function createOpeningVoucher(Request $request, OpeningVoucherService $service)
+    public function createOpeningVoucher(Request $request, OpeningVoucherService $service, FiscalYearService $fiscalYearService)
     {
-        $fiscalYears = $this->fiscalYearsForCurrentUser();
+        $fiscalYears = $this->fiscalYearsForCurrentUser($fiscalYearService);
         $selectedFiscalYear = $fiscalYears->firstWhere('id', (int) $request->get('fiscal_year_id'))
             ?: $fiscalYears->firstWhere('is_default', true)
             ?: $fiscalYears->first();
@@ -2894,16 +2933,31 @@ class AccountingController extends Controller
         return $query->get();
     }
 
-    private function fiscalYearsForCurrentUser()
+    private function fiscalYearsForCurrentUser(?FiscalYearService $fiscalYearService = null)
     {
         $user = Auth::user();
         $query = FiscalYear::query()->orderByDesc('starts_at')->orderByDesc('id');
 
         if ((int) $user->isGod !== 1) {
-            $query->where('tenant_id', $this->currentTenantId($user));
+            $tenantId = $this->currentTenantId($user);
+            $query->where('tenant_id', $tenantId);
         }
 
-        return $query->get();
+        $fiscalYears = $query->get();
+
+        if ((int) $user->isGod !== 1 && $fiscalYears->isEmpty()) {
+            $tenantId = $this->currentTenantId($user);
+            $service = $fiscalYearService ?: app(FiscalYearService::class);
+            $service->ensureDefaultForTenant($tenantId);
+
+            $fiscalYears = FiscalYear::query()
+                ->where('tenant_id', $tenantId)
+                ->orderByDesc('starts_at')
+                ->orderByDesc('id')
+                ->get();
+        }
+
+        return $fiscalYears;
     }
 
     private function paymentTerminals()

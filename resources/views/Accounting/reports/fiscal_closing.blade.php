@@ -29,6 +29,37 @@
                                 تراز آزمایشی</a>
                         </div>
 
+                        @if ($fiscalYears->isEmpty())
+                            <div class="alert alert-warning">
+                                هنوز سال مالی برای پنل شما ثبت نشده است. برای شروع حسابداری، ابتدا سال مالی جاری را ایجاد کنید.
+                            </div>
+                            <form method="POST" action="{{ route('Accounting.fiscalYears.store') }}" class="card mb-4">
+                                @csrf
+                                <div class="card-header">
+                                    <h5 class="mb-0">ایجاد سال مالی</h5>
+                                </div>
+                                <div class="card-body row g-3 align-items-end">
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label">سال شمسی</label>
+                                        <input type="number" name="jalali_year" class="form-control"
+                                            value="{{ old('jalali_year', verta()->format('Y')) }}" min="1300" max="1500">
+                                    </div>
+                                    <div class="col-12 col-md-5">
+                                        <div class="small text-muted mb-1">بازه پیشنهادی</div>
+                                        <div>{{ $suggestedTitle ?? ('سال مالی ' . verta()->format('Y')) }}</div>
+                                        <div class="small text-muted">
+                                            {{ isset($suggestedStart) ? verta_date($suggestedStart) : '' }}
+                                            تا
+                                            {{ isset($suggestedEnd) ? verta_date($suggestedEnd) : '' }}
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <button type="submit" class="btn btn-primary w-100">ایجاد سال مالی</button>
+                                    </div>
+                                </div>
+                            </form>
+                        @endif
+
                         <form method="GET" action="{{ route('Accounting.fiscalClosing') }}" class="card mb-4">
                             <div class="card-body row g-3 align-items-end">
                                 <div class="col-12 col-md-5">
