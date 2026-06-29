@@ -76,8 +76,8 @@
                                                 <label for="exampleInputEmail111">واحد پولی شعبه:</label>
                                                 <select class="form-control" name="currency_type">
                                                     <option value="0">-- انتخاب کنید --</option>
+                                                    <option value="2" @if($organization->currency_type == 2 || !$organization->currency_type) selected @endif>ریال</option>
                                                     <option value="1" @if($organization->currency_type == 1) selected @endif>تومان</option>
-                                                    <option value="2" @if($organization->currency_type == 2) selected @endif>ریال</option>
                                                 </select>
                                             </div>
                                         </div>

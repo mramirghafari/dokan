@@ -138,7 +138,7 @@
                                         @foreach($Depots as $depot)
                                             <tr>
                                                 <td>{{ $x }}</td>
-                                                <td>{{ number_format($depot->price) }} <small>@if($Organ->currency_type == 1) تومان @else ریال @endif</small></td>
+                                                <td>{{ number_format($depot->price) }} <small>{{ org_currency_label($Organ) }}</small></td>
                                                 <td>{{ number_format($depot->orderLimit) }}</td>
                                                 <td>{{ number_format($depot->entity) }}</td>
                                                 <td>{{ number_format($depot->discount) }}</td>

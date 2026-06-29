@@ -95,7 +95,7 @@ class RoohiTradePanelProvisioner
                 'status' => 1,
                 'panel_status' => 'active',
                 'panel_type' => 'subscription_sales',
-                'currency_type' => 'toman',
+                'currency_type' => 'rial',
             ]);
 
             return $tenant->fresh();
@@ -114,7 +114,7 @@ class RoohiTradePanelProvisioner
             'status' => 1,
             'panel_status' => 'active',
             'panel_type' => 'subscription_sales',
-            'currency_type' => 'toman',
+            'currency_type' => 'rial',
             'tozihat' => 'فروش اشتراک یک، دو و سه ماهه | تمرکز CRM، حسابداری و مدیریت کارمندان',
         ]);
     }
@@ -134,6 +134,7 @@ class RoohiTradePanelProvisioner
             'title' => 'مرکز روحی ترید',
             'description' => 'شعبه مرکزی ' . self::PANEL_NAME,
             'type' => 1,
+            'currency_type' => 2,
             'isActive' => 1,
             'tenants_id' => $tenant->id,
             'tenant_id' => $tenant->id,
@@ -407,7 +408,7 @@ class RoohiTradePanelProvisioner
                     'unit_price' => 'فی ماهانه',
                 ],
             ],
-            'currency_type' => 1,
+            'currency_type' => 2,
             'seller_name' => self::PANEL_NAME,
             'seller_phone' => self::ADMIN_MOBILE,
             'column_pr_code' => 1,
@@ -473,7 +474,7 @@ class RoohiTradePanelProvisioner
             'customer_approval_policy' => ['value' => 'auto', 'type' => 'select'],
             'crm_followup_policy' => ['value' => 'required_after_invoice', 'type' => 'select'],
             'crm_automation_policy' => ['value' => json_encode(['task_after_invoice', 'task_for_new_customer']), 'type' => 'multiselect'],
-            'currency_type' => ['value' => 'toman', 'type' => 'select'],
+            'currency_type' => ['value' => 'rial', 'type' => 'select'],
             'tax_percent' => ['value' => '0', 'type' => 'number'],
             'vat_percent' => ['value' => '0', 'type' => 'number'],
             'panel_onboarding_active' => ['value' => 'yes', 'type' => 'boolean'],

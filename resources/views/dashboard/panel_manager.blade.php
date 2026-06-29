@@ -72,7 +72,8 @@ try {
 
     /* ── Helpers ── */
     $nf  = fn($n) => number_format((int)$n);
-    $nfT = fn($n) => number_format((int)($n / 10));          // ریال → تومان
+    $currencyLabel = currency_label();
+    $currencyShort = mb_substr($currencyLabel, 0, 1);
     $pct = fn($a,$b) => $b > 0 ? round(($a-$b)/$b*100,1) : ($a>0?100:0);
 
     try { $updatedAt = Verta::now()->format('H:i'); }
@@ -529,7 +530,8 @@ try {
 } catch (\Throwable $e) {
     /* ── Global failsafe ── */
     $nf=fn($n)=>number_format((int)$n);
-    $nfT=fn($n)=>number_format((int)($n/10));
+    $currencyLabel = currency_label();
+    $currencyShort = mb_substr($currencyLabel, 0, 1);
     $pct=fn($a,$b)=>0;
     $updatedAt=$orgName='دارمینو'; $orgId=0;
     $today=$weekStart=$monthStart=now(); $monthEnd=$prevMonthStart=$prevMonthEnd=now();
@@ -746,8 +748,8 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                         </div>
                                         <div class="col-6 col-md-3">
                                             <div class="crm-mini-stat bg-label-success">
-                                                <div class="text-muted small mb-1">مبلغ فروش (تومان)</div>
-                                                <h5 class="mb-0 fw-bold text-success" id="sales-amount">{{ $nfT($salesTodayAmount) }}</h5>
+                                                <div class="text-muted small mb-1">مبلغ فروش (ریال)</div>
+                                                <h5 class="mb-0 fw-bold text-success" id="sales-amount">{{ $nf($salesTodayAmount) }}</h5>
                                             </div>
                                         </div>
                                     </div>
@@ -813,7 +815,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                     <div class="d-flex gap-3 mb-2 flex-wrap small">
                                                         <span><i class="ti ti-users text-primary me-1"></i>{{ $nf($smCust) }} مشتری</span>
                                                         <span><i class="ti ti-receipt text-success me-1"></i>{{ $nf($smInvCount) }} فاکتور</span>
-                                                        <span><i class="ti ti-coin text-warning me-1"></i>{{ $nfT($smSales) }} تومان</span>
+                                                        <span><i class="ti ti-coin text-warning me-1"></i>{{ $nf($smSales) }} {{ $currencyLabel }}</span>
                                                     </div>
                                                     {{-- Leaders under this SM --}}
                                                     @foreach($smLeaders as $ld)
@@ -831,7 +833,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                             <span class="fw-semibold">{{ $ld->name }}</span>
                                                             <span class="ms-auto text-muted small">
                                                                 {{ $nf($ldInvCount) }} فاکتور —
-                                                                {{ $nfT($ldSales) }} ت
+                                                                {{ $nf($ldSales) }} {{ $currencyShort }}
                                                                 @if($ldTrend>0)<span class="trend-up"><i class="ti ti-arrow-up-right"></i>{{ $ldTrend }}%</span>
                                                                 @elseif($ldTrend<0)<span class="trend-down"><i class="ti ti-arrow-down-right"></i>{{ abs($ldTrend) }}%</span>@endif
                                                             </span>
@@ -851,7 +853,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                                 <span>{{ $vs->name }}</span>
                                                                 <span class="ms-auto text-muted small">
                                                                     {{ $nf($vsCust) }}م · {{ $nf($vsInvCount) }}ف ·
-                                                                    <strong>{{ $nfT($vsSales) }}ت</strong>
+                                                                    <strong>{{ $nf($vsSales) }}{{ $currencyShort }}</strong>
                                                                     @if($vsTrend>0)<span class="trend-up ms-1">↑{{ $vsTrend }}%</span>
                                                                     @elseif($vsTrend<0)<span class="trend-down ms-1">↓{{ abs($vsTrend) }}%</span>@endif
                                                                 </span>
@@ -873,7 +875,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                             <span class="badge bg-label-primary team-role-badge">{{ $roleLabel['visitor'] }}</span>
                                                             <span>{{ $vs->name }}</span>
                                                             <span class="ms-auto text-muted small">
-                                                                {{ $nf($vsCust) }}م · {{ $nf($vsInvCount) }}ف · {{ $nfT($vsSales) }}ت
+                                                                {{ $nf($vsCust) }}م · {{ $nf($vsInvCount) }}ف · {{ $nf($vsSales) }}{{ $currencyShort }}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -904,7 +906,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                     <div class="d-flex gap-3 mb-2 flex-wrap small">
                                                         <span><i class="ti ti-users text-primary me-1"></i>{{ $nf($ldCust) }} مشتری</span>
                                                         <span><i class="ti ti-receipt text-success me-1"></i>{{ $nf($ldInvCount) }} فاکتور</span>
-                                                        <span><i class="ti ti-coin text-warning me-1"></i>{{ $nfT($ldSales) }} تومان</span>
+                                                        <span><i class="ti ti-coin text-warning me-1"></i>{{ $nf($ldSales) }} {{ $currencyLabel }}</span>
                                                     </div>
                                                     @foreach($visitors->where('leader_id',$ld->id) as $vs)
                                                     @php $vsInvCount=(int)($vsStats[$vs->id]->ic??0); $vsSales=(float)($vsStats[$vs->id]->ts??0); @endphp
@@ -912,7 +914,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                         <div class="d-flex align-items-center gap-2 flex-wrap">
                                                             <span class="badge bg-label-primary team-role-badge">{{ $roleLabel['visitor'] }}</span>
                                                             <span>{{ $vs->name }}</span>
-                                                            <span class="ms-auto text-muted small">{{ $nf($vsInvCount) }}ف · {{ $nfT($vsSales) }}ت</span>
+                                                            <span class="ms-auto text-muted small">{{ $nf($vsInvCount) }}ف · {{ $nf($vsSales) }}{{ $currencyShort }}</span>
                                                         </div>
                                                     </div>
                                                     @endforeach
@@ -960,8 +962,8 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                 style="width:{{ $tgt->pct_done }}%"></div>
                                         </div>
                                         <div class="d-flex justify-content-between text-muted" style="font-size:.75rem">
-                                            <span>واقعی: <strong>{{ $nfT($tgt->actual) }}</strong> ت</span>
-                                            <span>هدف: {{ $nfT($tgt->target_price_num) }} ت</span>
+                                            <span>واقعی: <strong>{{ $nf($tgt->actual) }}{{ $currencyShort }}</strong></span>
+                                            <span>هدف: {{ $nf($tgt->target_price_num) }} {{ $currencyShort }}</span>
                                         </div>
                                     </div>
                                     @endforeach
@@ -1003,7 +1005,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                 <tr>
                                                     <th class="ps-3" style="width:45%">نام محصول</th>
                                                     <th class="text-center">تعداد فروش</th>
-                                                    <th class="text-center pe-3">درآمد (تومان)</th>
+                                                    <th class="text-center pe-3">درآمد (ریال)</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1030,7 +1032,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                     </span>
                                                 </td>
                                                 <td class="text-center pe-3 fw-semibold small">
-                                                    {{ $nfT((float)$prod->total_revenue) }}
+                                                    {{ $nf((float)$prod->total_revenue) }}
                                                 </td>
                                             </tr>
                                             @endforeach
@@ -1063,15 +1065,15 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                         <div class="col-6">
                                             <div class="crm-mini-stat bg-label-success">
                                                 <div class="text-muted small mb-1"><i class="ti ti-arrow-down-circle text-success me-1"></i>بستانکار ماه</div>
-                                                <h5 class="mb-0 fw-bold text-success">{{ $nfT($totalCredit) }}</h5>
-                                                <small class="text-muted">تومان</small>
+                                                <h5 class="mb-0 fw-bold text-success">{{ $nf($totalCredit) }}</h5>
+                                                <small class="text-muted">{{ $currencyLabel }}</small>
                                             </div>
                                         </div>
                                         <div class="col-6">
                                             <div class="crm-mini-stat bg-label-danger">
                                                 <div class="text-muted small mb-1"><i class="ti ti-arrow-up-circle text-danger me-1"></i>بدهکار ماه</div>
-                                                <h5 class="mb-0 fw-bold text-danger">{{ $nfT($totalDebit) }}</h5>
-                                                <small class="text-muted">تومان</small>
+                                                <h5 class="mb-0 fw-bold text-danger">{{ $nf($totalDebit) }}</h5>
+                                                <small class="text-muted">{{ $currencyLabel }}</small>
                                             </div>
                                         </div>
                                         <div class="col-12">
@@ -1079,7 +1081,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                             <div class="crm-mini-stat {{ $netMonth >= 0 ? 'bg-label-success' : 'bg-label-danger' }}">
                                                 <div class="text-muted small mb-1">سود / زیان خالص ماه</div>
                                                 <h4 class="mb-0 fw-bold {{ $netMonth >= 0 ? 'text-success' : 'text-danger' }}">
-                                                    {{ $netMonth >= 0 ? '+' : '' }}{{ $nfT($netMonth) }} تومان
+                                                    {{ $netMonth >= 0 ? '+' : '' }}{{ $nf($netMonth) }} {{ $currencyLabel }}
                                                 </h4>
                                             </div>
                                         </div>
@@ -1141,7 +1143,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                     </div>
                                                     <div>
                                                         <div class="fw-semibold small">{{ $tc->name }}</div>
-                                                        <div class="text-muted" style="font-size:.75rem">{{ $nf($tc->ic) }} فاکتور · {{ $nfT((float)$tc->tot) }} ت</div>
+                                                        <div class="text-muted" style="font-size:.75rem">{{ $nf($tc->ic) }} فاکتور · {{ $nf((float)$tc->tot) }} {{ $currencyShort }}</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1265,7 +1267,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                     <th class="text-center">تعداد بازاریاب‌ها</th>
                                                     <th class="text-center">تعداد مشتریان جذب‌شده</th>
                                                     <th class="text-center">تعداد فاکتور</th>
-                                                    <th class="text-center pe-4">جمع فروش این ماه (تومان)</th>
+                                                    <th class="text-center pe-4">جمع فروش این ماه (ریال)</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1298,7 +1300,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                 </td>
                                                 <td class="text-center pe-4 fw-semibold">
                                                     @if($supSales > 0)
-                                                        <span class="text-success">{{ $nfT($supSales) }}</span>
+                                                        <span class="text-success">{{ $nf($supSales) }}</span>
                                                     @else
                                                         <span class="text-muted">—</span>
                                                     @endif
@@ -1343,7 +1345,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                     <th class="text-center">سرپرست</th>
                                                     <th class="text-center">تعداد مشتری</th>
                                                     <th class="text-center">تعداد فاکتور</th>
-                                                    <th class="text-center pe-4">جمع فروش این ماه (تومان)</th>
+                                                    <th class="text-center pe-4">جمع فروش این ماه (ریال)</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1381,7 +1383,7 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
                                                 </td>
                                                 <td class="text-center pe-4 fw-semibold">
                                                     @if($mktSales > 0)
-                                                        <span class="text-success">{{ $nfT($mktSales) }}</span>
+                                                        <span class="text-success">{{ $nf($mktSales) }}</span>
                                                     @else
                                                         <span class="text-muted">—</span>
                                                     @endif
@@ -1479,9 +1481,9 @@ $roleBadge = ['sales_manager'=>'danger','leader'=>'warning','visitor'=>'primary'
 
     /* ── PHP → JS data ── */
     var chartData = {
-        today:  { labels: {!! json_encode($hourlyLabels) !!}, data: {!! json_encode($hourlyData) !!},  count: {{ $salesTodayCount }},  amount: '{{ $nfT($salesTodayAmount) }}' },
-        week:   { labels: {!! json_encode($weeklyLabels) !!},  data: {!! json_encode($weeklyData) !!},  count: {{ $salesWeekCount }},   amount: '{{ $nfT($salesWeekAmount) }}' },
-        month:  { labels: {!! json_encode($monthlyLabels) !!}, data: {!! json_encode($monthlyData ?? []) !!}, count: {{ $salesMonthCount }},  amount: '{{ $nfT($salesMonthAmount) }}' }
+        today:  { labels: {!! json_encode($hourlyLabels) !!}, data: {!! json_encode($hourlyData) !!},  count: {{ $salesTodayCount }},  amount: '{{ $nf($salesTodayAmount) }}' },
+        week:   { labels: {!! json_encode($weeklyLabels) !!},  data: {!! json_encode($weeklyData) !!},  count: {{ $salesWeekCount }},   amount: '{{ $nf($salesWeekAmount) }}' },
+        month:  { labels: {!! json_encode($monthlyLabels) !!}, data: {!! json_encode($monthlyData ?? []) !!}, count: {{ $salesMonthCount }},  amount: '{{ $nf($salesMonthAmount) }}' }
     };
 
     var currentTab = 'today';

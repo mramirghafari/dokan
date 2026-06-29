@@ -82,8 +82,8 @@
                                             <label class="form-label" for="currency_type">واحد پولی فاکتور</label>
                                             <select class="select2 form-select" data-allow-clear="true" id="currency_type" name="currency_type">
                                                 <option value="">انتخاب کنید</option>
+                                                <option value="2" @if($factorMaker->currency_type == 2 || !$factorMaker->currency_type) selected @endif>ریال</option>
                                                 <option value="1" @if($factorMaker->currency_type == 1) selected @endif>تومان</option>
-                                                <option value="2" @if($factorMaker->currency_type == 2) selected @endif>ریال</option>
                                             </select>
                                         </div>
                                         <div class="mb-3 col-12 col-md-3">
@@ -401,7 +401,7 @@
                                             <th width="30">ردیف</th>
                                             <th>عنوان محصول</th>
                                             <th>وزن خالص</th>
-                                            <th>فی (تومان)</th>
+                                            <th>فی ({{ currency_label() }})</th>
                                             <th>جمع</th>
                                         </tr>
                                         </thead>

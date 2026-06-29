@@ -58,7 +58,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                     <div class="row justify-content-between">
                                         <div class="col-12 col-sm-6 col-lg-6">
                                             <div class="mt-lg-4 mt-lg-2 mb-lg-4 mb-2 pt-3">
-                                                <h2 class="mb-0 lh-80p">{{ number_format($Target->target_price) }} <small>@if($Organ->currency_type == 1) تومان @else ریال @endif</small></h2>
+                                                <h2 class="mb-0 lh-80p">{{ number_format($Target->target_price) }} <small>{{ org_currency_label($Organ) }}</small></h2>
                                                 <p class="mb-0">تارگت مالی کل</p>
                                             </div>
                                             <ul class="row p-0 m-0">
@@ -108,7 +108,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-nowrap">مجموع درآمد فاکتورها</h6>
-                                                        <strong class="text-darg">{{ number_format($AllFactorPrices) }} @if($Organ->currency_type == 1) تومان @else ریال @endif</strong>
+                                                        <strong class="text-darg">{{ number_format($AllFactorPrices) }} {{ org_currency_label($Organ) }}</strong>
                                                     </div>
                                                 </li>
                                             </ul>
@@ -129,7 +129,7 @@ use Hekmatinasser\Verta\Verta; ?>
                                             <h5 class="mb-0">{{ $myuser['name'] }}</h5>
                                             @php($MyUserFactors = DB::table('pishfactors')->where('sarparast_id',$myuser['id'])->whereIn('status',[1,4])->whereBetween('created_at', ["$Target->start_date_en", "$Target->end_date_en"])->get())
                                             <p>تعداد فاکتورها: {{ $myuser['factors_count'] }} </p>
-                                            <p>مجموع درآمد فاکتورها:  <span class="badge bg-label-success me-1">{{ number_format($myuser['FactorPrices']) }} @if($Organ->currency_type == 1) تومان @else ریال @endif</span></p>
+                                            <p>مجموع درآمد فاکتورها:  <span class="badge bg-label-success me-1">{{ number_format($myuser['FactorPrices']) }} {{ org_currency_label($Organ) }}</span></p>
                                             @if(count($myuser['children']) > 0)
                                                 <small class="text-muted">تعداد بازاریاب ها: {{ count($myuser['children']) }}</small>
                                             @endif
@@ -148,7 +148,7 @@ use Hekmatinasser\Verta\Verta; ?>
 
                                                     <div class="d-flex">
                                                         <p class="mb-0 fw-medium">{{ $visitor['factors_count'] }} فاکتور</p>
-                                                        <p class="ms-3 text-success mb-0">{{ number_format($visitor['FactorPrices']) }} <small>@if($Organ->currency_type == 1) تومان @else ریال @endif</small></p>
+                                                        <p class="ms-3 text-success mb-0">{{ number_format($visitor['FactorPrices']) }} <small>{{ org_currency_label($Organ) }}</small></p>
                                                     </div>
                                                 </div>
                                             </li>

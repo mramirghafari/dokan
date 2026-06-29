@@ -268,11 +268,7 @@
 
                                                                     <small>
                                                                         {{ number_format(intval(str_replace(',', '', $invoice->fullPrice))) }}
-                                                                        @if ($organ->currency_type == 1)
-                                                                            تومان
-                                                                        @elseif($organ->currency_type == 2)
-                                                                            ریال
-                                                                        @endif
+                                                                        {{ org_currency_label($organ) }}
                                                                     </small>
                                                                 </td>
                                                                 @if (auth()->user()->isAdmin == 1 || auth()->user()->isGod == 1)

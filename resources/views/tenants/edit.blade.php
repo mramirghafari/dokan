@@ -214,11 +214,11 @@
                                                     <select class="form-select" id="currency_type"
                                                         name="currency_type">
                                                         <option value="0">-- انتخاب کنید --</option>
-                                                        <option value="1"
-                                                            @if ($Tenant->currency_type == 1) selected @endif>تومان
-                                                        </option>
                                                         <option value="2"
-                                                            @if ($Tenant->currency_type == 2) selected @endif>ریال
+                                                            @if (in_array($Tenant->currency_type, [2, '2', 'rial', 0, '0'], true) || blank($Tenant->currency_type)) selected @endif>ریال
+                                                        </option>
+                                                        <option value="1"
+                                                            @if (in_array($Tenant->currency_type, [1, '1', 'toman'], true)) selected @endif>تومان
                                                         </option>
                                                     </select>
                                                 </div>

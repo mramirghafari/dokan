@@ -603,7 +603,7 @@
 
         var sum_price_with_tax = $('.full_prices span').html();
         var sum = sum_price_with_tax.replaceAll(",", "");
-        $('.factor_table th.horof').html(wordifyfa(sum)+" @if($Organ->currency_type == 1) تومان  @else ریال @endif " );
+        $('.factor_table th.horof').html(wordifyfa(sum)+" {{ org_currency_label($Organ) }} " );
 
 
 

@@ -232,7 +232,7 @@
                                                             دستمال دلسی 2 قلو
                                                         </h6>
                                                     </div>
-                                                    <small class="text-muted m-0">27,000 تومان</small>
+                                                    <small class="text-muted m-0">27,000 {{ currency_label() }}</small>
                                                 </div>
                                                 <div class="user-progress">
                                                     <p class="text-success fw-medium mb-0 d-flex justify-content-center gap-1">
@@ -250,7 +250,7 @@
                                                             دستمال دلسی 2 قلو
                                                         </h6>
                                                     </div>
-                                                    <small class="text-muted m-0">27,000 تومان</small>
+                                                    <small class="text-muted m-0">27,000 {{ currency_label() }}</small>
                                                 </div>
                                                 <div class="user-progress">
                                                     <p class="text-success fw-medium mb-0 d-flex justify-content-center gap-1">
@@ -268,7 +268,7 @@
                                                             دستمال دلسی 2 قلو
                                                         </h6>
                                                     </div>
-                                                    <small class="text-muted m-0">27,000 تومان</small>
+                                                    <small class="text-muted m-0">27,000 {{ currency_label() }}</small>
                                                 </div>
                                                 <div class="user-progress">
                                                     <p class="text-success fw-medium mb-0 d-flex justify-content-center gap-1">
@@ -286,7 +286,7 @@
                                                             دستمال دلسی 2 قلو
                                                         </h6>
                                                     </div>
-                                                    <small class="text-muted m-0">27,000 تومان</small>
+                                                    <small class="text-muted m-0">27,000 {{ currency_label() }}</small>
                                                 </div>
                                                 <div class="user-progress">
                                                     <p class="text-success fw-medium mb-0 d-flex justify-content-center gap-1">
@@ -304,7 +304,7 @@
                                                             دستمال دلسی 2 قلو
                                                         </h6>
                                                     </div>
-                                                    <small class="text-muted m-0">27,000 تومان</small>
+                                                    <small class="text-muted m-0">27,000 {{ currency_label() }}</small>
                                                 </div>
                                                 <div class="user-progress">
                                                     <p class="text-success fw-medium mb-0 d-flex justify-content-center gap-1">

@@ -93,8 +93,8 @@
                                                             <label for="exampleInputEmail111">واحد پولی شعبه:<small style="color: red;">*</small></label>
                                                             <select class="form-control" name="currency_type" required>
                                                                 <option value="0">-- انتخاب کنید --</option>
+                                                                <option value="2" selected>ریال</option>
                                                                 <option value="1">تومان</option>
-                                                                <option value="2">ریال</option>
                                                             </select>
                                                         </div>
                                                     </div>
