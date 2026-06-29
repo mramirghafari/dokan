@@ -297,7 +297,9 @@
                                                         </div>
 
                                                         @if (auth()->user()->isGod == 1)
-                                                            @php($tenants = DB::table('tenants')->get())
+                                                            @php
+                                                                $tenants = DB::table('tenants')->get();
+                                                            @endphp
                                                             <div class="form-group mb-3">
                                                                 <label for="exampleInputEmail12">انتخاب پنل:</label>
                                                                 <select class="js-example-basic-single form-control"
