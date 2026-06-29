@@ -161,7 +161,7 @@ class CrmSalesBoardController extends Controller
             $position = (int) CrmSalesBoard::query()->where('tenant_id', $user->tenant_id)->max('position') + 1;
             $board = CrmSalesBoard::create([
                 'tenant_id' => $user->tenant_id ?: $user->tenants_id,
-                'organization_id' => $user->organization_id,
+                'organization_id' => $this->organizationId($user),
                 'owner_user_id' => $data['owner_user_id'] ?: $user->id,
                 'title' => $data['title'],
                 'type' => $data['template'] === 'after_sales' ? 'after_sales' : 'sales_pipeline',
@@ -976,5 +976,20 @@ class CrmSalesBoardController extends Controller
         ], $meta);
 
         $card->forceFill(['activity_logs' => $activityLogs])->save();
+    }
+
+    private function organizationId($user): ?int
+    {
+        if (!$user || empty($user->organization_id)) {
+            return null;
+        }
+
+        $decoded = json_decode((string) $user->organization_id, true);
+
+        if (is_array($decoded)) {
+            return (int) ($decoded[0] ?? 0) ?: null;
+        }
+
+        return (int) $user->organization_id ?: null;
     }
 }

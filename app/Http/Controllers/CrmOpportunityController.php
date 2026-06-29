@@ -115,7 +115,7 @@ class CrmOpportunityController extends Controller
 
             CrmOpportunity::create([
                 'tenant_id' => $customer->tenant_id ?: $user->tenant_id,
-                'organization_id' => $customer->organization_id ?: $user->organization_id,
+                'organization_id' => $customer->organization_id ?: $this->organizationId($user),
                 'customer_id' => $customer->id,
                 'assigned_user_id' => $data['assigned_user_id'] ?: $user->id,
                 'code' => 'OPP-' . now()->format('Y') . '-' . str_pad((string) $nextId, 6, '0', STR_PAD_LEFT),
@@ -213,5 +213,20 @@ class CrmOpportunityController extends Controller
         $allowed = CrmOpportunity::query()->whereKey($opportunity->id)->forOrganizations($user)->exists();
 
         abort_unless($allowed, 403);
+    }
+
+    private function organizationId($user): ?int
+    {
+        if (!$user || empty($user->organization_id)) {
+            return null;
+        }
+
+        $decoded = json_decode((string) $user->organization_id, true);
+
+        if (is_array($decoded)) {
+            return (int) ($decoded[0] ?? 0) ?: null;
+        }
+
+        return (int) $user->organization_id ?: null;
     }
 }

@@ -97,7 +97,7 @@ class CrmFollowupController extends Controller
 
         $followup = CrmFollowup::create([
             'tenant_id' => $subject->tenant_id ?: $user->tenant_id,
-            'organization_id' => $subject->organization_id ?: $user->organization_id,
+            'organization_id' => $subject->organization_id ?: $this->organizationId($user),
             'subject_type' => $data['subject_type'],
             'customer_id' => $data['subject_type'] === 'customer' ? $subject->id : null,
             'employee_id' => $data['subject_type'] === 'employee' ? $subject->id : null,
@@ -175,5 +175,20 @@ class CrmFollowupController extends Controller
         $allowed = CrmFollowup::query()->whereKey($followup->id)->forOrganizations($user)->exists();
 
         abort_unless($allowed, 403);
+    }
+
+    private function organizationId($user): ?int
+    {
+        if (!$user || empty($user->organization_id)) {
+            return null;
+        }
+
+        $decoded = json_decode((string) $user->organization_id, true);
+
+        if (is_array($decoded)) {
+            return (int) ($decoded[0] ?? 0) ?: null;
+        }
+
+        return (int) $user->organization_id ?: null;
     }
 }
