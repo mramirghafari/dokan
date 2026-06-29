@@ -1198,7 +1198,7 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                         <a class="menu-link" href="{{ route('Accounting.incomes') }}">درآمدها</a>
                     </li>
                     <li class="menu-item {{ Request::routeIs(['Accounting.fiscalClosing']) ? 'active' : '' }}">
-                        <a class="menu-link" href="{{ route('Accounting.fiscalClosing') }}">بستن دوره مالی</a>
+                        <a class="menu-link" href="{{ route('Accounting.fiscalClosing') }}">سال مالی / بستن دوره</a>
                     </li>
                     <li class="menu-item {{ Request::routeIs(['employees.index', 'employees.edit']) ? 'active' : '' }}">
                         <a class="menu-link" href="{{ route('employees.index') }}">تعریف پرسنل</a>

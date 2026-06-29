@@ -29,11 +29,33 @@
                                 تراز آزمایشی</a>
                         </div>
 
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                @foreach ($errors->all() as $error)
+                                    <div>{{ $error }}</div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        @php
+                            $currentJalaliYear = (int) verta()->format('Y');
+                            $hasCurrentYear = $fiscalYears->contains(
+                                fn ($fiscalYear) => (int) verta($fiscalYear->starts_at)->format('Y') === $currentJalaliYear
+                            );
+                        @endphp
+
                         @if ($fiscalYears->isEmpty())
                             <div class="alert alert-warning">
-                                هنوز سال مالی برای پنل شما ثبت نشده است. برای شروع حسابداری، ابتدا سال مالی جاری را ایجاد کنید.
+                                هنوز سال مالی برای پنل شما ثبت نشده است. برای شروع حسابداری (از جمله سند افتتاحیه)، ابتدا سال مالی جاری را ایجاد کنید.
                             </div>
-                            <form method="POST" action="{{ route('Accounting.fiscalYears.store') }}" class="card mb-4">
+                        @elseif (!$hasCurrentYear)
+                            <div class="alert alert-info">
+                                سال مالی {{ $currentJalaliYear }} هنوز ثبت نشده است. در فرم زیر می‌توانید آن را اضافه کنید.
+                            </div>
+                        @endif
+
+                        @if ($fiscalYears->isEmpty() || !$hasCurrentYear)
+                            <form id="create-fiscal-year" method="POST" action="{{ route('Accounting.fiscalYears.store') }}" class="card mb-4">
                                 @csrf
                                 <div class="card-header">
                                     <h5 class="mb-0">ایجاد سال مالی</h5>
@@ -42,11 +64,11 @@
                                     <div class="col-12 col-md-4">
                                         <label class="form-label">سال شمسی</label>
                                         <input type="number" name="jalali_year" class="form-control"
-                                            value="{{ old('jalali_year', verta()->format('Y')) }}" min="1300" max="1500">
+                                            value="{{ old('jalali_year', $currentJalaliYear) }}" min="1300" max="1500" required>
                                     </div>
                                     <div class="col-12 col-md-5">
                                         <div class="small text-muted mb-1">بازه پیشنهادی</div>
-                                        <div>{{ $suggestedTitle ?? ('سال مالی ' . verta()->format('Y')) }}</div>
+                                        <div>{{ $suggestedTitle ?? ('سال مالی ' . $currentJalaliYear) }}</div>
                                         <div class="small text-muted">
                                             {{ isset($suggestedStart) ? verta_date($suggestedStart) : '' }}
                                             تا

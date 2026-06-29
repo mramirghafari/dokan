@@ -52,11 +52,15 @@
                         @endif
 
                         @if (!$selectedFiscalYear)
-                            <div class="alert alert-warning">
-                                هیچ سال مالی فعالی برای پنل شما تعریف نشده است.
-                                از صفحهٔ
-                                <a href="{{ route('Accounting.fiscalClosing') }}" class="alert-link">بستن دوره مالی</a>
-                                می‌توانید سال مالی جاری ({{ verta()->format('Y') }}) را ایجاد کنید، سپس به این صفحه برگردید.
+                            <div class="alert alert-warning d-flex flex-wrap justify-content-between align-items-center gap-3">
+                                <div>
+                                    <strong>سال مالی ثبت نشده است.</strong>
+                                    قبل از سند افتتاحیه باید سال مالی جاری ({{ verta()->format('Y') }}) را برای پنل تعریف کنید.
+                                    مسیر: <span class="text-muted">مالی و حسابداری ← بستن دوره مالی</span>
+                                </div>
+                                <a href="{{ route('Accounting.fiscalClosing') }}" class="btn btn-warning flex-shrink-0">
+                                    ایجاد سال مالی {{ verta()->format('Y') }}
+                                </a>
                             </div>
                         @endif
 

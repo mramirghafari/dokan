@@ -53,6 +53,7 @@ use App\Services\AccountingLedgerReportService;
 use App\Services\AccountingPeriodClosingService;
 use App\Services\FiscalYearService;
 use App\Services\OpeningVoucherService;
+use App\Services\TenantContextService;
 use App\Services\FixedAssetCapitalAdditionService;
 use App\Services\FixedAssetDisposalService;
 use App\Services\FixedAssetDepreciationService;
@@ -3445,7 +3446,7 @@ class AccountingController extends Controller
 
     private function currentTenantId($user): ?int
     {
-        return $user?->tenant_id ?: $user?->tenants_id;
+        return app(TenantContextService::class)->tenantId($user);
     }
 
     private function currentOrganizationId($user): ?int
