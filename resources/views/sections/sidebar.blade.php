@@ -193,29 +193,34 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                 <ul class="menu-sub">
                     <li class="menu-item setup-guide {{ Request::routeIs(['setup-guide.index']) ? 'active' : '' }}">
                         <a class="menu-link" href="{{ route('setup-guide.index') }}">
-                            <div>راهنمای مرحله‌ای راه‌اندازی</div>
+                            <div>راهنمای مرحله‌ای</div>
                         </a>
                     </li>
-                    @if (auth()->user()->isGod == 1)
-                        <li
-                            class="menu-item panels {{ Request::routeIs(['tenants.index', 'tenants.edit', 'tenants.trashed.get']) ? 'active' : '' }}">
-                            <a class="menu-link" href="{{ route('tenants.index') }}">
-                                <div>پنل ها</div>
+                    @can('settings')
+                        <li class="menu-item settings {{ Request::routeIs(['settings.index']) ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('settings.index') }}">
+                                <div>تنظیمات پنل</div>
                             </a>
                         </li>
-                    @endif
+                        <li
+                            class="menu-item sales-scenario {{ Request::routeIs(['settings.salesScenario']) ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('settings.salesScenario') }}">
+                                <div>سناریوی فروش</div>
+                            </a>
+                        </li>
+                    @endcan
                     @if ($featureWarehouseManagement)
                         @can('stores')
                             <li
                                 class="menu-item stores {{ Request::routeIs(['stores.index', 'stores.edit', 'stores.trashed.get']) ? 'active' : '' }}">
                                 <a class="menu-link" href="{{ route('stores.index') }}">
-                                    <div>لیست انبار ها</div>
+                                    <div>مدیریت انبار‌ها</div>
                                 </a>
                             </li>
                             <li
                                 class="menu-item warehouse_locations {{ Request::routeIs(['warehouse-locations.index', 'warehouse-locations.edit']) ? 'active' : '' }}">
                                 <a class="menu-link" href="{{ route('warehouse-locations.index') }}">
-                                    <div>قفسه و مکان انبار</div>
+                                    <div>مدیریت قفسه‌ها</div>
                                 </a>
                             </li>
                         @endcan
@@ -225,30 +230,42 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                             <li
                                 class="menu-item organizations {{ Request::routeIs(['organizations.index', 'organizations.edit']) ? 'active' : '' }}">
                                 <a class="menu-link" href="{{ route('organizations.index') }}">
-                                    <div>واحدهای پخش</div>
+                                    <div>واحدها / شعبه</div>
                                 </a>
                             </li>
                         @endcan
                     @endif
-
+                    @can('factormanager')
+                        <li class="menu-item factormaker">
+                            <a class="menu-link" href="{{ route('FactorManager.index') }}">
+                                <div>تنظیمات فاکتور</div>
+                            </a>
+                        </li>
+                    @endcan
+                    @can('settings')
+                        <li
+                            class="menu-item dashboard-widgets {{ Request::routeIs(['settings.dashboardWidgets']) ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('settings.dashboardWidgets') }}">
+                                <div>ویجت‌های داشبورد</div>
+                            </a>
+                        </li>
+                    @endcan
                     @can('categories')
                         <li
                             class="menu-item categories {{ Request::routeIs(['categories.index', 'categories.edit', 'categories.trashed.get']) ? 'active' : '' }}">
                             <a class="menu-link" href="{{ route('categories.index') }}">
-                                <div>دسته بندی ها</div>
+                                <div>دسته‌بندی‌ها</div>
                             </a>
                         </li>
                     @endcan
-
                     @can('brands')
                         <li
                             class="menu-item brands {{ Request::routeIs(['brands.index', 'brands.edit', 'brands.trashed.get']) ? 'active' : '' }}">
                             <a class="menu-link" href="{{ route('brands.index') }}">
-                                <div>برند ها</div>
+                                <div>برندها</div>
                             </a>
                         </li>
                     @endcan
-
                     @if ($featureCityManagement)
                         @can('cities')
                             <li
@@ -273,45 +290,11 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                         @can('areas')
                             <li class="menu-item areas {{ Request::routeIs(['areas.index', 'areas.edit']) ? 'active' : '' }}">
                                 <a class="menu-link" href="{{ route('areas.index') }}">
-                                    <div>مسیر ها</div>
+                                    <div>مسیرها</div>
                                 </a>
                             </li>
                         @endcan
                     @endif
-                    @can('factormanager')
-                        <li class="menu-item factormaker">
-                            <a class="menu-link" href="{{ route('FactorManager.index') }}">
-                                <div>تنظیمات فاکتور</div>
-                            </a>
-                        </li>
-                    @endcan
-                    @can('settings')
-                        <li class="menu-item settings {{ Request::routeIs(['settings.index']) ? 'active' : '' }}">
-                            <a class="menu-link" href="{{ route('settings.index') }}">
-                                <div>تنظیمات پنل</div>
-                            </a>
-                        </li>
-                        <li
-                            class="menu-item sales-scenario {{ Request::routeIs(['settings.salesScenario']) ? 'active' : '' }}">
-                            <a class="menu-link" href="{{ route('settings.salesScenario') }}">
-                                <div>سناریوی فروش</div>
-                            </a>
-                        </li>
-                        <li
-                            class="menu-item dashboard-widgets {{ Request::routeIs(['settings.dashboardWidgets']) ? 'active' : '' }}">
-                            <a class="menu-link" href="{{ route('settings.dashboardWidgets') }}">
-                                <div>ویجت‌های داشبورد</div>
-                            </a>
-                        </li>
-                        @if (auth()->user()->isGod == 1)
-                            <li
-                                class="menu-item notification-settings {{ Request::routeIs(['settings.notifications']) ? 'active' : '' }}">
-                                <a class="menu-link" href="{{ route('settings.notifications') }}">
-                                    <div>اعلانات و پیامک ها</div>
-                                </a>
-                            </li>
-                        @endif
-                    @endcan
                     @if (\App\Http\Controllers\ActivityLogController::canViewActivityLogs(auth()->user()))
                         <li
                             class="menu-item activity-logs {{ Request::routeIs(['activity-logs.index', 'logs.index']) ? 'active' : '' }}">
@@ -331,6 +314,24 @@ foreach ($navigationItems as $navigationKey => $navigationItem) {
                                 <div>پایانه ها / درگاه ها</div>
                             </a>
                         </li>
+                    @endcan
+                    @if (auth()->user()->isGod == 1)
+                        <li
+                            class="menu-item panels {{ Request::routeIs(['tenants.index', 'tenants.edit', 'tenants.trashed.get']) ? 'active' : '' }}">
+                            <a class="menu-link" href="{{ route('tenants.index') }}">
+                                <div>پنل ها</div>
+                            </a>
+                        </li>
+                    @endif
+                    @can('settings')
+                        @if (auth()->user()->isGod == 1)
+                            <li
+                                class="menu-item notification-settings {{ Request::routeIs(['settings.notifications']) ? 'active' : '' }}">
+                                <a class="menu-link" href="{{ route('settings.notifications') }}">
+                                    <div>اعلانات و پیامک ها</div>
+                                </a>
+                            </li>
+                        @endif
                     @endcan
                 </ul>
             </li>
